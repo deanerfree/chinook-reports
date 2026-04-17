@@ -137,15 +137,21 @@ defmodule ChinookReportsWeb.HomeLive do
   # ── Helpers ──
 
   defp build_extraction_status(nil) do
-    %{steps: Enum.map(@extraction_steps, fn {name, label} ->
-      %{name: name, label: label, status: "pending"}
-    end)}
+    %{
+      steps:
+        Enum.map(@extraction_steps, fn {name, label} ->
+          %{name: name, label: label, status: "pending"}
+        end)
+    }
   end
 
   defp build_extraction_status("complete") do
-    %{steps: Enum.map(@extraction_steps, fn {name, label} ->
-      %{name: name, label: label, status: "completed"}
-    end)}
+    %{
+      steps:
+        Enum.map(@extraction_steps, fn {name, label} ->
+          %{name: name, label: label, status: "completed"}
+        end)
+    }
   end
 
   defp build_extraction_status(current_step) do
@@ -158,7 +164,8 @@ defmodule ChinookReportsWeb.HomeLive do
             true -> "completed"
           end
 
-        {acc ++ [%{name: name, label: label, status: status}], past_current or name == current_step}
+        {acc ++ [%{name: name, label: label, status: status}],
+         past_current or name == current_step}
       end)
 
     %{steps: steps}
