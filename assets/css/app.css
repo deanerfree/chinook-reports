@@ -1,0 +1,191 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* This file is for your main application CSS */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap");
+
+/*
+ * Chinook Reports — Design Tokens
+ * Derived from chinookpetroleum.com brand palette
+ */
+
+:root {
+  /* ── Brand palette (constant) ──────────────────── */
+  --chinook-green:       #176935;
+  --chinook-green-dark:  #114a26;
+  --chinook-green-light: #d3e8d5;
+  --chinook-green-pale:  #c9e2cc;
+  --chinook-green-muted: #93a995;
+
+
+  /* ── Semantic tokens (light mode) ──────────────── */
+  --color-primary:       var(--chinook-green);
+  --color-primary-hover: var(--chinook-green-dark);
+  --color-secondary: var(--chinook-green-dark);
+  --color-secondary-hover: var(--chinook-green-muted);
+  --color-accent:        var(--chinook-green-light);
+  --color-accent-subtle: var(--chinook-green-pale);
+  --color-muted:         var(--chinook-green-muted);
+
+  --color-bg:            #f8f8f8;
+  --color-bg-btn-primary: #000;
+  --color-bg-card:       #f8f8f8;
+  --color-bg-header:     var(--chinook-green);
+
+  --color-text:          #000000;
+  --color-text-secondary:var(--color-muted);
+  --color-text-on-primary:#ffffff;
+  --color-text-on-accent: var(--color-text-on-primary);
+
+  --color-border:        #e0e0e0;
+  --color-border-light:  #ececec;
+
+  /* ── Status colors ─────────────────────────────── */
+  --color-success:       #28a745;
+  --color-warning:       #ffc107;
+  --color-danger:        #dc3545;
+  --color-info:          #17a2b8;
+
+  /* ── Chart curve colors (read by ECharts theme) ── */
+  --color-chart-rop:     #176935;
+  --color-chart-gas:     #dc3545;
+  --color-chart-gamma:   #1769c4;
+  --color-chart-trajectory: #114a26;
+  --color-chart-plan:    #93a995;
+  --color-chart-grid:    #e0e0e0;
+  --color-chart-axis:    #495057;
+  --color-chart-bg:      #ffffff;
+  --color-chart-tooltip-bg: rgba(255, 255, 255, 0.96);
+  --color-chart-tooltip-text: #000000;
+  --color-chart-tooltip-border: #e0e0e0;
+
+  /* ── Typography ────────────────────────────────── */
+  --font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* ── Radius & shadows ──────────────────────────── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-pill: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Dark mode ─────────────────────────────────────── */
+.dark {
+  --color-primary:       #2ecc71;
+  --color-primary-hover: var(--color-primary);
+  --color-accent:        #1a3d27;
+  --color-accent-subtle: #162e20;
+  --color-muted:         #6b8f74;
+
+  --color-bg:            #0f1613;
+  --color-bg-card:       #1a2520;
+  --color-bg-header:     #0d1f15;
+
+  --color-text:          #e8ede9;
+  --color-text-secondary:#a3b5a8;
+  --color-text-on-primary:#ffffff;
+
+  --color-border:        #2a3d30;
+  --color-border-light:  #223328;
+
+  --color-success:       #2ecc71;
+  --color-warning:       #f1c40f;
+  --color-danger:        #e74c3c;
+  --color-info:          #3498db;
+
+  --color-chart-rop:     #2ecc71;
+  --color-chart-gas:     #e74c3c;
+  --color-chart-gamma:   #3498db;
+  --color-chart-trajectory: #27ae60;
+  --color-chart-plan:    #6b8f74;
+  --color-chart-grid:    #2a3d30;
+  --color-chart-axis:    #a3b5a8;
+  --color-chart-bg:      #1a2520;
+  --color-chart-tooltip-bg: rgba(26, 37, 32, 0.96);
+  --color-chart-tooltip-text: #e8ede9;
+  --color-chart-tooltip-border: #2a3d30;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Base styles ───────────────────────────────────── */
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Card ──────────────────────────────────────────── */
+.card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Primary button ────────────────────────────────── */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-weight: 700;
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-bg-btn-primary);
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+  font-weight: 700;
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-accent-subtle);
+}
+
+/* ── Header bar ────────────────────────────────────── */
+.app-header {
+  background: linear-gradient(to right, var(--chinook-green), var(--chinook-green-dark));
+  color: var(--color-text-on-primary);
+  padding: 11px;
+}
+
+.dark .app-header {
+  background: linear-gradient(to right, #0d1f15, #091510);
+}
+
+/* ── Accent bar (mirrors the h2:after from the main site) ── */
+.accent-bar {
+  display: block;
+  width: 4rem;
+  height: 4px;
+  background-color: var(--color-accent);
+  margin: 0.75rem 0 1.25rem;
+  border-radius: 2px;
+}

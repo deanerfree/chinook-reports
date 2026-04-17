@@ -1,0 +1,46 @@
+{
+  "name": "chinook-reports",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "forwardPorts": [
+    4001,
+    4000,
+    5173,
+    5432
+  ],
+  "features": {
+    "ghcr.io/devcontainers-extra/features/claude-code:1": {},
+    "ghcr.io/jckimble/devcontainer-features/ngrok:3": {
+      "authtoken": "${localEnv:NGROK_AUTH_TOKEN}"
+    }
+  },
+  "mounts": [
+    "source=chinook-reports-pgdata,target=/var/lib/postgresql,type=volume",
+    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jakebecker.elixir-ls",
+        "phoenixframework.phoenix",
+        "svelte.svelte-vscode",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "[elixir]": {
+          "editor.formatOnSave": true
+        },
+        "[svelte]": {
+          "editor.defaultFormatter": "svelte.svelte-vscode"
+        },
+        "tailwindCSS.includeLanguages": {
+          "phoenix-heex": "html"
+        }
+      }
+    }
+  },
+  "postCreateCommand": "mix deps.get && cd assets && npm install"
+
+}
