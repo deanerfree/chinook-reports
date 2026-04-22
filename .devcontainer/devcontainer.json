@@ -11,9 +11,11 @@
   ],
   "features": {
     "ghcr.io/devcontainers-extra/features/claude-code:1": {},
+    "ghcr.io/devcontainers-community/npm-features/typescript:1": {},
     "ghcr.io/jckimble/devcontainer-features/ngrok:3": {
       "authtoken": "${localEnv:NGROK_AUTH_TOKEN}"
-    }
+    },
+    "ghcr.io/devcontainers-community/npm-features/prettier:1": {}
   },
   "mounts": [
     "source=chinook-reports-pgdata,target=/var/lib/postgresql,type=volume",
@@ -42,5 +44,4 @@
     }
   },
   "postCreateCommand": "mix deps.get && cd assets && npm install"
-
 }
