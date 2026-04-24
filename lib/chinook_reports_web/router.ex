@@ -17,7 +17,12 @@ defmodule ChinookReportsWeb.Router do
   scope "/", ChinookReportsWeb do
     pipe_through :browser
 
-    live "/", HomeLive, :home
+    live_session :default, on_mount: {ChinookReportsWeb.NavAssigns, :default} do
+      live "/", HomeLive, :home
+      live "/upload", UploadLive, :upload
+      live "/reports", ReportsLive, :reports
+      live "/reports/:id", ReportDetailLive, :report_detail
+    end
   end
 
   # Other scopes may use custom stacks.

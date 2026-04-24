@@ -8,6 +8,11 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script>
+      if (localStorage.getItem("sidebar-collapsed") === "true") {
+        document.documentElement.dataset.sidebarCollapsed = "true";
+      }
+    </script>
     <script src={~p"/assets/topbar.js"}>
     </script>
     <script defer phx-track-static type="module" src={~p"/assets/app.js"}>
