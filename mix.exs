@@ -46,6 +46,8 @@ defmodule ChinookReports.MixProject do
       {:phoenix_ecto, "~> 4.6"},
       {:ecto_sql, "~> 3.12"},
       {:postgrex, ">= 0.0.0"},
+      {:flop, "~> 0.26.3"},
+      {:flop_phoenix, "~> 0.26.0"},
 
       # ── LiveSvelte (Svelte inside LiveView) ───────────────────────────────
       #

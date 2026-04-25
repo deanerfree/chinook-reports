@@ -783,4 +783,38 @@ defmodule ChinookReportsWeb.CoreComponents do
     </aside>
     """
   end
+
+  attr :id, :string, required: true
+  attr :items, :any, required: true
+  attr :meta, :any, required: true
+  attr :path, :any, required: true
+  attr :on_sort, :any, default: nil
+
+  slot :col, required: true do
+    attr :label, :string
+    attr :field, :atom
+    attr :thead_th_attrs, :list
+    attr :tbody_td_attrs, :list
+  end
+
+  slot :action do
+    attr :label, :string
+  end
+
+  def my_table(assigns) do
+    ~H"""
+    <Flop.Phoenix.table
+      {assigns}
+      opts={[
+        container: true,
+        container_attrs: [class: "data-table-container"],
+        table_attrs: [class: "data-table"],
+        thead_th_attrs: [class: "data-table-th"],
+        tbody_tr_attrs: [class: "data-table-tr"],
+        tbody_td_attrs: [class: "data-table-td"]
+      ]}
+    />
+    """
+  end
+
 end
