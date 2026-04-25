@@ -11,6 +11,10 @@ config :chinook_reports,
   ecto_repos: [ChinookReports.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :mime, :types, %{
+  "application/vnd.ms-excel.sheet.macroEnabled.12" => ["xlsm"]
+}
+
 # Configures the endpoint
 config :chinook_reports, ChinookReportsWeb.Endpoint,
   url: [host: "localhost"],

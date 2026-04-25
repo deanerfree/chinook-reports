@@ -14,21 +14,12 @@ defmodule ChinookReportsWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <form phx-submit="upload_excel" phx-change="validate">
-      <.live_file_input upload={@uploads.excel} class="hidden" />
-      <.svelte
-        name="Home"
-        props={
-          %{
-            files:
-              Enum.map(@uploads.excel.entries, fn e ->
-                %{name: e.client_name, size: e.client_size, ref: e.ref, progress: e.progress}
-              end),
-            extraction_status: @extraction_status
-          }
-        }
-      />
-    </form>
+    <.heading>
+      <:title>Report Dashboard</:title>
+      <:subtitle>View and manage extracted well report data from uploaded Excel files.</:subtitle>
+    </.heading>
+
+    <.svelte name="HomePage" props={%{results: @results, error: @error}} />
     """
   end
 

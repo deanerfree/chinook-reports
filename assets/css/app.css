@@ -123,6 +123,10 @@ body {
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* ── Card ──────────────────────────────────────────── */
@@ -174,6 +178,7 @@ body {
   background: linear-gradient(to right, var(--chinook-green), var(--chinook-green-dark));
   color: var(--color-text-on-primary);
   padding: 11px;
+  flex-shrink: 0;
 }
 
 .dark .app-header {
@@ -194,12 +199,15 @@ body {
 .page-layout {
   display: flex;
   flex-direction: row;
-  min-height: calc(100vh - 60px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .page-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   padding: 2rem;
   overflow-y: auto;
 }

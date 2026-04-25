@@ -10,7 +10,8 @@ module.exports = {
     "./js/**/*.js",
     "./svelte/**/*.svelte",
     "../lib/chinook_reports_web.ex",
-    "../lib/chinook_reports_web/**/*.*ex"
+    "../lib/chinook_reports_web/**/*.*ex",
+    "../config/config.exs"
   ],
   darkMode: "class",
   theme: {
