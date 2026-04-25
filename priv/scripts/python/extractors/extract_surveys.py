@@ -19,7 +19,7 @@ Layout per sheet:
 
 from utils import serialize
 from models import (
-    Surveys, SurveySheet, SurveyMarker, SurveyPoint,
+    SurveySheet, SurveyMarker, SurveyPoint,
     PrognosedSurveyPoint, SlideRecord,
 )
 
@@ -116,7 +116,7 @@ def _has_data(sheet: SurveySheet) -> bool:
     return len(real_points) > 0
 
 
-def extract_surveys(wb) -> Surveys:
+def extract_surveys(wb) -> list[SurveySheet]:
     """Find all Surveys worksheets and extract data from each."""
     sheets = []
     for name in wb.sheetnames:
@@ -125,4 +125,4 @@ def extract_surveys(wb) -> Surveys:
             if _has_data(sheet):
                 sheets.append(sheet)
 
-    return Surveys(sheets=sheets)
+    return sheets

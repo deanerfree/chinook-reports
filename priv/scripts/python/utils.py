@@ -15,7 +15,9 @@ def serialize(val):
         return val.strftime("%H:%M")
     if isinstance(val, str):
         val = val.strip()
-        return val if val else None
+        if not val or val.startswith("#"):
+            return None
+        return val
     return val
 
 

@@ -12,7 +12,7 @@ Each Reservoir sheet contains:
 
 from utils import serialize, parse_percent
 from models import (
-    Reservoirs, ReservoirSheet, ReservoirMetadata,
+    ReservoirSheet, ReservoirMetadata,
     QualitySummary, LithologySummary, Threshold,
     CurveAnalysisRow, CurveMetadata, CurveRange, CurveCutoffs,
     ReservoirInterval, CurvePointActual, CurvePointCleaned,
@@ -260,16 +260,12 @@ def find_reservoir_sheets(wb):
     return sheets
 
 
-def extract_reservoirs(wb) -> Reservoirs:
+def extract_reservoirs(wb) -> list[ReservoirSheet]:
     """Extract reservoir data from all Reservoir sheets in the workbook."""
     sheet_names = find_reservoir_sheets(wb)
 
     if not sheet_names:
-        return Reservoirs()
-
-    first = wb[sheet_names[0]]
-    well_name = serialize(first["A3"].value)
-    uwi = serialize(first["A4"].value)
+        return []
 
     reservoirs = []
     for name in sheet_names:
@@ -280,8 +276,4 @@ def extract_reservoirs(wb) -> Reservoirs:
             continue
         reservoirs.append(extract_reservoir_sheet(ws, name))
 
-    return Reservoirs(
-        well_name=well_name,
-        uwi=uwi,
-        reservoirs=reservoirs,
-    )
+    return reservoirs

@@ -7,6 +7,20 @@ extract_all calls .model_dump() for final JSON output.
 from pydantic import BaseModel
 
 
+# ── Metadata model ───────────────────────────────────────────────────────────
+
+class WellMetadata(BaseModel):
+    well_name: str | None = None
+    unique_well_id: str | None = None
+    operator: str | None = None
+    spud_date: str | None = None
+    final_td_date: str | None = None
+    target_formation: str | None = None
+    country: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+
+
 # ── WellData models ──────────────────────────────────────────────────────────
 
 class TotalDepth(BaseModel):
@@ -151,7 +165,7 @@ class WellData(BaseModel):
     province: str | None = None
     country: str | None = None
     operator: str | None = None
-    reported_to: str | None = None
+    op_geo: str | None = None
     primary_target: str | None = None
     secondary_target: str | None = None
     terminating_zone: str | None = None
@@ -194,10 +208,6 @@ class FormationTop(BaseModel):
 
 
 class Tops(BaseModel):
-    well_name: str | None = None
-    uwid: str | None = None
-    kb_m: float | None = None
-    gl_m: float | None = None
     formations: list[FormationTop] = []
 
 
@@ -250,8 +260,6 @@ class SurveySheet(BaseModel):
     slides: list[SlideRecord] = []
 
 
-class Surveys(BaseModel):
-    sheets: list[SurveySheet] = []
 
 
 # ── Reservoir models ─────────────────────────────────────────────────────────
@@ -361,18 +369,31 @@ class ReservoirSheet(BaseModel):
     totals: list[QualityTotal] = []
 
 
-class Reservoirs(BaseModel):
-    well_name: str | None = None
-    uwi: str | None = None
-    reservoirs: list[ReservoirSheet] = []
+
+
+# ── Synopsis models ──────────────────────────────────────────────────────────
+
+class Synopsis(BaseModel):
+    well_summary: list[str] = []
+    well_profile: list[str] = []
+    formation_evaluation: list[str] = []
+
+
+# ── Leg data model ───────────────────────────────────────────────────────────
+
+class LegData(BaseModel):
+    leg_name: str | None = None
+    survey: SurveySheet | None = None
+    log_data: ReservoirSheet | None = None
 
 
 # ── Top-level result ─────────────────────────────────────────────────────────
 
 class ExtractionResult(BaseModel):
+    metadata: WellMetadata = WellMetadata()
     welldata: WellData = WellData()
     tops: Tops = Tops()
-    surveys: Surveys = Surveys()
-    reservoirs: Reservoirs = Reservoirs()
+    reservoir_data: list[LegData] = []
+    synopsis: Synopsis = Synopsis()
     # daily: Daily = Daily()
     # ... add as worksheets are built

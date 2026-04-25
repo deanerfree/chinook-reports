@@ -18,12 +18,6 @@ def extract_tops(wb) -> Tops:
     def cell(row, col):
         return serialize(ws[f"{col}{row}"].value)
 
-    # ── Header info ──────────────────────────────────────────────────────
-    well_name = cell(3, "A")
-    uwid = cell(4, "A")
-    kb_m = cell(6, "C")
-    gl_m = cell(7, "C")
-
     # ── Formation rows (row 10 onward, stop when col A is empty) ─────────
     formations = []
     for r in range(10, ws.max_row + 1):
@@ -53,10 +47,4 @@ def extract_tops(wb) -> Tops:
             difference_m=cell(r, "N"),
         ))
 
-    return Tops(
-        well_name=well_name,
-        uwid=uwid,
-        kb_m=kb_m,
-        gl_m=gl_m,
-        formations=formations,
-    )
+    return Tops(formations=formations)

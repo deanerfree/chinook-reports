@@ -108,7 +108,7 @@ def extract_welldata(wb) -> WellData:
         province=cell(10, "B"),
         country=cell(11, "B"),
         operator=cell(12, "B"),
-        reported_to=cell(13, "B"),
+        op_geo=cell(13, "B"),
         primary_target=cell(17, "B"),
         secondary_target=cell(18, "B"),
         terminating_zone=cell(19, "B"),
