@@ -110,7 +110,7 @@ defmodule ChinookReports.MixProject do
       # HTML parsing for tests
       {:floki, ">= 0.36.0", only: :test},
       # Tailwind CLI wrapper
-      {:tailwind, "~> 0.2", only: [:dev, :test]},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons, "~> 0.5",
        github: "tailwindlabs/heroicons",
        tag: "v2.2.0",

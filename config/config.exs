@@ -36,10 +36,9 @@ config :chinook_reports, ChinookReportsWeb.Endpoint,
 # config :chinook_reports, ChinookReports.Mailer, adapter: Swoosh.Adapters.Local
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.4.3",
+  version: "4.1.10",
   chinook_reports: [
     args: ~w(
-      --config=tailwind.config.js
       --input=css/app.css
       --output=../priv/static/assets/app.css
     ),

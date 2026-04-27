@@ -448,7 +448,7 @@ defmodule ChinookReportsWeb.CoreComponents do
   @spec heading(map()) :: Phoenix.LiveView.Rendered.t()
   def heading(assigns) do
     ~H"""
-    <h1 class="uppercase font-bold tracking-tight text-zinc-900">
+    <h1 class="uppercase font-bold text-3xl tracking-tight text-zinc-900">
       {render_slot(@title)}
     </h1>
     <p :if={@subtitle != []} class="mt-4 text-lg text-zinc-600">
@@ -698,42 +698,19 @@ defmodule ChinookReportsWeb.CoreComponents do
     assigns = assign(assigns, :nav_items, ChinookReportsWeb.Navigation.nav_items())
 
     ~H"""
-    <aside class="sidebar" id="sidebar" phx-hook="SidebarCollapseHook">
-      <nav class="nav-section">
-        <ul>
+    <aside
+      class="w-60 [&.collapsed]:w-8 bg-linear-to-b from-sidebar-from to-sidebar-to flex flex-col shrink-0 border-r border-sidebar-border shadow-[2px_0_12px_rgba(0,0,0,0.2)] overflow-hidden transition-[width] duration-300 ease-in-out min-h-[calc(100vh-90px)] group"
+      id="sidebar"
+      phx-hook="SidebarCollapseHook"
+    >
+      <nav class="p-4">
+        <ul class="list-none m-0 p-0 flex flex-col gap-0.5">
           <li :for={item <- @nav_items}>
             <a
               href={item.href}
-              class={["nav-link flex items-center gap-2", @current_page == item.href && "active"]}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                width="16"
-                height="16"
-                style="flex-shrink: 0;"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d={item.path} />
-              </svg>
-              <span>{item.label}</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div :if={@reports != []} class="divider"></div>
-      <nav :if={@reports != []} class="nav-section">
-        <p class="nav-label">Recent Reports</p>
-        <ul>
-          <li :for={report <- @reports}>
-            <a
-              href={"/reports/#{report.id}"}
               class={[
-                "nav-link nav-sub flex items-center gap-2",
-                @current_page == "/reports/#{report.id}" && "active"
+                "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-nav-text no-underline transition-colors relative hover:bg-sidebar-link-hover hover:text-nav-text-hover group-[.collapsed]:px-0 group-[.collapsed]:justify-center",
+                @current_page == item.href && "bg-sidebar-link-active text-nav-text-active font-semibold"
               ]}
             >
               <svg
@@ -744,7 +721,39 @@ defmodule ChinookReportsWeb.CoreComponents do
                 stroke="currentColor"
                 width="16"
                 height="16"
-                style="flex-shrink: 0;"
+                class="shrink-0"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d={item.path} />
+              </svg>
+              <span class="group-[.collapsed]:hidden">{item.label}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div :if={@reports != []} class="group-[.collapsed]:hidden"></div>
+      <nav :if={@reports != []} class="p-4">
+        <p class="text-[0.65rem] font-semibold tracking-widest uppercase text-nav-label px-2 pb-2 m-0 group-[.collapsed]:hidden">
+          Recent Reports
+        </p>
+        <ul class="list-none m-0 p-0 flex flex-col gap-0.5">
+          <li :for={report <- @reports}>
+            <a
+              href={"/reports/#{report.id}"}
+              class={[
+                "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-nav-text no-underline transition-colors relative hover:bg-sidebar-link-hover hover:text-nav-text-hover group-[.collapsed]:px-0 group-[.collapsed]:justify-center",
+                @current_page == "/reports/#{report.id}" && "bg-sidebar-link-active text-nav-text-active font-semibold"
+              ]}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                width="16"
+                height="16"
+                class="shrink-0"
               >
                 <path
                   stroke-linecap="round"
@@ -752,14 +761,17 @@ defmodule ChinookReportsWeb.CoreComponents do
                   d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
                 />
               </svg>
-              <span class="nav-sub-label" title={report.well_name}>{report.well_name}</span>
+              <span
+                class="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px] text-[0.8125rem] group-[.collapsed]:hidden"
+                title={report.well_name}
+              >{report.well_name}</span>
             </a>
           </li>
         </ul>
       </nav>
 
       <button
-        class="sidebar-toggle"
+        class="mt-auto w-full py-3 flex items-center justify-center bg-transparent border-0 border-t border-sidebar-border text-nav-toggle cursor-pointer shrink-0 transition-colors hover:bg-sidebar-link-hover hover:text-nav-text-hover"
         phx-click={
           JS.toggle_class("collapsed", to: "#sidebar")
           |> JS.toggle_class("rotated", to: "#sidebar-toggle-chevron")
@@ -775,7 +787,7 @@ defmodule ChinookReportsWeb.CoreComponents do
           stroke="currentColor"
           width="16"
           height="16"
-          class="toggle-chevron"
+          class="transition-transform duration-300 [&.rotated]:rotate-180"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
@@ -816,5 +828,4 @@ defmodule ChinookReportsWeb.CoreComponents do
     />
     """
   end
-
 end

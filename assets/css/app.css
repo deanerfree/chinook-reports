@@ -1,9 +1,38 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@source "../../lib/chinook_reports_web.ex";
+@source "../../lib/chinook_reports_web/**/*.ex";
+@source "../../lib/chinook_reports_web/**/*.heex";
+@source "../js/**/*.js";
+@source "../svelte/**/*.svelte";
 
 /* This file is for your main application CSS */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap");
+
+/*
+ * Tailwind v4 color tokens — gives utility classes for sidebar, nav, and header.
+ * Sidebar/nav colors are static (always dark). Header colors are overridden in .dark {}.
+ */
+@theme {
+  /* ── Sidebar ──────────────────────────────────── */
+  --color-sidebar-from:        #0d2b17;
+  --color-sidebar-to:          #0a2013;
+  --color-sidebar-border:      rgba(23, 105, 53, 0.3);
+  --color-sidebar-link-hover:  rgba(46, 204, 113, 0.12);
+  --color-sidebar-link-active: rgba(23, 105, 53, 0.5);
+
+  /* ── Nav ──────────────────────────────────────── */
+  --color-nav-text:        rgba(232, 237, 233, 0.75);
+  --color-nav-text-hover:  #e8ede9;
+  --color-nav-text-active: #f8f8f8;
+  --color-nav-label:       rgba(163, 181, 168, 0.6);
+  --color-nav-toggle:      rgba(163, 181, 168, 0.8);
+
+  /* ── Header (light mode defaults, .dark overrides below) ── */
+  --color-header-from: #176935;
+  --color-header-to:   #114a26;
+}
 
 /*
  * Chinook Reports — Design Tokens
@@ -48,9 +77,9 @@
   --color-info:          #17a2b8;
 
   /* ── Chart curve colors (read by ECharts theme) ── */
-  --color-chart-rop:     #176935;
+  --color-chart-rop:     #1769c4;
   --color-chart-gas:     #dc3545;
-  --color-chart-gamma:   #1769c4;
+  --color-chart-gamma:   #176935;
   --color-chart-trajectory: #114a26;
   --color-chart-plan:    #93a995;
   --color-chart-grid:    #e0e0e0;
@@ -98,6 +127,9 @@
   --color-warning:       #f1c40f;
   --color-danger:        #e74c3c;
   --color-info:          #3498db;
+
+  --color-header-from: #0d1f15;
+  --color-header-to:   #091510;
 
   --color-chart-rop:     #2ecc71;
   --color-chart-gas:     #e74c3c;
@@ -273,27 +305,22 @@ body {
     min-height: calc(100vh - 90px);
   }
 
-  .sidebar.collapsed,
-  html[data-sidebar-collapsed] .sidebar {
+  html[data-sidebar-collapsed] #sidebar {
     width: 32px;
   }
 
-  .sidebar.collapsed .nav-link,
-  html[data-sidebar-collapsed] .sidebar .nav-link {
-    padding: 0.5rem 0;
+  html[data-sidebar-collapsed] #sidebar a {
+    padding-left: 0;
+    padding-right: 0;
     justify-content: center;
   }
 
-  .sidebar.collapsed .nav-link span,
-  .sidebar.collapsed .nav-label,
-  .sidebar.collapsed .divider,
-  html[data-sidebar-collapsed] .sidebar .nav-link span,
-  html[data-sidebar-collapsed] .sidebar .nav-label,
-  html[data-sidebar-collapsed] .sidebar .divider {
+  html[data-sidebar-collapsed] #sidebar span,
+  html[data-sidebar-collapsed] #sidebar p {
     display: none;
   }
 
-  html[data-sidebar-collapsed] .toggle-chevron {
+  html[data-sidebar-collapsed] #sidebar-toggle-chevron {
     transform: rotate(180deg);
   }
 
