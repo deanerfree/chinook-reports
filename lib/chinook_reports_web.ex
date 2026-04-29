@@ -90,6 +90,8 @@ defmodule ChinookReportsWeb do
       import LiveSvelte
       # Core UI components
       import ChinookReportsWeb.CoreComponents
+      import ChinookReportsWeb.Icons
+      import ChinookReportsWeb.ReportComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
