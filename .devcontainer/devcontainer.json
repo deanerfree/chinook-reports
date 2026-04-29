@@ -9,6 +9,7 @@
     5173,
     5432
   ],
+  "runArgs": ["-p", "4000:4000", "-p", "4001:4001", "-p", "5173:5173", "-p", "5432:5432"],
   "features": {
     "ghcr.io/devcontainers-extra/features/claude-code:1": {},
     "ghcr.io/devcontainers-community/npm-features/typescript:1": {},
@@ -43,5 +44,5 @@
       }
     }
   },
-  "postCreateCommand": "mix deps.get && cd assets && npm install"
+"postCreateCommand": "mix deps.get && mix deps.compile && mix compile && cd assets && npm install"
 }
