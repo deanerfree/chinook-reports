@@ -14,8 +14,11 @@ defmodule ChinookReportsWeb.ReportsLive do
       {:ok, {reports, meta}} ->
         {:noreply, assign(socket, reports: reports, meta: meta)}
 
-      {:error, _reason} ->
-        {:noreply, push_navigate(socket, to: ~p"/reports")}
+      {:error, reason} ->
+        reports = []
+        meta = %{}
+        IO.inspect("Error fetching reports: #{inspect(reason)}")
+        {:noreply, assign(socket, reports: reports, meta: meta, error: reason)}
     end
   end
 
@@ -27,6 +30,7 @@ defmodule ChinookReportsWeb.ReportsLive do
         <:title>Reports</:title>
         <:subtitle>View and manage well reports</:subtitle>
       </.heading>
+
       <div>
         <.my_table id="reports" items={@reports} meta={@meta} path={~p"/reports"}>
           <:col :let={report} label="Well Name" field={:well_name}>{report.well_name}</:col>
