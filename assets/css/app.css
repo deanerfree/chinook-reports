@@ -15,6 +15,9 @@
  * Sidebar/nav colors are static (always dark). Header colors are overridden in .dark {}.
  */
 @theme {
+  /* ── Font family ──────────────────────────────── */
+  --font-body: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
   /* ── Sidebar ──────────────────────────────────── */
   --color-sidebar-from:        #0d2b17;
   --color-sidebar-to:          #0a2013;
@@ -32,6 +35,14 @@
   /* ── Header (light mode defaults, .dark overrides below) ── */
   --color-header-from: #176935;
   --color-header-to:   #114a26;
+
+  --color-primary:       var(--chinook-green);
+  --color-primary-hover: var(--chinook-green-dark);
+  --color-secondary: var(--chinook-green-dark);
+  --color-secondary-hover: var(--chinook-green-muted);
+  --color-accent:        var(--chinook-green-light);
+  --color-accent-subtle: var(--chinook-green-pale);
+  --color-muted:         var(--chinook-green-muted);
 }
 
 /*
@@ -146,19 +157,6 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 1px 4px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-/* ── Base styles ───────────────────────────────────── */
-body {
-  font-family: var(--font-family);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
 }
 
 /* ── Card ──────────────────────────────────────────── */

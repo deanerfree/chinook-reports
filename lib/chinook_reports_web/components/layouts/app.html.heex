@@ -1,4 +1,4 @@
-<header class="bg-linear-to-r from-header-from to-header-to text-white shrink-0 py-[11px] px-4 sm:px-6 lg:px-8">
+<header class="fixed top-0 inset-x-0 z-20 bg-linear-to-r from-header-from to-header-to text-white py-3 px-4 sm:px-6 lg:px-8">
   <div class="flex items-center justify-between py-3 text-sm">
     <div class="flex items-center gap-4">
       <a href="/">
@@ -16,12 +16,12 @@
     </div>
   </div>
 </header>
-<div class="flex flex-row flex-1 min-h-0 overflow-hidden">
+<div class="flex flex-row mt-22.5 h-[calc(100vh-90px)]">
   <.nav_sidebar
     current_page={assigns[:current_page] || "/"}
     reports={assigns[:reports] || []}
   />
-  <main class="flex-1 min-w-0 min-h-0 p-8 overflow-y-auto">
+  <main class="flex-1 min-w-0 overflow-y-auto p-8">
     <.flash_group flash={@flash} />
     {@inner_content}
   </main>

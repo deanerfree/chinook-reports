@@ -430,9 +430,9 @@ defmodule ChinookReportsWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h2 class="text-4xl font-semibold leading-8 text-zinc-800">
           {render_slot(@inner_block)}
-        </h1>
+        </h2>
         <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
           {render_slot(@subtitle)}
         </p>
@@ -449,10 +449,11 @@ defmodule ChinookReportsWeb.CoreComponents do
   @spec heading(map()) :: Phoenix.LiveView.Rendered.t()
   def heading(assigns) do
     ~H"""
-    <h1 class="uppercase font-bold text-3xl tracking-tight text-zinc-900">
+    <h2 class="font-bold text-5xl tracking-tight text-zinc-900">
       {render_slot(@title)}
-    </h1>
-    <p :if={@subtitle != []} class="mt-4 text-lg text-zinc-600">
+    </h2>
+    <div class="bg-accent p-0.5 w-16.25 mt-3.75 mb-6.25" />
+    <p :if={@subtitle != []} class="text-lg text-zinc-600">
       {render_slot(@subtitle)}
     </p>
     """
@@ -491,7 +492,7 @@ defmodule ChinookReportsWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-160 mt-11 sm:w-full">
+      <table class="w-160 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal">{col[:label]}</th>
@@ -700,7 +701,7 @@ defmodule ChinookReportsWeb.CoreComponents do
 
     ~H"""
     <aside
-      class="w-60 [&.collapsed]:w-8 bg-linear-to-b from-sidebar-from to-sidebar-to flex flex-col shrink-0 border-r border-sidebar-border shadow-[2px_0_12px_rgba(0,0,0,0.2)] overflow-hidden transition-[width] duration-300 ease-in-out min-h-[calc(100vh-90px)] group"
+      class="w-60 [&.collapsed]:w-8 bg-linear-to-b from-sidebar-from to-sidebar-to flex flex-col shrink-0 border-r border-sidebar-border shadow-[2px_0_12px_rgba(0,0,0,0.2)] overflow-hidden transition-[width] duration-300 ease-in-out group h-full"
       id="sidebar"
       phx-hook="SidebarCollapseHook"
     >
@@ -763,7 +764,7 @@ defmodule ChinookReportsWeb.CoreComponents do
                 />
               </svg>
               <span
-                class="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px] text-[0.8125rem] group-[.collapsed]:hidden"
+                class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5 text-[0.8125rem] group-[.collapsed]:hidden"
                 title={report.well_name}
               >{report.well_name}</span>
             </a>
@@ -826,7 +827,10 @@ defmodule ChinookReportsWeb.CoreComponents do
         tbody_tr_attrs: [class: "data-table-tr"],
         tbody_td_attrs: [class: "data-table-td"]
       ]}
-    />
+    >
+      <%!-- <:col :for={col <- @col} {col}></:col>
+      <:action :for={action <- @action} {action}></:action> --%>
+    </Flop.Phoenix.table>
     """
   end
 end
