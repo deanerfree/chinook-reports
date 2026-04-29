@@ -40,14 +40,14 @@ def _extract_single_survey(ws, sheet_name: str) -> SurveySheet:
         event = cell(r, "J")
         if md is not None and event:
             markers.append(SurveyMarker(
-                md_m=md,
+                md=md,
                 inclination_deg=cell(r, "B"),
                 azimuth_deg=cell(r, "C"),
-                tvd_m=cell(r, "D"),
-                north_south_m=cell(r, "E"),
-                east_west_m=cell(r, "F"),
-                vertical_section_m=cell(r, "G"),
-                subsea_m=cell(r, "I"),
+                tvd=cell(r, "D"),
+                north_south=cell(r, "E"),
+                east_west=cell(r, "F"),
+                vertical_section=cell(r, "G"),
+                subsea=cell(r, "I"),
                 event=event,
             ))
 
@@ -58,15 +58,15 @@ def _extract_single_survey(ws, sheet_name: str) -> SurveySheet:
         if md is None:
             break
         survey_points.append(SurveyPoint(
-            md_m=md,
+            md=md,
             inclination_deg=cell(r, "B"),
             azimuth_deg=cell(r, "C"),
-            tvd_m=cell(r, "D"),
-            north_south_m=cell(r, "E"),
-            east_west_m=cell(r, "F"),
-            vertical_section_m=cell(r, "G"),
+            tvd=cell(r, "D"),
+            north_south=cell(r, "E"),
+            east_west=cell(r, "F"),
+            vertical_section=cell(r, "G"),
             dogleg_severity=cell(r, "H"),
-            subsea_m=cell(r, "I"),
+            subsea=cell(r, "I"),
             remarks=cell(r, "J"),
         ))
 
@@ -77,7 +77,7 @@ def _extract_single_survey(ws, sheet_name: str) -> SurveySheet:
         if md is None:
             break
         prognosed_survey.append(PrognosedSurveyPoint(
-            md_m=md,
+            md=md,
             inclination_deg=cell(r, "L"),
             azimuth_deg=cell(r, "M"),
         ))
@@ -93,9 +93,9 @@ def _extract_single_survey(ws, sheet_name: str) -> SurveySheet:
         toolface = cell(r, "Q")
         if any(v is not None for v in [from_m, to_m, slide_m, toolface]):
             slides.append(SlideRecord(
-                from_m=from_m,
-                to_m=to_m,
-                slide_m=slide_m,
+                from_depth=from_m,
+                to_depth=to_m,
+                slide=slide_m,
                 toolface=toolface,
             ))
 
@@ -112,7 +112,7 @@ def _extract_single_survey(ws, sheet_name: str) -> SurveySheet:
 def _has_data(sheet: SurveySheet) -> bool:
     """Check if a survey sheet has any meaningful data beyond the template."""
     # Check if survey points have any non-zero MD values
-    real_points = [p for p in sheet.survey_points if p.md_m and p.md_m > 0]
+    real_points = [p for p in sheet.survey_points if p.md and p.md > 0]
     return len(real_points) > 0
 
 

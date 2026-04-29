@@ -27,24 +27,23 @@ def extract_tops(wb) -> Tops:
         formations.append(FormationTop(
             formation=name,
             prognosis=FormationPick(
-                md_m=cell(r, "B"),
-                tvd_m=cell(r, "C"),
-                isopach_m=cell(r, "D"),
-                ss_m=cell(r, "E"),
+                md=cell(r, "B"),
+                tvd=cell(r, "C"),
+                isopach=cell(r, "D"),
+                subsea=cell(r, "E"),
             ),
             samples=FormationPick(
-                md_m=cell(r, "F"),
-                tvd_m=cell(r, "G"),
-                isopach_m=cell(r, "H"),
-                ss_m=cell(r, "I"),
+                md=cell(r, "F"),
+                tvd=cell(r, "G"),
+                isopach=cell(r, "H"),
+                subsea=cell(r, "I"),
             ),
-            mwd_gamma=FormationPick(
-                md_m=cell(r, "J"),
-                tvd_m=cell(r, "K"),
-                isopach_m=cell(r, "L"),
-                ss_m=cell(r, "M"),
+            gamma=FormationPick(
+                md=cell(r, "J"),
+                tvd=cell(r, "K"),
+                isopach=cell(r, "L"),
+                subsea=cell(r, "M"),
             ),
-            difference_m=cell(r, "N"),
         ))
 
     return Tops(formations=formations)

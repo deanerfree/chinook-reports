@@ -5,7 +5,7 @@ WellData Pydantic model.
 
 from utils import serialize
 from models import (
-    WellData, TotalDepth, Elevation, GeographicCoordinates,
+    WellData, Units, TotalDepth, Elevation, GeographicCoordinates,
     SurfaceLocationGrid, LocationData, TimingEvent, WellTiming,
     HoleSize, Mud, CasingData, WellsiteGeology, DrillingContractor,
     Services, GeologicalServices, ProfilePoint, WellProfileSection,
@@ -19,6 +19,15 @@ def extract_welldata(wb) -> WellData:
     def cell(row, col):
         return serialize(ws[f"{col}{row}"].value)
 
+    # ── Units (J9:J13) ───────────────────────────────────────────────────
+    units = Units(
+        depth=cell(9, "J"),
+        diameter=cell(10, "J"),
+        rop=cell(11, "J"),
+        weight=cell(12, "J"),
+        gas=cell(13, "J"),
+    )
+
     # ── Hole sizes (rows 60-62) ──────────────────────────────────────────
     hole_sizes = []
     for r in [60, 61, 62]:
@@ -26,10 +35,10 @@ def extract_welldata(wb) -> WellData:
         if label:
             hole_sizes.append(HoleSize(
                 section=label,
-                bit_diameter_mm=cell(r, "B"),
-                from_m=cell(r, "D"),
-                to_m=cell(r, "E"),
-                interval_m=cell(r, "F"),
+                bit_diameter=cell(r, "B"),
+                from_depth=cell(r, "D"),
+                to_depth=cell(r, "E"),
+                interval=cell(r, "F"),
             ))
 
     # ── Mud (rows 66-68) ─────────────────────────────────────────────────
@@ -40,8 +49,8 @@ def extract_welldata(wb) -> WellData:
             mud.append(Mud(
                 section=label,
                 type=cell(r, "B"),
-                from_m=cell(r, "D"),
-                to_m=cell(r, "E"),
+                from_depth=cell(r, "D"),
+                to_depth=cell(r, "E"),
             ))
 
     # ── Casing data (rows 72-74) ─────────────────────────────────────────
@@ -51,9 +60,9 @@ def extract_welldata(wb) -> WellData:
         if label:
             casing_data.append(CasingData(
                 section=label,
-                size_mm=cell(r, "B"),
-                set_at_m=cell(r, "C"),
-                weight_kg_m=cell(r, "D"),
+                size=cell(r, "B"),
+                set_at=cell(r, "C"),
+                weight=cell(r, "D"),
                 type=cell(r, "F"),
             ))
 
@@ -79,15 +88,15 @@ def extract_welldata(wb) -> WellData:
                 start=ProfilePoint(
                     date=start_date,
                     time=cell(start_row, "D"),
-                    depth_m=cell(start_row, "E"),
+                    depth=cell(start_row, "E"),
                 ),
                 end=ProfilePoint(
                     date=end_date,
                     time=cell(end_row, "D"),
-                    depth_m=cell(end_row, "E"),
+                    depth=cell(end_row, "E"),
                 ),
                 duration_days=cell(start_row, "G"),
-                length_m=cell(end_row, "G"),
+                length=cell(end_row, "G"),
             ))
 
     # ── BA Codes (rows 175+) ─────────────────────────────────────────────
@@ -100,6 +109,7 @@ def extract_welldata(wb) -> WellData:
 
     # ── Assemble model ───────────────────────────────────────────────────
     return WellData(
+        units=units,
         well_name=cell(4, "B"),
         unique_well_id=cell(6, "B"),
         surface_location=cell(7, "B"),
@@ -128,9 +138,9 @@ def extract_welldata(wb) -> WellData:
         security=cell(33, "B"),
         elevations=Elevation(
             reference=cell(35, "C"),
-            ground_level_m=cell(37, "B"),
-            kelly_bushing_m=cell(38, "B"),
-            kb_to_ground_m=cell(39, "B"),
+            ground_level=cell(37, "B"),
+            kelly_bushing=cell(38, "B"),
+            kb_to_ground=cell(39, "B"),
         ),
         location_data=LocationData(
             coordinate_system=cell(41, "H"),
@@ -156,13 +166,13 @@ def extract_welldata(wb) -> WellData:
             bottom_coordinates=cell(45, "B"),
         ),
         well_timing=WellTiming(
-            spud_date=TimingEvent(date=cell(49, "B"), time=cell(49, "E"), depth_m=cell(49, "G")),
-            surface_casing=TimingEvent(date=cell(50, "B"), depth_m=cell(50, "G")),
-            sample_point=TimingEvent(date=cell(51, "B"), time=cell(51, "E"), depth_m=cell(51, "G")),
-            kick_off_point=TimingEvent(date=cell(52, "B"), time=cell(52, "E"), depth_m=cell(52, "G")),
-            intermediate_casing_point=TimingEvent(date=cell(53, "B"), time=cell(53, "E"), depth_m=cell(53, "G")),
-            heel=TimingEvent(date=cell(54, "B"), time=cell(54, "E"), depth_m=cell(54, "G")),
-            final_td=TimingEvent(date=cell(55, "B"), time=cell(55, "E"), depth_m=cell(55, "G")),
+            spud_date=TimingEvent(date=cell(49, "B"), time=cell(49, "E"), depth=cell(49, "G")),
+            surface_casing=TimingEvent(date=cell(50, "B"), depth=cell(50, "G")),
+            sample_point=TimingEvent(date=cell(51, "B"), time=cell(51, "E"), depth=cell(51, "G")),
+            kick_off_point=TimingEvent(date=cell(52, "B"), time=cell(52, "E"), depth=cell(52, "G")),
+            intermediate_casing_point=TimingEvent(date=cell(53, "B"), time=cell(53, "E"), depth=cell(53, "G")),
+            heel=TimingEvent(date=cell(54, "B"), time=cell(54, "E"), depth=cell(54, "G")),
+            final_td=TimingEvent(date=cell(55, "B"), time=cell(55, "E"), depth=cell(55, "G")),
             rig_release_date=cell(56, "B"),
         ),
         hole_sizes=hole_sizes,

@@ -144,10 +144,10 @@ def extract_intervals(ws, cell, last_row):
                 continue
 
         intervals.append(ReservoirInterval(
-            from_m=from_m,
-            to_m=to_m,
-            interval_m=cell(r, "C"),
-            gas_units=cell(r, "D"),
+            from_depth=from_m,
+            to_depth=to_m,
+            interval=cell(r, "C"),
+            gas=cell(r, "D"),
             porosity=str(cell(r, "E")) if cell(r, "E") is not None else None,
             lithology=serialize(cell(r, "F")),
             quality=serialize(cell(r, "G")),

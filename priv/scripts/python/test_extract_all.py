@@ -55,7 +55,7 @@ class TestWellData:
         assert result.welldata.well_geometry == "Horizontal"
 
     def test_kelly_bushing(self, result):
-        assert result.welldata.elevations.kelly_bushing_m == 575.9
+        assert result.welldata.elevations.kelly_bushing == 575.9
 
     def test_spud_date(self, result):
         assert result.welldata.well_timing.spud_date.date == "2024-02-14"
@@ -82,7 +82,7 @@ class TestWellData:
 
     def test_lateral_length(self, result):
         lateral = next(s for s in result.welldata.well_profile if s.section == "Lateral")
-        assert lateral.length_m == 1368.0
+        assert lateral.length == 1368.0
 
 
 # ── Tops ─────────────────────────────────────────────────────────────────────

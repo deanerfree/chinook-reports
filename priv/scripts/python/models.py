@@ -7,9 +7,27 @@ extract_all calls .model_dump() for final JSON output.
 from pydantic import BaseModel
 
 
+# ── WellData models ──────────────────────────────────────────────────────────
+
+class Units(BaseModel):
+    depth: str | None = None
+    diameter: str | None = None
+    rop: str | None = None
+    weight: str | None = None
+    gas: str | None = None
+
+
+class TotalDepth(BaseModel):
+    md: float | None = None
+    tvd: float | None = None
+    subsea: float | None = None
+    unit: str | None = None
+
+
 # ── Metadata model ───────────────────────────────────────────────────────────
 
 class WellMetadata(BaseModel):
+    units: Units = Units()
     well_name: str | None = None
     unique_well_id: str | None = None
     operator: str | None = None
@@ -21,20 +39,11 @@ class WellMetadata(BaseModel):
     longitude: float | None = None
 
 
-# ── WellData models ──────────────────────────────────────────────────────────
-
-class TotalDepth(BaseModel):
-    md: float | None = None
-    tvd: float | None = None
-    subsea: float | None = None
-    unit: str | None = None
-
-
 class Elevation(BaseModel):
     reference: str | None = None
-    ground_level_m: float | None = None
-    kelly_bushing_m: float | None = None
-    kb_to_ground_m: float | None = None
+    ground_level: float | None = None
+    kelly_bushing: float | None = None
+    kb_to_ground: float | None = None
 
 
 class GeographicCoordinates(BaseModel):
@@ -68,7 +77,7 @@ class LocationData(BaseModel):
 class TimingEvent(BaseModel):
     date: str | None = None
     time: str | None = None
-    depth_m: float | None = None
+    depth: float | None = None
 
 
 class WellTiming(BaseModel):
@@ -84,24 +93,24 @@ class WellTiming(BaseModel):
 
 class HoleSize(BaseModel):
     section: str
-    bit_diameter_mm: float | None = None
-    from_m: float | None = None
-    to_m: float | None = None
-    interval_m: float | None = None
+    bit_diameter: float | None = None
+    from_depth: float | None = None
+    to_depth: float | None = None
+    interval: float | None = None
 
 
 class Mud(BaseModel):
     section: str
     type: str | None = None
-    from_m: float | None = None
-    to_m: float | None = None
+    from_depth: float | None = None
+    to_depth: float | None = None
 
 
 class CasingData(BaseModel):
     section: str
-    size_mm: float | None = None
-    set_at_m: float | None = None
-    weight_kg_m: float | None = None
+    size: float | None = None
+    set_at: float | None = None
+    weight: float | None = None
     type: str | None = None
 
 
@@ -139,7 +148,7 @@ class GeologicalServices(BaseModel):
 class ProfilePoint(BaseModel):
     date: str | None = None
     time: str | None = None
-    depth_m: float | None = None
+    depth: float | None = None
 
 
 class WellProfileSection(BaseModel):
@@ -148,7 +157,7 @@ class WellProfileSection(BaseModel):
     start: ProfilePoint = ProfilePoint()
     end: ProfilePoint = ProfilePoint()
     duration_days: float | str | None = None
-    length_m: float | None = None
+    length: float | None = None
 
 
 class BACode(BaseModel):
@@ -157,6 +166,7 @@ class BACode(BaseModel):
 
 
 class WellData(BaseModel):
+    units: Units = Units()
     well_name: str | None = None
     unique_well_id: str | None = None
     surface_location: str | None = None
@@ -193,18 +203,17 @@ class WellData(BaseModel):
 # ── Tops models ──────────────────────────────────────────────────────────────
 
 class FormationPick(BaseModel):
-    md_m: float | None = None
-    tvd_m: float | None = None
-    isopach_m: float | None = None
-    ss_m: float | None = None
+    md: float | None = None
+    tvd: float | None = None
+    isopach: float | None = None
+    subsea: float | None = None
 
 
 class FormationTop(BaseModel):
     formation: str
     prognosis: FormationPick = FormationPick()
     samples: FormationPick = FormationPick()
-    mwd_gamma: FormationPick = FormationPick()
-    difference_m: float | None = None
+    gamma: FormationPick = FormationPick()
 
 
 class Tops(BaseModel):
@@ -214,40 +223,40 @@ class Tops(BaseModel):
 # ── Surveys models ───────────────────────────────────────────────────────────
 
 class SurveyMarker(BaseModel):
-    md_m: float | None = None
+    md: float | None = None
     inclination_deg: float | None = None
     azimuth_deg: float | None = None
-    tvd_m: float | None = None
-    north_south_m: float | None = None
-    east_west_m: float | None = None
-    vertical_section_m: float | None = None
-    subsea_m: float | None = None
+    tvd: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    vertical_section: float | None = None
+    subsea: float | None = None
     event: str | None = None
 
 
 class SurveyPoint(BaseModel):
-    md_m: float | None = None
+    md: float | None = None
     inclination_deg: float | None = None
     azimuth_deg: float | None = None
-    tvd_m: float | None = None
-    north_south_m: float | None = None
-    east_west_m: float | None = None
-    vertical_section_m: float | None = None
+    tvd: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    vertical_section: float | None = None
     dogleg_severity: float | None = None
-    subsea_m: float | None = None
+    subsea: float | None = None
     remarks: str | None = None
 
 
 class PrognosedSurveyPoint(BaseModel):
-    md_m: float | None = None
+    md: float | None = None
     inclination_deg: float | None = None
     azimuth_deg: float | None = None
 
 
 class SlideRecord(BaseModel):
-    from_m: float | None = None
-    to_m: float | None = None
-    slide_m: float | None = None
+    from_depth: float | None = None
+    to_depth: float | None = None
+    slide: float | None = None
     toolface: str | None = None
 
 
@@ -312,10 +321,10 @@ class CurveMetadata(BaseModel):
 
 
 class ReservoirInterval(BaseModel):
-    from_m: float | None = None
-    to_m: float | None = None
-    interval_m: float | None = None
-    gas_units: float | None = None
+    from_depth: float | None = None
+    to_depth: float | None = None
+    interval: float | None = None
+    gas: float | None = None
     porosity: str | None = None
     lithology: str | None = None
     quality: str | None = None
@@ -371,6 +380,48 @@ class ReservoirSheet(BaseModel):
 
 
 
+# ── Bit models ───────────────────────────────────────────────────────────────
+
+class BitRecord(BaseModel):
+    bit_number: int | str | None = None
+    size: float | str | None = None
+    make: str | None = None
+    type: str | None = None
+    depth_in: float | None = None
+    depth_out: float | None = None
+    progress: float | None = None
+    hours: float | None = None
+    wob: float | None = None
+    rpm: float | None = None
+    rop: float | None = None
+    remarks: str | int | float | None = None
+
+
+# ── Daily models ─────────────────────────────────────────────────────────────
+
+class DailyEntry(BaseModel):
+    date: str | None = None
+    depth: float | int | None = None
+    progress: float | int | None = None
+    drilling_hours: float | None = None
+    rop: float | None = None
+    operations_summary: str | None = None
+    tag: str | None = None
+
+
+# ── Mud log models ───────────────────────────────────────────────────────────
+
+class MudEntry(BaseModel):
+    date: str | None = None
+    depth: float | int | None = None
+    mud_type: str | None = None
+    density: float | None = None
+    viscosity: float | None = None
+    wl: float | None = None
+    ph: float | None = None
+    remarks: str | None = None
+
+
 # ── Synopsis models ──────────────────────────────────────────────────────────
 
 class Synopsis(BaseModel):
@@ -395,5 +446,6 @@ class ExtractionResult(BaseModel):
     tops: Tops = Tops()
     reservoir_data: list[LegData] = []
     synopsis: Synopsis = Synopsis()
-    # daily: Daily = Daily()
-    # ... add as worksheets are built
+    daily: list[DailyEntry] = []
+    mud_log: list[MudEntry] = []
+    bits: list[BitRecord] = []

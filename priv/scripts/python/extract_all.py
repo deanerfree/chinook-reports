@@ -16,13 +16,12 @@ from models import ExtractionResult, WellMetadata, LegData
 from extractors.extract_welldata import extract_welldata
 from extractors.extract_tops import extract_tops
 from extractors.extract_reservoirs import extract_reservoirs
-# from extractors.extract_daily import extract_daily
-# from extractors.extract_mud import extract_mud
-# from extractors.extract_bit import extract_bit
+from extractors.extract_daily import extract_daily
+from extractors.extract_mud import extract_mud
+from extractors.extract_bit import extract_bit
 # from extractors.extract_gas import extract_gas
 from extractors.extract_surveys import extract_surveys
 from extractors.extract_synopsis import extract_synopsis
-# ... add more as they are built
 
 
 def _pair_leg_data(surveys, reservoirs) -> list[LegData]:
@@ -56,12 +55,14 @@ def extract_all(filepath) -> ExtractionResult:
     progress("reservoirs")
     reservoirs = extract_reservoirs(wb)
 
-    # progress("daily")
-    # daily = extract_daily(wb)
-    # progress("mud")
-    # mud = extract_mud(wb)
-    # progress("bit")
-    # bit = extract_bit(wb)
+    progress("daily")
+    daily = extract_daily(wb)
+
+    progress("mud")
+    mud = extract_mud(wb)
+
+    progress("bit")
+    bit = extract_bit(wb)
     # progress("gas")
     # gas = extract_gas(wb)
 
@@ -71,7 +72,12 @@ def extract_all(filepath) -> ExtractionResult:
     progress("synopsis")
     synopsis = extract_synopsis(wb)
 
+    units = welldata.units
+
+    del welldata.units  # Remove units from welldata since it's now in metadata and we don't want duplication in the JSON output
+
     metadata = WellMetadata(
+        units=units,
         well_name=welldata.well_name,
         unique_well_id=welldata.unique_well_id,
         operator=welldata.operator,
@@ -89,6 +95,9 @@ def extract_all(filepath) -> ExtractionResult:
         tops=tops,
         reservoir_data=_pair_leg_data(surveys, reservoirs),
         synopsis=synopsis,
+        daily=daily,
+        mud_log=mud,
+        bits=bit,
     )
 
     wb.close()
