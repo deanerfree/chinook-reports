@@ -21,7 +21,7 @@ defmodule ChinookReportsWeb.Router do
       live "/", HomeLive, :home
       live "/upload", UploadLive, :upload
       live "/reports", ReportsLive, :reports
-      live "/reports/:id", ReportDetailLive, :report_detail
+      live "/reports/:id", ReportPageLive, :report_detail
     end
   end
 
