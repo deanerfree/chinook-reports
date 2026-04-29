@@ -48,16 +48,15 @@ defmodule ChinookReports.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:flop, "~> 0.26.3"},
       {:flop_phoenix, "~> 0.26.0"},
-
       # ── LiveSvelte (Svelte inside LiveView) ───────────────────────────────
       #
       # 0.17+ uses Vite via phoenix_vite. Requires Node 19+.
       # Replaces the default esbuild setup — remove {:esbuild, ...} from deps
       # and the esbuild config from config.exs after installing.
-
-      {:live_svelte, "~> 0.17"},
+      {:live_svelte, "~> 0.18"},
+      {:igniter, "~> 0.6"},
       # Vite integration for Phoenix (pulled by live_svelte)
-      {:phoenix_vite, "~> 0.3"},
+      {:phoenix_vite, "~> 0.4.3"},
 
       # ── HTTP server ───────────────────────────────────────────────────────
       #
@@ -111,13 +110,8 @@ defmodule ChinookReports.MixProject do
       {:floki, ">= 0.36.0", only: :test},
       # Tailwind CLI wrapper
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      {:heroicons, "~> 0.5",
-       github: "tailwindlabs/heroicons",
-       tag: "v2.2.0",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
+      {:heroicons, "~> 0.5", github: "tailwindlabs/heroicons", tag: "v2.2.0", sparse: "optimized",
+       app: false, compile: false, depth: 1},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:gettext, "~> 0.26"},
@@ -137,11 +131,14 @@ defmodule ChinookReports.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind chinook_reports", "esbuild chinook_reports"],
+      "assets.setup": ["tailwind.install --if-missing", "cmd --cd assets npm install"],
+      "assets.build": [
+        "tailwind chinook_reports",
+        "cmd --cd assets npm run build"
+      ],
       "assets.deploy": [
         "tailwind chinook_reports --minify",
-        "esbuild chinook_reports --minify",
+        "cmd --cd assets npm run build",
         "phx.digest"
       ]
     ]
