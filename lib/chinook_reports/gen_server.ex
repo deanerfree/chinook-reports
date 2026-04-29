@@ -55,9 +55,14 @@ defmodule ChinookReports.GenServer do
       end
 
     case ExcelExtractor.extract_data(file_path, callback) do
-      {:ok, data} ->
-        new_state = Map.update(state, :results, [data], &[data | &1])
-        {:reply, {:ok, data}, new_state}
+      {:ok, json} ->
+        with {:ok, data} <- Jason.decode(json),
+             {:ok, report} <- ChinookReports.HandleData.store_report_data(data) do
+          new_state = Map.update(state, :results, [report], &[report | &1])
+          {:reply, {:ok, report}, new_state}
+        else
+          {:error, reason} -> {:reply, {:error, reason}, state}
+        end
 
       {:error, reason} ->
         {:reply, {:error, reason}, state}
