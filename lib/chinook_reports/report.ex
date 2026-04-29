@@ -2,7 +2,7 @@ defmodule ChinookReports.Report do
   use Ecto.Schema
   import Ecto.Changeset
 
-    @derive {
+  @derive {
     Flop.Schema,
     filterable: [
       :well_name,
@@ -32,6 +32,7 @@ defmodule ChinookReports.Report do
     field :country, :string
     field :latitude, :float
     field :longitude, :float
+    field :report_data, :map
 
     timestamps()
   end
@@ -39,8 +40,16 @@ defmodule ChinookReports.Report do
   def changeset(report, attrs) do
     report
     |> cast(attrs, [
-      :well_name, :unique_well_id, :operator, :spud_date, :final_td_date,
-      :target_formation, :country, :latitude, :longitude
+      :well_name,
+      :unique_well_id,
+      :operator,
+      :spud_date,
+      :final_td_date,
+      :target_formation,
+      :country,
+      :latitude,
+      :longitude,
+      :report_data
     ])
     |> validate_required([:well_name, :unique_well_id])
     |> unique_constraint(:unique_well_id)
