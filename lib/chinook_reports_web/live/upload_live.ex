@@ -247,11 +247,6 @@ defmodule ChinookReportsWeb.UploadLive do
     }
   end
 
-  defp upload_error_to_string(:too_large), do: "File too large (max 50 MB)"
-  defp upload_error_to_string(:not_accepted), do: "File type not accepted"
-  defp upload_error_to_string(:too_many_files), do: "Too many files selected"
-  defp upload_error_to_string(_), do: "Upload error"
-
   defp build_extraction_status(current_step) do
     {steps, _past} =
       Enum.reduce(@extraction_steps, {[], false}, fn {name, label}, {acc, past_current} ->
@@ -268,4 +263,9 @@ defmodule ChinookReportsWeb.UploadLive do
 
     %{steps: steps}
   end
+
+  defp upload_error_to_string(:too_large), do: "File too large (max 50 MB)"
+  defp upload_error_to_string(:not_accepted), do: "File type not accepted"
+  defp upload_error_to_string(:too_many_files), do: "Too many files selected"
+  defp upload_error_to_string(_), do: "Upload error"
 end
