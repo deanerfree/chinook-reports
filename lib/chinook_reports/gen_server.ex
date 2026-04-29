@@ -82,6 +82,18 @@ defmodule ChinookReports.GenServer do
   end
 
   @impl true
+  def handle_call({:fetch_report, params}, _from, state) do
+    case ChinookReports.HandleData.fetch_report(params) do
+      {:ok, data} ->
+        new_state = Map.put(state, :results, data)
+        {:reply, {:ok, data}, new_state}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
+  end
+
+  @impl true
   def handle_info(_msg, state) do
     {:noreply, state}
   end
