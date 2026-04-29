@@ -18,6 +18,7 @@ defmodule ChinookReportsWeb.CoreComponents do
   use Gettext, backend: ChinookReportsWeb.Gettext
 
   alias Phoenix.LiveView.JS
+  alias ChinookReportsWeb.Constants
 
   @doc """
   Renders a modal.
@@ -695,7 +696,7 @@ defmodule ChinookReportsWeb.CoreComponents do
   attr :nav_options, :list, default: []
 
   def nav_sidebar(assigns) do
-    assigns = assign(assigns, :nav_items, ChinookReportsWeb.Navigation.nav_items())
+    assigns = assign(assigns, :nav_items, Constants.nav_items())
 
     ~H"""
     <aside

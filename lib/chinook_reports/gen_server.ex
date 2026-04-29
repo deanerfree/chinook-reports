@@ -16,8 +16,12 @@ defmodule ChinookReports.GenServer do
     GenServer.call(__MODULE__, {:extract_excel_data, file_path, nil}, 120_000)
   end
 
-  def fetch_report_data(params \\ %{}) do
-    GenServer.call(__MODULE__, {:fetch_report_data, params})
+  def fetch_reports_list(params \\ %{}) do
+    GenServer.call(__MODULE__, {:fetch_reports_list, params})
+  end
+
+  def fetch_report(params \\ %{}) do
+    GenServer.call(__MODULE__, {:fetch_report, params})
   end
 
   @doc """
@@ -61,8 +65,8 @@ defmodule ChinookReports.GenServer do
   end
 
   @impl true
-  def handle_call({:fetch_report_data, params}, _from, state) do
-    case ChinookReports.HandleData.fetch_report_data(params) do
+  def handle_call({:fetch_reports_list, params}, _from, state) do
+    case ChinookReports.HandleData.fetch_reports_list(params) do
       {:ok, {data, meta}} ->
         new_state = Map.put(state, :results, data)
         {:reply, {:ok, {data, meta}}, new_state}

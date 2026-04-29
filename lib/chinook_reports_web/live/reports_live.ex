@@ -10,7 +10,7 @@ defmodule ChinookReportsWeb.ReportsLive do
 
   @impl true
   def handle_params(params, _uri, socket) do
-    case GenServer.fetch_report_data(params) do
+    case GenServer.fetch_reports_list(params) do
       {:ok, {reports, meta}} ->
         {:noreply, assign(socket, reports: reports, meta: meta)}
 

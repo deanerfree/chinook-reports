@@ -3,7 +3,18 @@ defmodule ChinookReports.HandleData do
 
   alias ChinookReports.{Repo, Report}
 
-  def fetch_report_data(params \\ %{}) do
+  def fetch_report(params \\ %{}) do
+    IO.inspect("Fetching report with params: #{inspect(params["id"])}")
+    # convert id to integer if it's a string
+    id = String.to_integer(params["id"])
+
+    case Repo.get_by(Report, id: id) do
+      nil -> {:error, :not_found}
+      report -> {:ok, report}
+    end
+  end
+
+  def fetch_reports_list(params \\ %{}) do
     Flop.validate_and_run(Report, params, for: Report, repo: Repo)
   rescue
     e -> {:error, Exception.message(e)}
@@ -56,6 +67,7 @@ defmodule ChinookReports.HandleData do
   end
 
   defp parse_date(nil), do: nil
+
   defp parse_date(str) do
     case Date.from_iso8601(str) do
       {:ok, date} -> date
