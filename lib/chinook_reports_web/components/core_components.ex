@@ -453,7 +453,7 @@ defmodule ChinookReportsWeb.CoreComponents do
       {render_slot(@title)}
     </h2>
     <div class="bg-accent p-0.5 w-16.25 mt-3.75 mb-6.25" />
-    <p :if={@subtitle != []} class="text-lg text-zinc-600">
+    <p :if={@subtitle != []} class="text-lg font-semibold text-secondary">
       {render_slot(@subtitle)}
     </p>
     """
