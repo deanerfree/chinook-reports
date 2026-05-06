@@ -106,7 +106,7 @@ defmodule ChinookReportsWeb.UploadLive do
             <% end %>
 
             <%= if @uploads.excel.entries != [] do %>
-              <% uploading? = Enum.any?(@uploads.excel.entries, & &1.progress < 100) %>
+              <% uploading? = Enum.any?(@uploads.excel.entries, &(&1.progress < 100)) %>
               <div class="flex flex-col items-center gap-8">
                 <ul class="mt-6 w-full space-y-2">
                   <%= for entry <- @uploads.excel.entries do %>
