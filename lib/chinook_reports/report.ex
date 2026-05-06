@@ -33,6 +33,7 @@ defmodule ChinookReports.Report do
     field :latitude, :float
     field :longitude, :float
     field :report_data, :map
+    field :metadata, :map
 
     timestamps()
   end
@@ -49,7 +50,8 @@ defmodule ChinookReports.Report do
       :country,
       :latitude,
       :longitude,
-      :report_data
+      :report_data,
+      :metadata
     ])
     |> validate_required([:well_name, :unique_well_id])
     |> unique_constraint(:unique_well_id)

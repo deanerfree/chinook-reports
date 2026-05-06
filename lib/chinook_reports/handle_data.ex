@@ -32,7 +32,8 @@ defmodule ChinookReports.HandleData do
       target_formation: meta["target_formation"],
       country: meta["country"],
       latitude: meta["latitude"],
-      longitude: meta["longitude"]
+      longitude: meta["longitude"],
+      metadata: meta
     }
 
     %Report{}
