@@ -717,7 +717,8 @@ defmodule ChinookReportsWeb.CoreComponents do
               href={item.href}
               class={[
                 "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-nav-text no-underline transition-colors relative hover:bg-sidebar-link-hover hover:text-nav-text-hover group-[.collapsed]:px-0 group-[.collapsed]:justify-center",
-                @current_page == item.href && "bg-sidebar-link-active text-nav-text-active font-semibold"
+                @current_page == item.href &&
+                  "bg-sidebar-link-active text-nav-text-active font-semibold"
               ]}
             >
               <svg
@@ -749,7 +750,8 @@ defmodule ChinookReportsWeb.CoreComponents do
               href={"/reports/#{report.id}"}
               class={[
                 "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-nav-text no-underline transition-colors relative hover:bg-sidebar-link-hover hover:text-nav-text-hover group-[.collapsed]:px-0 group-[.collapsed]:justify-center",
-                @current_page == "/reports/#{report.id}" && "bg-sidebar-link-active text-nav-text-active font-semibold"
+                @current_page == "/reports/#{report.id}" &&
+                  "bg-sidebar-link-active text-nav-text-active font-semibold"
               ]}
             >
               <svg
@@ -771,7 +773,9 @@ defmodule ChinookReportsWeb.CoreComponents do
               <span
                 class="overflow-hidden text-ellipsis whitespace-nowrap max-w-37.5 text-[0.8125rem] group-[.collapsed]:hidden"
                 title={report.well_name}
-              >{report.well_name}</span>
+              >
+                {report.well_name}
+              </span>
             </a>
           </li>
         </ul>
