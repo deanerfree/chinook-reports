@@ -35,8 +35,18 @@ defmodule ChinookReportsWeb.UploadLive do
                 ]}>
                   <%= cond do %>
                     <% step.status == "completed" -> %>
-                      <svg class="h-4 w-4 shrink-0 text-success" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      <svg
+                        class="h-4 w-4 shrink-0 text-success"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2.5"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
                       </svg>
                     <% step.status == "extracting" -> %>
                       <div class="h-4 w-4 shrink-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
@@ -61,8 +71,18 @@ defmodule ChinookReportsWeb.UploadLive do
               class="rounded-lg border-2 border-dashed p-10 text-center transition-colors border-border hover:border-muted"
               phx-drop-target={@uploads.excel.ref}
             >
-              <svg class="mx-auto h-12 w-12 text-muted" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+              <svg
+                class="mx-auto h-12 w-12 text-muted"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                />
               </svg>
               <p class="mt-4 text-lg font-medium text-copy">Drag & drop Excel file here</p>
               <p class="mt-1 text-sm text-copy-secondary">or</p>
@@ -92,8 +112,18 @@ defmodule ChinookReportsWeb.UploadLive do
                   <%= for entry <- @uploads.excel.entries do %>
                     <li class="flex items-center justify-between rounded-md border border-border-light bg-surface-card px-4 py-3">
                       <div class="flex items-center gap-3">
-                        <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        <svg
+                          class="h-5 w-5 text-primary"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                          />
                         </svg>
                         <span class="text-sm font-medium text-copy">{entry.client_name}</span>
                         <span class="text-xs text-copy-secondary">({Float.round(entry.client_size / 1024, 1)} KB)</span>
@@ -106,8 +136,18 @@ defmodule ChinookReportsWeb.UploadLive do
                         class="text-copy-secondary transition-colors hover:text-danger"
                         aria-label={"Remove #{entry.client_name}"}
                       >
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        <svg
+                          class="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 18 18 6M6 6l12 12"
+                          />
                         </svg>
                       </button>
                     </li>
