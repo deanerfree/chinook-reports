@@ -12,6 +12,7 @@ defmodule ChinookReports.Repo.Migrations.CreateReports do
       add :country, :string
       add :latitude, :float
       add :longitude, :float
+      add :report_data, :map
 
       timestamps()
     end
