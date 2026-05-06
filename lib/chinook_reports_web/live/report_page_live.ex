@@ -16,26 +16,23 @@ defmodule ChinookReportsWeb.ReportPageLive do
   def render(assigns) do
     ~H"""
     <div class="w-full p-6 overflow-y-auto">
-
       <%= cond do %>
         <% @report -> %>
-
-          <.heading>
-            <:title>Report</:title>
-            <:subtitle>View detailed information about the report</:subtitle>
-          </.heading>
-          <.report_details report={@report} />
-
+          <div class="space-y-4">
+            <.heading>
+              <:title>Report</:title>
+              <:subtitle>{@report.well_name}</:subtitle>
+            </.heading>
+            <.report_details report={@report} />
+          </div>
         <% @report == nil -> %>
           <p>Report not found.</p>
-          <p if={@error} class="text-red-500"><%= @error %></p>
+          <p if={@error} class="text-red-500">{@error}</p>
       <% end %>
 
-      <button class="back-button" phx-click="back">Back to Reports</button>
-
+      <button class="cursor-pointer" phx-click="back">&#8592; Back to Reports</button>
     </div>
     <script>
-
     </script>
     """
   end
