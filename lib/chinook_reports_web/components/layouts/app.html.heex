@@ -1,6 +1,6 @@
 <header class="fixed top-0 inset-x-0 z-20 bg-linear-to-r from-header-from to-header-to text-white py-3 px-4 sm:px-6 lg:px-8">
   <div class="flex items-center justify-between py-3 text-sm">
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-6">
       <a href="/">
         <img
           alt="Chinook Consulting"
@@ -8,6 +8,15 @@
           src="https://chinookpetroleum.com/wp-content/uploads/2018/01/logo.png"
         />
       </a>
+
+      <div>
+        <%= if report = assigns[:report] do %>
+          <div class="flex flex-col items-start text-center text-xs leading-tight">
+            <span class="font-bold text-sm">{report.well_name}</span>
+            <span class="opacity-75">{report.unique_well_id} · {report.operator}</span>
+          </div>
+        <% end %>
+      </div>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 btn-primary">
       <a href="https://chinookpetroleum.com" target="_blank" rel="noopener noreferrer">
