@@ -37,9 +37,14 @@ defmodule ChinookReportsWeb.ReportsLive do
           <:col :let={report} label="Unique Well ID">{report.unique_well_id}</:col>
           <:col :let={report} label="Operator" field={:operator}>{report.operator}</:col>
           <:col :let={report} label="Spud Date" field={:spud_date}>{report.spud_date}</:col>
-          <:col :let={report} label="Final TD Date" field={:final_td_date}>{report.final_td_date}</:col>
+          <:col :let={report} label="Final TD Date" field={:final_td_date}>
+            {report.final_td_date}
+          </:col>
           <:col :let={report} label="Target Formation">{report.target_formation}</:col>
           <:col :let={report} label="Country">{report.country}</:col>
+          <:col :let={report} label="Link">
+            <a href={~p"/reports/#{report.id}"}><.chevron_right_icon class="w-6 h-6" /></a>
+          </:col>
         </.my_table>
 
         <Flop.Phoenix.pagination meta={@meta} path={~p"/reports"} />

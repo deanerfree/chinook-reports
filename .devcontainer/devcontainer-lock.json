@@ -1,0 +1,35 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-community/npm-features/prettier:1": {
+      "version": "1.1.0",
+      "resolved": "ghcr.io/devcontainers-community/npm-features/prettier@sha256:41aca434d43373d78b276d3cd89ecdce960e0b618ff0ee59f2ecee0810dbabe9",
+      "integrity": "sha256:41aca434d43373d78b276d3cd89ecdce960e0b618ff0ee59f2ecee0810dbabe9",
+      "dependsOn": [
+        "ghcr.io/devcontainers/features/node"
+      ]
+    },
+    "ghcr.io/devcontainers-community/npm-features/typescript:1": {
+      "version": "1.1.0",
+      "resolved": "ghcr.io/devcontainers-community/npm-features/typescript@sha256:13a0f63e88513a6022431c39b7ca4ec732ba0760cdb6d882638f4ddf73deb0e7",
+      "integrity": "sha256:13a0f63e88513a6022431c39b7ca4ec732ba0760cdb6d882638f4ddf73deb0e7",
+      "dependsOn": [
+        "ghcr.io/devcontainers/features/node"
+      ]
+    },
+    "ghcr.io/devcontainers-extra/features/claude-code:1": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/devcontainers-extra/features/claude-code@sha256:cce04f0fb8313336f679c243f032338434d9386d4857c3d38e1253b1e3d62a00",
+      "integrity": "sha256:cce04f0fb8313336f679c243f032338434d9386d4857c3d38e1253b1e3d62a00"
+    },
+    "ghcr.io/devcontainers/features/node": {
+      "version": "2.0.0",
+      "resolved": "ghcr.io/devcontainers/features/node@sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f",
+      "integrity": "sha256:fedd4c11f7adfb64283b578dddc7da906728daa25fa293351c9d913231acf12f"
+    },
+    "ghcr.io/jckimble/devcontainer-features/ngrok:3": {
+      "version": "3.1.2",
+      "resolved": "ghcr.io/jckimble/devcontainer-features/ngrok@sha256:48daeec5d1c350d8bb225091f16fd9e0f947437831ca133264c93e4068229fa9",
+      "integrity": "sha256:48daeec5d1c350d8bb225091f16fd9e0f947437831ca133264c93e4068229fa9"
+    }
+  }
+}
