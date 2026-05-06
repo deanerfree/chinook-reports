@@ -21,7 +21,11 @@ defmodule ChinookReportsWeb.UploadLive do
         <:subtitle>Upload your Chinook Report Excel file to get started.</:subtitle>
       </.heading>
 
-      <form class="flex w-full justify-center items-center mt-8" phx-submit="upload_excel" phx-change="validate">
+      <form
+        class="flex w-full justify-center items-center mt-8"
+        phx-submit="upload_excel"
+        phx-change="validate"
+      >
         <%= if @extraction_status do %>
           <div class="w-full max-w-md mx-auto">
             <p class="text-sm font-semibold text-copy mb-4">Extracting data…</p>
@@ -49,7 +53,8 @@ defmodule ChinookReportsWeb.UploadLive do
                         />
                       </svg>
                     <% step.status == "extracting" -> %>
-                      <div class="h-4 w-4 shrink-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                      <div class="h-4 w-4 shrink-0 rounded-full border-2 border-primary border-t-transparent animate-spin">
+                      </div>
                     <% true -> %>
                       <div class="h-4 w-4 shrink-0 rounded-full border-2 border-border"></div>
                   <% end %>
@@ -87,8 +92,7 @@ defmodule ChinookReportsWeb.UploadLive do
               <p class="mt-4 text-lg font-medium text-copy">Drag & drop Excel file here</p>
               <p class="mt-1 text-sm text-copy-secondary">or</p>
               <label class="mt-3 inline-block cursor-pointer rounded-full px-6 py-2 text-sm font-bold btn-primary">
-                Browse files
-                <.live_file_input upload={@uploads.excel} class="hidden" />
+                Browse files <.live_file_input upload={@uploads.excel} class="hidden" />
               </label>
               <p class="mt-3 text-xs text-copy-secondary">Accepted formats: .xlsx, .xls, .xlsm</p>
             </div>
@@ -126,7 +130,9 @@ defmodule ChinookReportsWeb.UploadLive do
                           />
                         </svg>
                         <span class="text-sm font-medium text-copy">{entry.client_name}</span>
-                        <span class="text-xs text-copy-secondary">({Float.round(entry.client_size / 1024, 1)} KB)</span>
+                        <span class="text-xs text-copy-secondary">
+                          ({Float.round(entry.client_size / 1024, 1)} KB)
+                        </span>
                         <span class="text-xs text-copy-secondary">{entry.progress}%</span>
                       </div>
                       <button
