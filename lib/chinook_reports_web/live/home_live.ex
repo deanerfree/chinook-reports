@@ -4,12 +4,21 @@ defmodule ChinookReportsWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.heading>
-      <:title>Report Dashboard</:title>
-      <:subtitle>View and manage extracted well report data from uploaded Excel files.</:subtitle>
-    </.heading>
+    <div class="flex flex-col gap-4">
+      <.heading>
+        <:title>Report Dashboard</:title>
+        <:subtitle>View and manage extracted well report data from uploaded Excel files.</:subtitle>
+      </.heading>
 
-    <.svelte name="HomePage" props={%{results: @results, error: @error}} />
+      <div class="border rounded-lg p-4 bg-white shadow">
+        <p class="text-gray-700">
+          Welcome to the Chinook Reports Dashboard! Use the navigation above to view and manage well reports extracted from Excel files.
+        </p>
+        <p class="text-gray-700 mt-2">
+          You can upload new Excel files to extract data, view existing reports, and see details for each report.
+        </p>
+      </div>
+    </div>
     """
   end
 
