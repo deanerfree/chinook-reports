@@ -7,6 +7,35 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
+## Database Migrations
+
+To create and migrate the database:
+
+```bash
+mix ecto.create        # create the database
+mix ecto.migrate       # run all pending migrations
+```
+
+Or do both at once with:
+
+```bash
+mix ecto.setup         # create, migrate, and seed
+```
+
+To create a new migration:
+
+```bash
+mix ecto.gen.migration add_some_column_to_table
+```
+
+This generates a timestamped file in `priv/repo/migrations/`. Edit it to define your `up`/`change`, then run `mix ecto.migrate`.
+
+To roll back the most recent migration:
+
+```bash
+mix ecto.rollback
+```
+
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
 ## Learn more

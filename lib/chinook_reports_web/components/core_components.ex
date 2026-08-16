@@ -798,7 +798,11 @@ defmodule ChinookReportsWeb.CoreComponents do
   def my_table(assigns) do
     ~H"""
     <Flop.Phoenix.table
-      {assigns}
+      id={@id}
+      items={@items}
+      meta={@meta}
+      path={@path}
+      on_sort={@on_sort}
       opts={[
         container: true,
         container_attrs: [class: "data-table-container"],
@@ -808,8 +812,19 @@ defmodule ChinookReportsWeb.CoreComponents do
         tbody_td_attrs: [class: "data-table-td"]
       ]}
     >
-      <%!-- <:col :for={col <- @col} {col}></:col>
-      <:action :for={action <- @action} {action}></:action> --%>
+      <:col
+        :let={item}
+        :for={col <- @col}
+        label={col[:label]}
+        field={col[:field]}
+        thead_th_attrs={col[:thead_th_attrs] || []}
+        tbody_td_attrs={col[:tbody_td_attrs] || []}
+      >
+        {render_slot(col, item)}
+      </:col>
+      <:action :let={item} :for={action <- @action} label={action[:label]}>
+        {render_slot(action, item)}
+      </:action>
     </Flop.Phoenix.table>
     """
   end

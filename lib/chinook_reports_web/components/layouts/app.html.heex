@@ -18,13 +18,50 @@
         <% end %>
       </div>
     </div>
-    <div class="flex items-center gap-4 font-semibold leading-6 btn-primary">
-      <a href="https://chinookpetroleum.com" target="_blank" rel="noopener noreferrer">
-        Return to Chinook Homepage
-      </a>
+    <div class="flex items-center gap-4">
+      <button type="button" class="btn-primary" phx-click={show_modal("new-report-modal")}>
+        + New Report
+      </button>
     </div>
   </div>
 </header>
+
+<.modal id="new-report-modal">
+  <h2 class="text-lg font-bold text-copy mb-1">Draft New Well Report</h2>
+  <p class="text-xs text-copy-secondary mb-6">Enter the well information to get started.</p>
+
+  <.form
+    for={@new_report_form}
+    phx-change="validate_new_report"
+    phx-submit="create_new_report"
+    class="space-y-4"
+  >
+    <.field
+      field={@new_report_form[:well_name]}
+      label="Well Name *"
+      placeholder="e.g. GEAR SODA LAKE 103 HZ"
+    />
+    <.field
+      field={@new_report_form[:unique_well_id]}
+      label="UWI *"
+      placeholder="e.g. XXX/XX-XX-XXX-XXWX/XX"
+    />
+    <.field
+      field={@new_report_form[:operator]}
+      label="Operator"
+      placeholder="e.g. Chinook Petroleum Ltd."
+    />
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-border-light">
+      <button type="button" class="btn-secondary" phx-click={hide_modal("new-report-modal")}>
+        Cancel
+      </button>
+      <button type="submit" class="btn-primary">
+        Continue →
+      </button>
+    </div>
+  </.form>
+</.modal>
 <div class="flex flex-row mt-22.5 h-[calc(100vh-90px)]">
   <.nav_sidebar
     current_page={assigns[:current_page] || "/"}

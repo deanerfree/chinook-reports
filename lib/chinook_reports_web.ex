@@ -92,6 +92,8 @@ defmodule ChinookReportsWeb do
       import ChinookReportsWeb.CoreComponents
       import ChinookReportsWeb.Icons
       import ChinookReportsWeb.ReportComponents
+      import ChinookReportsWeb.Stepper
+      import ChinookReportsWeb.ReportFormComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

@@ -19,9 +19,11 @@ defmodule ChinookReportsWeb.Router do
 
     live_session :default, on_mount: {ChinookReportsWeb.NavAssigns, :default} do
       live "/", HomeLive, :home
+      live "/create_report", CreateReportLive, :create
       live "/upload", UploadLive, :upload
       live "/reports", ReportsLive, :reports
       live "/reports/:id", ReportPageLive, :report_detail
+      live "/reports/:id/edit", CreateReportLive, :edit
     end
   end
 

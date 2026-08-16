@@ -54,6 +54,9 @@
   --color-bg:            #f8f8f8;
   --color-border-light:  #ececec;
 
+  /* ── Status ────────────────────────────────────── */
+  --color-danger:        #dc3545;
+
   /* ── Brand palette ────────────────────────────── */
   --chinook-green:       #176935;
   --chinook-green-dark:  #114a26;
@@ -216,18 +219,26 @@
 }
 
 .btn-secondary {
-  background-color: var(--color-accent);
-  color: var(--color-text-on-accent);
+  background-color: transparent;
+  color: var(--color-secondary);
   font-weight: 700;
   padding: 0.625rem 1.5rem;
   border-radius: var(--radius-pill);
-  border: none;
+  border: 2px solid var(--color-secondary);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-accent-subtle);
+  background-color: var(--color-secondary);
+  color: var(--color-text-on-primary);
+}
+
+.btn-secondary:disabled {
+  background-color: var(--color-muted);
+  color: var(--color-text-on-primary);
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 /* ── Header bar ────────────────────────────────────── */

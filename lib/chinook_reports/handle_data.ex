@@ -1,7 +1,7 @@
 defmodule ChinookReports.HandleData do
   require Logger
 
-  alias ChinookReports.{Repo, Report}
+  alias ChinookReports.{Repo, Reports.Report}
 
   def fetch_report(params \\ %{}) do
     IO.inspect("Fetching report with params: #{inspect(params["id"])}")
@@ -29,10 +29,15 @@ defmodule ChinookReports.HandleData do
       operator: meta["operator"],
       spud_date: parse_date(meta["spud_date"]),
       final_td_date: parse_date(meta["final_td_date"]),
-      target_formation: meta["target_formation"],
+      primary_target: meta["primary_target"],
+      secondary_target: meta["secondary_target"],
       country: meta["country"],
+      province: meta["province"],
       latitude: meta["latitude"],
       longitude: meta["longitude"],
+      geometry: meta["geometry"],
+      status: meta["status"],
+      company_id: meta["company_id"],
       metadata: meta
     }
 
