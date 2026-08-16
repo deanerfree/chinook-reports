@@ -108,7 +108,7 @@
   --color-info:          #17a2b8;
 
   /* ── Chart curve colors (read by ECharts theme) ── */
-  --color-chart-rop:     #1769c4;
+  --color-chart-rop:     #000000;
   --color-chart-gas:     #dc3545;
   --color-chart-gamma:   #176935;
   --color-chart-trajectory: #114a26;
@@ -163,9 +163,9 @@
   --color-header-from: #0d1f15;
   --color-header-to:   #091510;
 
-  --color-chart-rop:     #2ecc71;
-  --color-chart-gas:     #e74c3c;
-  --color-chart-gamma:   #3498db;
+  --color-chart-rop:     #3b82f6;
+  --color-chart-gas:     #ef4444;
+  --color-chart-gamma:   #10b981;
   --color-chart-trajectory: #27ae60;
   --color-chart-plan:    #6b8f74;
   --color-chart-grid:    #2a3d30;

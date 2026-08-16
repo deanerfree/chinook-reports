@@ -2,6 +2,7 @@ defmodule ChinookReportsWeb.ReportComponents do
   use Phoenix.Component
   use Gettext, backend: ChinookReportsWeb.Gettext
   import ChinookReportsWeb.CoreComponents
+  import LiveSvelte
 
   def report_details(assigns) do
     IO.inspect(assigns.report, label: "Report in report_details component")
@@ -11,10 +12,10 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
-  defp format_date(date) do
-    # TODO: format date as needed
-    date
-  end
+  # defp format_date(date) do
+  #   # TODO: format date as needed
+  #   date
+  # end
 
   @sections [
     {"welldata", &__MODULE__.welldata_section/1},
@@ -85,7 +86,10 @@ defmodule ChinookReportsWeb.ReportComponents do
       <% "reservoir_data" -> %>
         <.reservoir_section reservoir={@report.report_data["reservoir_data"]} />
       <% "synopsis" -> %>
-        <.synopsis_section synopsis={@report.report_data["synopsis"]} />
+        <.synopsis_section
+          synopsis={@report.report_data["synopsis"]}
+          legs={@report.report_data["reservoir_data"] || []}
+        />
       <% "tops" -> %>
         <.tops_section tops={@report.report_data["tops"]} />
       <% "welldata" -> %>
@@ -181,12 +185,16 @@ defmodule ChinookReportsWeb.ReportComponents do
 
   defp reservoir_section(assigns) do
     ~H"""
-    <div id="reservoir-container">
-      <h3>Reservoir Data</h3>
-      <pre><%= inspect(@reservoir) %></pre>
-    </div>
+    <.section_panel id="reservoir" title="Reservoir Data">
+      <div class="py-4">
+        <.svelte name="ProfileChart" props={%{legs: @reservoir}} />
+      </div>
+    </.section_panel>
     """
   end
+
+  attr :synopsis, :map, required: true
+  attr :legs, :list, default: []
 
   defp synopsis_section(assigns) do
     ~H"""
@@ -204,12 +212,15 @@ defmodule ChinookReportsWeb.ReportComponents do
       <%= if profile = @synopsis["well_profile"] do %>
         <.flat_card_panel title="Well Profile">
           <div class="py-4 flex flex-col gap-4">
-            <div
-              id="synopsis-well-profile-chart"
-              class="w-full h-64 rounded-lg bg-bg border border-border-light flex items-center justify-center"
-            >
-              <p class="text-sm text-muted">Directional survey chart — coming soon</p>
-            </div>
+            <%= if @legs != [] do %>
+              <div class="rounded-lg border border-border-light bg-bg p-2">
+                <.svelte name="ProfileChart" props={%{legs: @legs}} />
+              </div>
+            <% else %>
+              <div class="w-full h-32 rounded-lg bg-bg border border-border-light flex items-center justify-center">
+                <p class="text-sm text-muted">No wellpath data available</p>
+              </div>
+            <% end %>
             <ul class="flex flex-col gap-1.5">
               <%= for item <- profile do %>
                 <li class="text-sm text-text flex gap-2">
