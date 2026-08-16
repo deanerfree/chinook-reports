@@ -44,49 +44,32 @@ defmodule ChinookReportsWeb.CoreComponents do
 
   def modal(assigns) do
     ~H"""
-    <div
+    <dialog
       id={@id}
+      phx-hook="DialogHook"
       phx-mounted={@show && show_modal(@id)}
       phx-remove={hide_modal(@id)}
-      data-cancel={JS.exec(@on_cancel, "phx-remove")}
-      class="relative z-50 hidden"
+      data-cancel={@on_cancel |> hide_modal(@id)}
+      class="fixed inset-0 z-200 m-0 w-screen h-screen max-w-none max-h-none border-0 p-0 bg-transparent open:flex items-center justify-center"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
-      <div
-        class="fixed inset-0 overflow-y-auto"
-        aria-labelledby={"#{@id}-title"}
-        aria-describedby={"#{@id}-description"}
-        role="dialog"
-        aria-modal="true"
-        tabindex="0"
-      >
-        <div class="flex min-h-full items-center justify-center">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
-            <.focus_wrap
-              id={"#{@id}-container"}
-              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
-              phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
-            >
-              <div class="absolute top-6 right-5">
-                <button
-                  phx-click={JS.exec("data-cancel", to: "##{@id}")}
-                  type="button"
-                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
-                  aria-label={gettext("close")}
-                >
-                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
-                </button>
-              </div>
-              <div id={"#{@id}-content"}>
-                {render_slot(@inner_block)}
-              </div>
-            </.focus_wrap>
-          </div>
+      <%!-- backdrop: blurs and dims the page behind the modal --%>
+      <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" aria-hidden="true" />
+
+      <%!-- content: centered card with close button floating outside top-right --%>
+      <div class="relative z-10 mx-4 my-8 w-full max-w-lg">
+        <button
+          phx-click={JS.exec("data-cancel", to: "##{@id}")}
+          type="button"
+          class="absolute -top-4 -right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md text-copy-secondary hover:text-copy transition-colors"
+          aria-label={gettext("close")}
+        >
+          <.icon name="hero-x-mark-solid" class="h-4 w-4" />
+        </button>
+        <div id={"#{@id}-content"} class="rounded-2xl bg-white shadow-xl ring-1 ring-black/8 p-10">
+          {render_slot(@inner_block)}
         </div>
       </div>
-    </div>
+    </dialog>
     """
   end
 
@@ -646,25 +629,13 @@ defmodule ChinookReportsWeb.CoreComponents do
 
   def show_modal(js \\ %JS{}, id) when is_binary(id) do
     js
-    |> JS.show(to: "##{id}")
-    |> JS.show(
-      to: "##{id}-bg",
-      time: 300,
-      transition: {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
-    )
-    |> show("##{id}-container")
+    |> JS.dispatch("dialog:open", to: "##{id}")
     |> JS.add_class("overflow-hidden", to: "body")
-    |> JS.focus_first(to: "##{id}-content")
   end
 
   def hide_modal(js \\ %JS{}, id) do
     js
-    |> JS.hide(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
-    )
-    |> hide("##{id}-container")
-    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
+    |> JS.dispatch("dialog:close", to: "##{id}")
     |> JS.remove_class("overflow-hidden", to: "body")
     |> JS.pop_focus()
   end

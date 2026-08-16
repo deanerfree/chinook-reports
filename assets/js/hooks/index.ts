@@ -54,4 +54,12 @@ const TanStackTableHook = {
   }
 }
 
-export { SidebarCollapseHook, TanStackTableHook }
+const DialogHook = {
+  mounted(this: LiveViewHookContext) {
+    const dialog = this.el as HTMLDialogElement
+    this.el.addEventListener("dialog:open", () => dialog.showModal())
+    this.el.addEventListener("dialog:close", () => dialog.close())
+  }
+}
+
+export { SidebarCollapseHook, TanStackTableHook, DialogHook }
