@@ -108,6 +108,7 @@ defmodule ChinookReports.MixProject do
 
       # HTML parsing for tests
       {:floki, ">= 0.36.0", only: :test},
+      {:lazy_html, ">= 0.1.0", only: :test},
       # Tailwind CLI wrapper
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:heroicons, "~> 0.5",
