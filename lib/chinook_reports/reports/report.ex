@@ -61,7 +61,7 @@ defmodule ChinookReports.Reports.Report do
       field :gl_elevation, :decimal
       field :kb_elevation, :decimal
       field :kb_to_ground, :decimal
-      field :datum, :string
+      field :datum, :string, default: "UTM"
       field :surface_coordinates, :string
 
       field :classification, :string

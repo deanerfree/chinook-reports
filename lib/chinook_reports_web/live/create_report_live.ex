@@ -45,9 +45,15 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{field: :kb_to_ground, label: "KB to Ground", unit: :depth}
   ]
 
-  @location_fields [
+  # latitude/longitude are top-level Report columns; the rest of the
+  # Location section lives in the report_data embed, so they're rendered
+  # against different form scopes (see step_content/1, step 2).
+  @coordinate_fields [
     %{field: :latitude, label: "Latitude", unit: "°N"},
-    %{field: :longitude, label: "Longitude", unit: "°W"},
+    %{field: :longitude, label: "Longitude", unit: "°W"}
+  ]
+
+  @location_fields [
     %{field: :datum, label: "Datum", input: :select, options: &Report.datums/0},
     %{field: :surface_coordinates, label: "Surface Coordinates", wide: true}
   ]
@@ -100,6 +106,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
      |> assign(:current_step, 1)
      |> assign(:identity_fields, @identity_fields)
      |> assign(:elevation_fields, @elevation_fields)
+     |> assign(:coordinate_fields, @coordinate_fields)
      |> assign(:location_fields, @location_fields)
      |> assign(:configuration_fields, @configuration_fields)
      |> assign(:profile_columns, @profile_columns)
@@ -224,6 +231,11 @@ defmodule ChinookReportsWeb.CreateReportLive do
 
             <.section_card title="Location" subtitle="Geographic coordinates and datum">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <.report_field
+                  :for={spec <- coordinate_fields(data)}
+                  form={@form}
+                  spec={spec}
+                />
                 <.report_field
                   :for={spec <- @location_fields}
                   form={data}
@@ -381,6 +393,16 @@ defmodule ChinookReportsWeb.CreateReportLive do
   end
 
   # ── helpers ───────────────────────────────────────────────────────────────
+
+  # UTM coordinates are metric Easting/Northing; every other supported datum
+  # (ATS/NTS/DLS/Other) is a lat/long-based description, so the unit suffix
+  # on the Latitude/Longitude fields follows whichever Datum is selected.
+  defp coordinate_fields(data_form) do
+    case data_form[:datum].value do
+      "UTM" -> Enum.map(@coordinate_fields, &Map.put(&1, :unit, "m"))
+      _other -> @coordinate_fields
+    end
+  end
 
   defp resolve_columns(columns) do
     Enum.map(columns, fn col ->
