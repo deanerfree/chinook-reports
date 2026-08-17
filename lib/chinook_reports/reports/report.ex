@@ -116,6 +116,7 @@ defmodule ChinookReports.Reports.Report do
   """
   def changeset(report, attrs) do
     report
+    |> reset_errors()
     |> cast(attrs, [
       :well_name,
       :unique_well_id,
@@ -135,7 +136,7 @@ defmodule ChinookReports.Reports.Report do
       :created_by,
       :updated_by
     ])
-    |> cast_embed(:report_data, with: &report_data_changeset/2)
+    |> cast_report_data(attrs)
     |> validate_required(@required_fields)
     |> validate_inclusion(:geometry, @geometries)
     |> validate_inclusion(:status, @statuses)
@@ -144,15 +145,20 @@ defmodule ChinookReports.Reports.Report do
   end
 
   defp profile_section_changeset(section, attrs) do
-    cast(section, attrs, [:section, :start_depth, :end_depth, :start_date])
+    section
+    |> reset_errors()
+    |> cast(attrs, [:section, :start_depth, :end_depth, :start_date])
   end
 
   defp formation_top_changeset(top, attrs) do
-    cast(top, attrs, [:formation, :md, :tvd, :isopach, :subsea])
+    top
+    |> reset_errors()
+    |> cast(attrs, [:formation, :md, :tvd, :isopach, :subsea])
   end
 
   defp survey_point_changeset(survey_point, attrs) do
     survey_point
+    |> reset_errors()
     |> cast(attrs, [:md, :inclination, :azimuth])
     |> validate_number(:md, greater_than_or_equal_to: 0)
     |> validate_number(:inclination, greater_than_or_equal_to: 0, less_than_or_equal_to: 180)
@@ -161,6 +167,7 @@ defmodule ChinookReports.Reports.Report do
 
   defp report_data_changeset(data, attrs) do
     data
+    |> reset_errors()
     |> cast(attrs, [
       :surface_location,
       :bottom_location,
@@ -182,4 +189,41 @@ defmodule ChinookReports.Reports.Report do
     |> validate_inclusion(:datum, ~w(ATS NTS DLS UTM Other))
     |> validate_inclusion(:classification, ["DEV", "EXP", "Other"])
   end
+
+  # `cast/3` accepts an existing changeset (e.g. a multi-step form re-casting
+  # itself), but it carries that changeset's `errors` forward as-is — a stale
+  # error from an earlier, blank step would otherwise persist forever even
+  # after the field becomes valid, since these functions always recompute
+  # every validation from scratch on each call anyway.
+  defp reset_errors(%Ecto.Changeset{} = changeset), do: %{changeset | errors: [], valid?: true}
+  defp reset_errors(data), do: data
+
+  # `cast_embed/3` always diffs the embed against `changeset.data.report_data`
+  # (the true persisted value) — never against an already-accumulated
+  # `changes[:report_data]` from an earlier step, unlike plain `cast/3`, which
+  # correctly merges onto an existing changeset. Since report_data is touched
+  # by several separate wizard steps (Elevations, Configuration, Well Profile,
+  # ...), relying on cast_embed's default would silently wipe out an earlier
+  # step's changes the moment a later step touches report_data again. So we
+  # manage the accumulation ourselves: reuse the existing nested changeset (if
+  # any) as the base passed to report_data_changeset/2.
+  defp cast_report_data(changeset, attrs) do
+    case fetch_report_data_params(attrs) do
+      :error ->
+        changeset
+
+      {:ok, report_data_attrs} ->
+        base =
+          case fetch_change(changeset, :report_data) do
+            {:ok, existing} -> existing
+            :error -> changeset.data.report_data
+          end
+
+        put_embed(changeset, :report_data, report_data_changeset(base, report_data_attrs))
+    end
+  end
+
+  defp fetch_report_data_params(%{"report_data" => report_data}), do: {:ok, report_data}
+  defp fetch_report_data_params(%{report_data: report_data}), do: {:ok, report_data}
+  defp fetch_report_data_params(_attrs), do: :error
 end

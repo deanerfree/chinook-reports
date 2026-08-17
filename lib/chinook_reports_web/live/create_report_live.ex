@@ -28,12 +28,13 @@ defmodule ChinookReportsWeb.CreateReportLive do
 
   @identity_fields [
     %{field: :well_name, label: "Well Name", placeholder: "GEAR SODA LAKE 103 HZ…", wide: true},
+    %{field: :spud_date, label: "Spud Date", placeholder: "YYYY-MM-DD"},
     %{field: :unique_well_id, label: "Unique Well I.D.", placeholder: "XXX/XX-XX-XXX-XXWX/XX"},
     %{field: :operator, label: "Operator", placeholder: "Operator name"},
     %{field: :country, label: "Country", placeholder: "Canada"},
     %{field: :province, label: "Province", placeholder: "Alberta"},
     %{field: :geometry, label: "Well Geometry", input: :select, options: &Report.geometries/0},
-    %{field: :primary_target, label: "Primary Target", placeholder: "Enter the target formation"},
+    %{field: :target_formation, label: "Primary Target", placeholder: "Enter the target formation"},
     %{field: :secondary_target, label: "Secondary target if applicable"},
     %{field: :units, label: "Unit System", input: :select, options: &Report.units/0}
   ]
@@ -298,7 +299,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
   @impl true
   def handle_event("validate", %{"report" => params}, socket) do
     changeset =
-      socket.assigns.form.source.data
+      socket.assigns.form.source
       |> Reports.change_report(params)
       |> Map.put(:action, :validate)
 
@@ -309,7 +310,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
     required = Map.get(@step_guards, socket.assigns.current_step, [])
 
     changeset =
-      socket.assigns.form.source.data
+      socket.assigns.form.source
       |> Reports.change_report(socket.assigns.form.params || %{})
       |> Map.put(:action, :validate)
 
@@ -335,42 +336,25 @@ defmodule ChinookReportsWeb.CreateReportLive do
   end
 
   def handle_event("update", %{"report" => params}, socket) do
-    report = socket.assigns.editing_report
+    changeset = Map.put(socket.assigns.form.source, :action, nil)
 
-    case Reports.update_report(report, params) do
+    result =
+      case socket.assigns.editing_report do
+        nil -> Reports.create_report(changeset, params)
+        _report -> Reports.update_report(changeset, params)
+      end
+
+    case result do
       {:ok, updated} ->
+        message = if socket.assigns.editing_report, do: "Report updated.", else: "Report created."
+
         {:noreply,
          socket
-         |> put_flash(:info, "Report updated.")
+         |> put_flash(:info, message)
          |> push_navigate(to: ~p"/reports/#{updated.id}")}
 
       {:error, changeset} ->
         {:noreply, assign_form(socket, changeset)}
-    end
-  end
-
-  def handle_event("create", %{"report" => params}, socket) do
-    case socket.assigns.editing_report do
-      nil ->
-        case Reports.create_report(params) do
-          {:ok, _report} ->
-            {:noreply, socket |> put_flash(:info, "Report created.") |> push_navigate(to: ~p"/")}
-
-          {:error, changeset} ->
-            {:noreply, assign_form(socket, changeset)}
-        end
-
-      report ->
-        case Reports.update_report(report, params) do
-          {:ok, updated} ->
-            {:noreply,
-             socket
-             |> put_flash(:info, "Report saved.")
-             |> push_navigate(to: ~p"/reports/#{updated.id}")}
-
-          {:error, changeset} ->
-            {:noreply, assign_form(socket, changeset)}
-        end
     end
   end
 
@@ -430,19 +414,26 @@ defmodule ChinookReportsWeb.CreateReportLive do
   # Pull the current changeset and re-merge the latest form params so any
   # in-flight typing isn't lost when we add/remove a row.
   defp current_changeset(socket) do
-    data = socket.assigns.form.source.data
     params = socket.assigns.form.params || %{}
-    Reports.change_report(data, params)
+    Reports.change_report(socket.assigns.form.source, params)
   end
 
   # Update one nested list inside report_data and rebuild that embed.
+  #
+  # Ecto.Changeset.put_embed/3 on report_data with a plain, already-modified
+  # struct doesn't reliably register nested embeds_many changes (it diffs the
+  # embeds_one as a whole against the original, and that diff can come back
+  # empty even though a nested list clearly differs). Putting the list at its
+  # own nesting level, via a proper changeset for report_data, is what
+  # actually gets tracked.
   defp put_in_report_data(changeset, list_atom, new_list) do
-    report_data =
+    report_data_changeset =
       changeset
       |> Ecto.Changeset.get_field(:report_data)
-      |> Map.put(list_atom, new_list)
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_embed(list_atom, new_list)
 
-    Ecto.Changeset.put_embed(changeset, :report_data, report_data)
+    Ecto.Changeset.put_embed(changeset, :report_data, report_data_changeset)
   end
 
   defp blank_row(:profile_sections), do: %ProfileSection{}

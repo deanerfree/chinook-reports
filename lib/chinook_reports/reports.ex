@@ -25,21 +25,31 @@ defmodule ChinookReports.Reports do
     |> Report.changeset(attrs)
   end
 
-  @doc "Build a changeset for `phx-change` validation — does not persist."
-  def change_report(%Report{} = report, attrs \\ %{}) do
-    Report.changeset(report, attrs)
+  @doc """
+  Build a changeset for `phx-change` validation — does not persist.
+
+  Accepts either a `%Report{}` or an existing changeset. Passing a changeset
+  (e.g. across the steps of a multi-step form) merges the new params on top
+  of it, preserving changes from earlier steps that aren't present in `attrs`
+  while keeping the original persisted struct as `changeset.data`.
+  """
+  def change_report(report_or_changeset, attrs \\ %{}) do
+    Report.changeset(report_or_changeset, attrs)
   end
 
   @doc "Insert a new report."
-  def create_report(attrs) do
-    %Report{report_data: %Report.ReportData{}}
+  def create_report(attrs), do: create_report(%Report{report_data: %Report.ReportData{}}, attrs)
+
+  @doc "Insert a new report, from a `%Report{}` or an accumulated multi-step changeset."
+  def create_report(report_or_changeset, attrs) do
+    report_or_changeset
     |> Report.changeset(attrs)
     |> Repo.insert()
   end
 
-  @doc "Update an existing report."
-  def update_report(%Report{} = report, attrs) do
-    report
+  @doc "Update an existing report, from a `%Report{}` or an accumulated multi-step changeset."
+  def update_report(report_or_changeset, attrs) do
+    report_or_changeset
     |> Report.changeset(attrs)
     |> Repo.update()
   end
