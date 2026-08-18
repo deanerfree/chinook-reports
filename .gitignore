@@ -22,6 +22,7 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
+/node_modules/
 # Ignore package tarball (built via "mix hex.build").
 chinook_reports-*.tar
 
