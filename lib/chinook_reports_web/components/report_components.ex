@@ -4,59 +4,57 @@ defmodule ChinookReportsWeb.ReportComponents do
   import ChinookReportsWeb.CoreComponents
   import LiveSvelte
 
-  def report_details(assigns) do
-    IO.inspect(assigns.report, label: "Report in report_details component")
-
-    ~H"""
-    <.render_component report={@report} />
-    """
-  end
-
-  # defp format_date(date) do
-  #   # TODO: format date as needed
-  #   date
-  # end
-
-  @sections [
-    {"welldata", &__MODULE__.welldata_section/1},
-    {"synopsis", &__MODULE__.synopsis_section/1},
-    {"tops", &__MODULE__.tops_section/1},
-    {"daily", &__MODULE__.daily_section/1},
-    {"mud_log", &__MODULE__.mud_section/1},
-    {"bits", &__MODULE__.bits_section/1},
-    {"reservoir_data", &__MODULE__.reservoir_section/1}
-  ]
-
   attr :report, :map, required: true
 
-  @section_order Enum.map(@sections, fn {key, _} -> key end)
-
-  def render_component(assigns) do
-    assigns = assign(assigns, :section_order, @section_order)
-
+  def report_details(assigns) do
     ~H"""
     <div class="flex flex-col gap-8">
-      <%= for key <- @section_order, has_section?(@report, key) do %>
-        <section class={key <> "_section"}>
-          <.dynamic_section report={@report} section_key={key} />
-        </section>
+      <.well_summary_section report={@report} />
+
+      <%= if data = @report.report_data do %>
+        <.elevations_location_section report={@report} data={data} />
+        <.configuration_section data={data} />
+        <.profile_section rows={data.profile_sections} />
+        <.formation_tops_section rows={data.formation_tops} />
+        <.surveys_section rows={data.surveys} />
+      <% end %>
+
+      <%= if @report.import_data not in [nil, %{}] do %>
+        <.import_sections import={@report.import_data} />
       <% end %>
     </div>
     """
   end
 
-  defp has_section?(%{report_data: data}, key) when is_map(data) do
-    case Map.get(data, key) do
-      nil -> false
-      [] -> false
-      "" -> false
-      map when map_size(map) == 0 -> false
-      _ -> true
-    end
-  end
+  # ── Imported JSON (Excel extraction / seeded test data) ──────────────────
 
-  # Fallback for non-map report_data or missing keys
-  defp has_section?(_report, _key), do: false
+  attr :import, :map, required: true
+
+  defp import_sections(assigns) do
+    ~H"""
+    <%= if welldata = @import["welldata"] do %>
+      <.welldata_section report={welldata} />
+    <% end %>
+    <%= if tops = @import["tops"] do %>
+      <.tops_section tops={tops} />
+    <% end %>
+    <%= if reservoir = @import["reservoir_data"] do %>
+      <.reservoir_section reservoir={reservoir} />
+    <% end %>
+    <%= if synopsis = @import["synopsis"] do %>
+      <.synopsis_section synopsis={synopsis} legs={@import["reservoir_data"] || []} />
+    <% end %>
+    <%= if daily = @import["daily"] do %>
+      <.daily_section daily={daily} />
+    <% end %>
+    <%= if mud = @import["mud_log"] do %>
+      <.mud_section mud={mud} />
+    <% end %>
+    <%= if bits = @import["bits"] do %>
+      <.bits_section bits={bits} />
+    <% end %>
+    """
+  end
 
   defp illuminated_box(assigns) do
     ~H"""
@@ -69,98 +67,44 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
-  attr :report, :map, required: true
-  attr :section_key, :string, required: true
-
-  def dynamic_section(assigns) do
-    ~H"""
-    <%= case @section_key do %>
-      <% "bits" -> %>
-        <.bits_section bits={@report.report_data["bits"]} />
-      <% "casing" -> %>
-        <.casing_section casing={@report.report_data["casing"]} />
-      <% "daily" -> %>
-        <.daily_section daily={@report.report_data["daily"]} />
-      <% "mud_log" -> %>
-        <.mud_section mud={@report.report_data["mud_log"]} />
-      <% "reservoir_data" -> %>
-        <.reservoir_section reservoir={@report.report_data["reservoir_data"]} />
-      <% "synopsis" -> %>
-        <.synopsis_section
-          synopsis={@report.report_data["synopsis"]}
-          legs={@report.report_data["reservoir_data"] || []}
-        />
-      <% "tops" -> %>
-        <.tops_section tops={@report.report_data["tops"]} />
-      <% "welldata" -> %>
-        <.welldata_section report={@report.report_data["welldata"]} />
-    <% end %>
-    """
-  end
-
   defp bits_section(assigns) do
-    # TODO: Add calculation for cumulative Drill time, average ROP.
     ~H"""
-    <div id="bits-container" class="flex flex-col gap-4">
-      <h3 class="text-lg font-semibold">Bits</h3>
-      <%= for bit <- @bits do %>
-        <div class="w-full flex flex-col gap-2">
-          <div class="w-full flex flex-row gap-4">
-            <p><strong>No:</strong> {bit["bit_number"]}</p>
-            <p><strong>Type:</strong> {bit["type"]}</p>
-            <p><strong>Make:</strong> {bit["make"]}</p>
-            <p><strong>Size:</strong> {bit["size"]}</p>
-          </div>
-          <div class="w-full flex flex-row gap-4">
-            <p><strong>Depth in:</strong> {bit["depth_in"]}</p>
-            <p><strong>Depth out:</strong> {bit["depth_out"]}</p>
-            <p><strong>Progress:</strong> {bit["progress"]}</p>
-          </div>
-          <div class="w-full flex flex-row gap-4">
-            <p><strong>WOB:</strong> {bit["wob"]}</p>
-            <p><strong>ROP:</strong> {bit["rop"]}</p>
-            <p><strong>RPM:</strong> {bit["rpm"]}</p>
-            <p><strong>Hours:</strong> {bit["hours"]}</p>
-          </div>
-          
-    <!-- Add more fields as needed -->
-        </div>
-      <% end %>
-    </div>
-    """
-  end
-
-  defp casing_section(assigns) do
-    ~H"""
-    <div id="casing-container">
-      <h3>Casing</h3>
-      <pre><%= inspect(@casing) %></pre>
-    </div>
+    <.section_panel id="bits" title="Bits">
+      <div class="py-4 overflow-x-auto">
+        <.table id="bits_table" rows={@bits}>
+          <:col :let={b} label="No">{b["bit_number"]}</:col>
+          <:col :let={b} label="Type">{b["type"]}</:col>
+          <:col :let={b} label="Make">{b["make"]}</:col>
+          <:col :let={b} label="Size">{b["size"]}</:col>
+          <:col :let={b} label="Depth In">{b["depth_in"]}</:col>
+          <:col :let={b} label="Depth Out">{b["depth_out"]}</:col>
+          <:col :let={b} label="Progress">{b["progress"]}</:col>
+          <:col :let={b} label="WOB">{b["wob"]}</:col>
+          <:col :let={b} label="ROP">{b["rop"]}</:col>
+          <:col :let={b} label="RPM">{b["rpm"]}</:col>
+          <:col :let={b} label="Hours">{b["hours"]}</:col>
+        </.table>
+      </div>
+    </.section_panel>
     """
   end
 
   defp daily_section(assigns) do
     ~H"""
-    <div id="daily-container">
-      <h3 class="text-lg font-semibold">Daily Drilling Events</h3>
-      <%= for event <- @daily do %>
-        <%= if event["operations_summary"] != nil do %>
-          <%!-- Skip entries without operations summary for now --%>
-          <div class="w-full flex flex-col gap-4">
-            <div class="w-full flex flex-col gap-2">
-              <h4><strong>Operations Summary for {event["date"]}:</strong></h4>
-              <div class="w-full flex flex-row gap-2">
-                <span><strong>Depth:</strong> {event["depth"]}</span>
-                <span><strong>Drilling Hours:</strong> {event["drilling_hours"]}hrs</span>
-              </div>
-              <span class="block p-2 rounded bg-bg">{event["operations_summary"]}</span>
+    <.section_panel id="daily" title="Daily Drilling Reports">
+      <div class="py-4 flex flex-col gap-4">
+        <%= for event <- @daily, event["operations_summary"] != nil do %>
+          <div class="w-full flex flex-col gap-2">
+            <h4 class="text-sm font-semibold text-text">Operations Summary for {event["date"]}</h4>
+            <div class="w-full flex flex-row gap-4 text-sm text-text-secondary">
+              <span><strong>Depth:</strong> {event["depth"]} m</span>
+              <span><strong>Drilling Hours:</strong> {event["drilling_hours"]} hrs</span>
             </div>
+            <span class="block p-2 rounded bg-bg text-sm text-text">{event["operations_summary"]}</span>
           </div>
-        <% else %>
-          <%!-- Skip entries without operations summary for now --%>
         <% end %>
-      <% end %>
-    </div>
+      </div>
+    </.section_panel>
     """
   end
 
@@ -170,7 +114,7 @@ defmodule ChinookReportsWeb.ReportComponents do
       <div class="py-4 overflow-x-auto">
         <.table id="mud_table" rows={@mud}>
           <:col :let={m} label="Date">{m["date"]}</:col>
-          <:col :let={m} label="Depth (m)">{m["depth"]}</:col>
+          <:col :let={m} label="Depth (m)">{fmt_num(m["depth"])}</:col>
           <:col :let={m} label="Mud Type">{m["mud_type"]}</:col>
           <:col :let={m} label="Density">{m["density"]}</:col>
           <:col :let={m} label="Viscosity">{m["viscosity"]}</:col>
@@ -186,8 +130,9 @@ defmodule ChinookReportsWeb.ReportComponents do
   defp reservoir_section(assigns) do
     ~H"""
     <.section_panel id="reservoir" title="Reservoir Data">
-      <div class="py-4">
+      <div class="py-4 flex flex-col gap-6">
         <.svelte name="ProfileChart" props={%{legs: @reservoir}} />
+        <.svelte name="ReservoirChart" props={%{legs: @reservoir}} />
       </div>
     </.section_panel>
     """
@@ -399,82 +344,9 @@ defmodule ChinookReportsWeb.ReportComponents do
   defp format_top_val(v) when is_float(v), do: :erlang.float_to_binary(v, decimals: 1)
   defp format_top_val(v), do: to_string(v)
 
-  attr :title, :string, required: true
-  attr :subtitle, :string, default: nil
-  slot :inner_block, required: true
-
-  defp card_panel(assigns) do
-    ~H"""
-    <div class="card overflow-hidden">
-      <div class="px-5 py-2.5">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
-          {@title}
-          <%= if @subtitle do %>
-            <span class="font-normal normal-case ml-1.5 text-xs text-chinook-green-light">
-              {@subtitle}
-            </span>
-          <% end %>
-        </h4>
-      </div>
-      {render_slot(@inner_block)}
-    </div>
-    """
-  end
-
-  defp flat_card_panel(assigns) do
-    ~H"""
-    <div class="overflow-hidden">
-      <div class="py-2.5">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
-          {@title}
-        </h4>
-      </div>
-      {render_slot(@inner_block)}
-    </div>
-    """
-  end
-
-  attr :title, :string, required: true
-  slot :inner_block, required: true
-
-  defp table_panel(assigns) do
-    ~H"""
-    <div class="data-table-container">
-      <div class="py-2.5 w-full">
-        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
-          {@title}
-        </h4>
-      </div>
-      <div class="w-full overflow-x-auto">
-        {render_slot(@inner_block)}
-      </div>
-    </div>
-    """
-  end
-
-  attr :id, :string, required: true
-  attr :title, :string, required: true
-  slot :inner_block, required: true
-
-  defp section_panel(assigns) do
-    ~H"""
-    <div id={"#{@id}"} class="flex flex-col rounded-xl card-shadow">
-      <div class="flex flex-col relative rounded-xl overflow-hidden">
-        <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-        <div class="px-5 py-3 bg-linear-to-r from-primary to-secondary rounded-t-xl overflow-hidden">
-          <h3 class="text-lg font-semibold text-on-primary">{@title}</h3>
-        </div>
-        <div class="px-5 space-y-4 pb-4">
-          {render_slot(@inner_block)}
-        </div>
-      </div>
-    </div>
-    """
-  end
-
   defp welldata_section(assigns) do
     ~H"""
-    <.section_panel id="well_summary" title="Well Summary">
+    <.section_panel id="welldata" title="Well Data">
       <div class="py-4 flex flex-col gap-4">
         <.subtitle subtitle="Well Identification" />
         <div>
@@ -520,9 +392,9 @@ defmodule ChinookReportsWeb.ReportComponents do
                 <span class="text-xs font-normal text-text-secondary">
                   <%= if td["unit"] == "m" do %>
                     {"meters"}
-                    <%= if td["unit"] == "ft" do %>
-                      {"feet"}
-                    <% end %>
+                  <% end %>
+                  <%= if td["unit"] == "ft" do %>
+                    {"feet"}
                   <% end %>
                 </span>
               </div>
@@ -533,8 +405,6 @@ defmodule ChinookReportsWeb.ReportComponents do
 
       <%!-- ── Objectives + Well Type + Elevations + Location ───── --%>
 
-      <%!-- Left: Objectives + Well Type --%>
-      <%!-- <div class="py-4 flex flex-col gap-4"> --%>
       <.flat_card_panel title="Well Objectives and Type">
         <div class="py-4 flex flex-col gap-6">
           <div class="grid grid-cols-3 gap-4">
@@ -552,7 +422,6 @@ defmodule ChinookReportsWeb.ReportComponents do
             <.illuminated_box title="Final Well Status" description={status} />
           <% end %>
         </div>
-        <%!-- </div> --%>
       </.flat_card_panel>
 
       <%!-- ── Elevations + Location ─────────────────────────── --%>
@@ -570,7 +439,7 @@ defmodule ChinookReportsWeb.ReportComponents do
                       {"KB to Ground", "#{elev["kb_to_ground"]} m"},
                       {"Datum", "#{elev["reference"]}"}
                     ] do %>
-                    <div class="rounded-md bg-bg">
+                    <div class="rounded-md bg-bg p-2">
                       <p class="text-xs mb-0.5 text-muted uppercase font-medium">{label}</p>
                       <p class="text-sm text-text">{val}</p>
                     </div>
@@ -584,25 +453,27 @@ defmodule ChinookReportsWeb.ReportComponents do
               <% grid = loc["surface_location_grid"] %>
               <div class="flex flex-col gap-2 pt-2 border-t border-border-light">
                 <div class="grid grid-cols-3 gap-2">
-                  <div class="rounded-md bg-bg">
+                  <div class="rounded-md bg-bg p-2">
                     <p class="text-xs mb-0.5 text-muted uppercase font-medium">Surface</p>
                     <p class="text-sm text-text">{@report["surface_location"]}</p>
                   </div>
-                  <div class="rounded-md bg-bg">
+                  <div class="rounded-md bg-bg p-2">
                     <p class="text-xs mb-0.5 text-muted uppercase font-medium">Bottom</p>
                     <p class="text-sm text-text">{@report["bottom_location"]}</p>
                   </div>
-                  <div class="rounded-md bg-bg">
+                  <div class="rounded-md bg-bg p-2">
                     <p class="text-xs mb-0.5 text-muted uppercase font-medium">Bottom Offset</p>
                     <p class="text-sm text-text">{loc["bottom_coordinates"]}</p>
                   </div>
                   <%= if coords do %>
-                    <div class="rounded-md bg-bg col-span-2">
+                    <div class="rounded-md bg-bg p-2 col-span-2">
                       <p class="text-xs mb-0.5 text-muted uppercase font-medium">
                         Geographic Coordinates
                       </p>
                       <p class="text-sm font-mono text-text">
-                        {coords["latitude"]}° N, {abs(coords["longitude"])}° W
+                        {abs(coords["latitude"])}° {coord_dir(coords["latitude"], coords["latitude_dir"], "N", "S")}, {abs(
+                          coords["longitude"]
+                        )}° {coord_dir(coords["longitude"], coords["longitude_dir"], "E", "W")}
                         <span class="text-xs font-sans font-normal text-muted ml-1">
                           {coords["datum"]}
                         </span>
@@ -610,7 +481,7 @@ defmodule ChinookReportsWeb.ReportComponents do
                     </div>
                   <% end %>
                   <%= if grid do %>
-                    <div class="rounded-md bg-bg col-span-3">
+                    <div class="rounded-md bg-bg p-2 col-span-3">
                       <p class="text-xs mb-0.5 text-muted uppercase font-medium">Grid Offset</p>
                       <p class="text-sm text-text">
                         {grid["northing"]}m {grid["northing_dir"]}, {grid["easting"]}m {grid[
@@ -668,10 +539,10 @@ defmodule ChinookReportsWeb.ReportComponents do
         <%= if holes = @report["hole_sizes"] do %>
           <.table_panel title="Hole Sizes">
             <.table id="hole_sizes_table" rows={holes}>
-              <:col :let={h} label="Section">{String.capitalize(h["section"])}</:col>
-              <:col :let={h} label="Ø (mm)">{h["bit_diameter"]}</:col>
-              <:col :let={h} label="From">{h["from_depth"]}</:col>
-              <:col :let={h} label="To (m)">{h["to_depth"]}</:col>
+              <:col :let={h} label="Section">{String.capitalize(h["section"] || "")}</:col>
+              <:col :let={h} label="Ø (mm)">{fmt_num(h["bit_diameter"])}</:col>
+              <:col :let={h} label="From">{fmt_num(h["from_depth"])}</:col>
+              <:col :let={h} label="To (m)">{fmt_num(h["to_depth"])}</:col>
             </.table>
           </.table_panel>
         <% end %>
@@ -679,10 +550,10 @@ defmodule ChinookReportsWeb.ReportComponents do
         <%= if mud = @report["mud"] do %>
           <.table_panel title="Mud">
             <.table id="welldata_mud_table" rows={mud}>
-              <:col :let={m} label="Section">{String.capitalize(m["section"])}</:col>
+              <:col :let={m} label="Section">{String.capitalize(m["section"] || "")}</:col>
               <:col :let={m} label="Type">{m["type"]}</:col>
-              <:col :let={m} label="From">{m["from_depth"]}</:col>
-              <:col :let={m} label="To (m)">{m["to_depth"]}</:col>
+              <:col :let={m} label="From">{fmt_num(m["from_depth"])}</:col>
+              <:col :let={m} label="To (m)">{fmt_num(m["to_depth"])}</:col>
             </.table>
           </.table_panel>
         <% end %>
@@ -691,8 +562,8 @@ defmodule ChinookReportsWeb.ReportComponents do
           <.table_panel title="Casing">
             <.table id="casing_table" rows={casing}>
               <:col :let={c} label="Section">{c["section"]}</:col>
-              <:col :let={c} label="Size (mm)">{c["size"]}</:col>
-              <:col :let={c} label="Set At (m)">{c["set_at"]}</:col>
+              <:col :let={c} label="Size (mm)">{fmt_num(c["size"])}</:col>
+              <:col :let={c} label="Set At (m)">{fmt_num(c["set_at"])}</:col>
               <:col :let={c} label="Type">{c["type"]}</:col>
             </.table>
           </.table_panel>
@@ -741,7 +612,7 @@ defmodule ChinookReportsWeb.ReportComponents do
       <%!-- ── Well Profile ──────────────────────────────────────── --%>
       <%= if profile = @report["well_profile"] do %>
         <.table_panel title="Well Profile">
-          <.table id="well_profile_table" rows={profile}>
+          <.table id="welldata_profile_table" rows={profile}>
             <:col :let={s} label="Section">{s["section"]}</:col>
             <:col :let={s} label="Start">
               {get_in(s, ["start", "date"])}
@@ -751,12 +622,259 @@ defmodule ChinookReportsWeb.ReportComponents do
               {get_in(s, ["end", "date"])}
               <span class="text-xs ml-1 text-muted">{get_in(s, ["end", "time"])}</span>
             </:col>
-            <:col :let={s} label="Length (m)">{s["length"]}</:col>
+            <:col :let={s} label="Length (m)">{fmt_num(s["length"])}</:col>
             <:col :let={s} label="Duration (days)">{s["duration_days"]}</:col>
           </.table>
         </.table_panel>
       <% end %>
     </.section_panel>
+    """
+  end
+
+  # ── Well Summary ─────────────────────────────────────────────────────────
+
+  defp well_summary_section(assigns) do
+    ~H"""
+    <.section_panel id="well_summary" title="Well Summary">
+      <div class="py-4 flex flex-col gap-4">
+        <.subtitle subtitle="Well Identification" />
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3">
+          <.wfield label="Well Name" value={@report.well_name} />
+          <.wfield label="Unique Well ID" value={@report.unique_well_id} />
+          <.wfield label="Operator" value={@report.operator} />
+          <div class="flex flex-col gap-0.5">
+            <span class="text-xs font-medium text-muted uppercase">Status</span>
+            <.status_badge status={@report.status} />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3 pt-3 border-t border-border-light">
+          <.wfield label="Spud Date" value={@report.spud_date} />
+          <.wfield label="Final T.D. Date" value={@report.final_td_date} />
+          <.wfield label="Geometry" value={@report.geometry} />
+          <.wfield label="Units" value={@report.units} />
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3 pt-3 border-t border-border-light">
+          <.wfield label="Primary Target" value={@report.target_formation} />
+          <.wfield label="Secondary Target" value={@report.secondary_target} />
+          <.wfield label="Country" value={@report.country} />
+          <.wfield label="Province" value={@report.province} />
+        </div>
+
+        <%= if @report.latitude && @report.longitude do %>
+          <div class="pt-3 border-t border-border-light">
+            <div class="rounded-md bg-bg w-fit px-3 py-2">
+              <p class="text-xs mb-0.5 text-muted uppercase font-medium">Coordinates</p>
+              <p class="text-sm font-mono text-text">
+                <%= if @report.report_data && @report.report_data.datum == "UTM" do %>
+                  {@report.latitude}m, {@report.longitude}m
+                <% else %>
+                  {@report.latitude}° N, {abs(@report.longitude)}° W
+                <% end %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </.section_panel>
+    """
+  end
+
+  # ── Elevations & Location (report_data embed) ───────────────────────────
+
+  defp elevations_location_section(assigns) do
+    ~H"""
+    <%= if has_any?(@data, [:gl_elevation, :kb_elevation, :kb_to_ground, :surface_coordinates, :surface_location, :bottom_location, :field_region]) do %>
+      <.card_panel title="Elevations and Location">
+        <div class="px-5 py-4 flex flex-col gap-4">
+          <div class="grid grid-cols-3 gap-2">
+            <%= for {label, val} <- [
+                {"Ground Level", fmt_unit(@data.gl_elevation)},
+                {"Kelly Bushing", fmt_unit(@data.kb_elevation)},
+                {"KB to Ground", fmt_unit(@data.kb_to_ground)},
+                {"Datum", @data.datum}
+              ] do %>
+              <div class="rounded-md bg-bg p-2">
+                <p class="text-xs mb-0.5 text-muted uppercase font-medium">{label}</p>
+                <p class="text-sm text-text">{val || "—"}</p>
+              </div>
+            <% end %>
+          </div>
+
+          <%= if @data.surface_location || @data.bottom_location || @data.field_region do %>
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-border-light">
+              <div class="rounded-md bg-bg p-2">
+                <p class="text-xs mb-0.5 text-muted uppercase font-medium">Surface Location</p>
+                <p class="text-sm text-text">{@data.surface_location || "—"}</p>
+              </div>
+              <div class="rounded-md bg-bg p-2">
+                <p class="text-xs mb-0.5 text-muted uppercase font-medium">Bottom Location</p>
+                <p class="text-sm text-text">{@data.bottom_location || "—"}</p>
+              </div>
+              <div class="rounded-md bg-bg p-2">
+                <p class="text-xs mb-0.5 text-muted uppercase font-medium">Field / Region</p>
+                <p class="text-sm text-text">{@data.field_region || "—"}</p>
+              </div>
+            </div>
+          <% end %>
+
+          <%= if @data.surface_coordinates do %>
+            <div class="rounded-md bg-bg p-2">
+              <p class="text-xs mb-0.5 text-muted uppercase font-medium">Surface Coordinates</p>
+              <p class="text-sm text-text">{@data.surface_coordinates}</p>
+            </div>
+          <% end %>
+        </div>
+      </.card_panel>
+    <% end %>
+    """
+  end
+
+  # ── Configuration (report_data embed) ────────────────────────────────────
+
+  defp configuration_section(assigns) do
+    ~H"""
+    <%= if has_any?(@data, [:classification, :license, :purpose, :substance, :terminating_zone]) do %>
+      <.flat_card_panel title="Configuration">
+        <div class="py-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+          <.wfield label="Classification" value={@data.classification} />
+          <.wfield label="License" value={@data.license} />
+          <.wfield label="Purpose" value={@data.purpose} />
+          <.wfield label="Substance" value={@data.substance} />
+          <.wfield label="Terminating Zone" value={@data.terminating_zone} />
+        </div>
+      </.flat_card_panel>
+    <% end %>
+    """
+  end
+
+  # ── Well Profile (report_data.profile_sections) ─────────────────────────
+
+  defp profile_section(assigns) do
+    ~H"""
+    <%= if @rows != [] do %>
+      <.table_panel title="Well Profile">
+        <.table id="profile_sections_table" rows={@rows}>
+          <:col :let={s} label="Section">{s.section}</:col>
+          <:col :let={s} label="Start (m)">{fmt_decimal(s.start_depth)}</:col>
+          <:col :let={s} label="End (m)">{fmt_decimal(s.end_depth)}</:col>
+          <:col :let={s} label="Start Date">{s.start_date || "—"}</:col>
+        </.table>
+      </.table_panel>
+    <% end %>
+    """
+  end
+
+  # ── Formation Tops (report_data.formation_tops) ─────────────────────────
+
+  defp formation_tops_section(assigns) do
+    ~H"""
+    <%= if @rows != [] do %>
+      <.table_panel title="Formation Tops">
+        <.table id="formation_tops_table" rows={@rows}>
+          <:col :let={t} label="Formation">{t.formation}</:col>
+          <:col :let={t} label="MD (m)">{fmt_decimal(t.md)}</:col>
+          <:col :let={t} label="TVD (m)">{fmt_decimal(t.tvd)}</:col>
+          <:col :let={t} label="Isopach (m)">{fmt_decimal(t.isopach)}</:col>
+          <:col :let={t} label="Subsea (m)">{fmt_decimal(t.subsea)}</:col>
+        </.table>
+      </.table_panel>
+    <% end %>
+    """
+  end
+
+  # ── Directional Program (report_data.surveys) ────────────────────────────
+
+  defp surveys_section(assigns) do
+    ~H"""
+    <%= if @rows != [] do %>
+      <.table_panel title="Directional Surveys">
+        <.table id="surveys_table" rows={@rows}>
+          <:col :let={s} label="MD (m)">{fmt_decimal(s.md)}</:col>
+          <:col :let={s} label="Inclination (°)">{fmt_decimal(s.inclination)}</:col>
+          <:col :let={s} label="Azimuth (°)">{fmt_decimal(s.azimuth)}</:col>
+        </.table>
+      </.table_panel>
+    <% end %>
+    """
+  end
+
+  # ── Shared building blocks ────────────────────────────────────────────────
+
+  attr :title, :string, required: true
+  attr :subtitle, :string, default: nil
+  slot :inner_block, required: true
+
+  defp card_panel(assigns) do
+    ~H"""
+    <div class="card overflow-hidden">
+      <div class="px-5 py-2.5">
+        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
+          {@title}
+          <%= if @subtitle do %>
+            <span class="font-normal normal-case ml-1.5 text-xs text-chinook-green-light">
+              {@subtitle}
+            </span>
+          <% end %>
+        </h4>
+      </div>
+      {render_slot(@inner_block)}
+    </div>
+    """
+  end
+
+  attr :title, :string, required: true
+  slot :inner_block, required: true
+
+  defp flat_card_panel(assigns) do
+    ~H"""
+    <div class="overflow-hidden">
+      <div class="py-2.5">
+        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
+          {@title}
+        </h4>
+      </div>
+      {render_slot(@inner_block)}
+    </div>
+    """
+  end
+
+  attr :title, :string, required: true
+  slot :inner_block, required: true
+
+  defp table_panel(assigns) do
+    ~H"""
+    <div class="data-table-container">
+      <div class="py-2.5 w-full">
+        <h4 class="text-sm font-semibold uppercase tracking-wider text-table-header-label">
+          {@title}
+        </h4>
+      </div>
+      <div class="w-full overflow-x-auto">
+        {render_slot(@inner_block)}
+      </div>
+    </div>
+    """
+  end
+
+  attr :id, :string, required: true
+  attr :title, :string, required: true
+  slot :inner_block, required: true
+
+  defp section_panel(assigns) do
+    ~H"""
+    <div id={"#{@id}"} class="flex flex-col rounded-xl card-shadow">
+      <div class="flex flex-col relative rounded-xl overflow-hidden">
+        <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+        <div class="px-5 py-3 bg-linear-to-r from-primary to-secondary rounded-t-xl overflow-hidden">
+          <h3 class="text-lg font-semibold text-on-primary">{@title}</h3>
+        </div>
+        <div class="px-5 space-y-4 pb-4">
+          {render_slot(@inner_block)}
+        </div>
+      </div>
+    </div>
     """
   end
 
@@ -776,4 +894,50 @@ defmodule ChinookReportsWeb.ReportComponents do
     <span class="font-semibold uppercase text-md text-table-header-label">{@subtitle}</span>
     """
   end
+
+  attr :status, :string, required: true
+
+  defp status_badge(assigns) do
+    ~H"""
+    <span class={[
+      "inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-medium",
+      @status == "complete" && "bg-green-100 text-green-800",
+      @status == "active" && "bg-blue-100 text-blue-800",
+      @status == "draft" && "bg-gray-100 text-gray-700"
+    ]}>
+      {String.capitalize(@status || "draft")}
+    </span>
+    """
+  end
+
+  defp has_any?(data, fields), do: Enum.any?(fields, &(Map.get(data, &1) not in [nil, ""]))
+
+  defp fmt_decimal(nil), do: "—"
+  defp fmt_decimal(%Decimal{} = d), do: d |> Decimal.round(2) |> Decimal.to_string(:normal)
+
+  defp fmt_unit(nil), do: nil
+  defp fmt_unit(%Decimal{} = d), do: "#{d |> Decimal.round(2) |> Decimal.to_string(:normal)} m"
+
+  defp fmt_num(nil), do: nil
+  defp fmt_num(n) when is_float(n), do: :erlang.float_to_binary(n, decimals: 2)
+  defp fmt_num(n) when is_integer(n), do: Integer.to_string(n)
+
+  defp fmt_num(n) when is_binary(n) do
+    case Float.parse(n) do
+      {f, _} -> :erlang.float_to_binary(f, decimals: 2)
+      :error -> n
+    end
+  end
+
+  defp fmt_num(n), do: n
+
+  defp coord_dir(_value, dir, _pos, _neg) when is_binary(dir) and dir != "" do
+    String.first(dir)
+  end
+
+  defp coord_dir(value, _dir, pos, neg) when is_number(value) do
+    if value < 0, do: neg, else: pos
+  end
+
+  defp coord_dir(_value, _dir, pos, _neg), do: pos
 end

@@ -33,6 +33,9 @@ defmodule ChinookReportsWeb.Icons do
     """
   end
 
+  attr :class, :string, default: "w-5 h-5"
+  attr :rest, :global
+
   def eye_icon(assigns) do
     ~H"""
     <svg

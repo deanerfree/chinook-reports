@@ -501,7 +501,7 @@ defmodule ChinookReportsWeb.CoreComponents do
               class={["relative px-2 py-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-1 pr-4">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
+                <span class=" group-hover:bg-zinc-50 sm:rounded-l-xl" />
                 <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
                   {render_slot(col, @row_item.(row))}
                 </span>
