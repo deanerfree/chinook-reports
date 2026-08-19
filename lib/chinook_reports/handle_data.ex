@@ -36,9 +36,9 @@ defmodule ChinookReports.HandleData do
       latitude: meta["latitude"],
       longitude: meta["longitude"],
       geometry: meta["geometry"],
-      status: meta["status"],
+      status: meta["status"] || "draft",
       company_id: meta["company_id"],
-      metadata: meta
+      import_data: Map.drop(json_map, ["metadata"])
     }
 
     %Report{}
