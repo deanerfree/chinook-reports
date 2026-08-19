@@ -29,7 +29,7 @@ defmodule ChinookReports.HandleData do
       operator: meta["operator"],
       spud_date: parse_date(meta["spud_date"]),
       final_td_date: parse_date(meta["final_td_date"]),
-      primary_target: meta["primary_target"],
+      target_formation: meta["target_formation"],
       secondary_target: meta["secondary_target"],
       country: meta["country"],
       province: meta["province"],
