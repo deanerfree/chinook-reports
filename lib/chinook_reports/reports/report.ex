@@ -52,6 +52,11 @@ defmodule ChinookReports.Reports.Report do
     field :created_by, :string
     field :updated_by, :string
 
+    # --- Raw imported JSON (Excel extraction / seeded test data) ---
+    # welldata / tops / reservoir_data / synopsis / daily / mud_log / bits,
+    # as extracted — distinct from the wizard's typed `report_data` below.
+    field :import_data, :map, default: %{}
+
     # --- Everything else: structured JSONB ---
     embeds_one :report_data, ReportData, on_replace: :update do
       field :surface_location, :string
@@ -134,7 +139,8 @@ defmodule ChinookReports.Reports.Report do
       :company_id,
       :units,
       :created_by,
-      :updated_by
+      :updated_by,
+      :import_data
     ])
     |> cast_report_data(attrs)
     |> validate_required(@required_fields)
