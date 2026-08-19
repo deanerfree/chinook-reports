@@ -1,0 +1,5640 @@
+{
+  "metadata": {
+    "units": {
+      "depth": "m",
+      "diameter": "mm",
+      "rop": "m/hr",
+      "weight": "kg/m",
+      "gas": "units"
+    },
+    "well_name": "PRAIRIE FALCON CARSLAND 7-14-18-25W4",
+    "unique_well_id": "100/07-14-018-25W4/00",
+    "operator": "Prairie Falcon Resources Inc.",
+    "spud_date": "2026-06-02",
+    "final_td_date": "2026-06-05",
+    "target_formation": "VIKING SS",
+    "secondary_target": null,
+    "country": "Canada",
+    "province": "Alberta",
+    "latitude": 50.7645,
+    "longitude": -113.2891,
+    "geometry": "Vertical",
+    "status": "complete",
+    "company_id": "a098bfd5-2aca-4ed2-8380-7fb66e486dcf"
+  },
+  "welldata": {
+    "units": {
+      "depth": "m",
+      "diameter": "mm",
+      "rop": "m/hr",
+      "weight": "kg/m",
+      "gas": "units"
+    },
+    "well_name": "PRAIRIE FALCON CARSLAND 7-14-18-25W4",
+    "unique_well_id": "100/07-14-018-25W4/00",
+    "surface_location": "7-14-018-25W4",
+    "bottom_location": "7-14-018-25W4",
+    "field_region": "CARSLAND",
+    "province": "Alberta",
+    "country": "Canada",
+    "operator": "Prairie Falcon Resources Inc.",
+    "op_geo": "Melissa Chan",
+    "primary_target": "VIKING SS",
+    "secondary_target": "-",
+    "terminating_zone": "MANNVILLE",
+    "total_depth_actual": {
+      "md": 1145.0,
+      "tvd": 1139.0,
+      "subsea": -321.1,
+      "unit": "m"
+    },
+    "final_well_status": "cased vertical VIKING SS crude oil production well",
+    "well_geometry": "Vertical",
+    "afe_number": "26DRL0041",
+    "well_license": "412207",
+    "well_purpose": "Development",
+    "substance": "Crude oil",
+    "well_classification": "DEV",
+    "security": "NC (Non-Confidential)",
+    "elevations": {
+      "reference": "Sea Level",
+      "ground_level": 812.4,
+      "kelly_bushing": 817.9,
+      "kb_to_ground": 5.5
+    },
+    "location_data": {
+      "coordinate_system": "ATS",
+      "geographic_coordinates": {
+        "latitude": 50.7645,
+        "latitude_dir": "North",
+        "longitude": -113.2891,
+        "longitude_dir": "West",
+        "datum": "NAD83"
+      },
+      "surface_coordinates": "150.0m North of South, 200.0m West of East boundary of section 7-18-25W4",
+      "surface_location_grid": {
+        "format": "ATS",
+        "northing": 150.0,
+        "northing_dir": "North",
+        "easting": 200.0,
+        "easting_dir": "West",
+        "section": 7,
+        "township": 18,
+        "range": 25,
+        "meridian": 4
+      },
+      "bottom_coordinates": "150.0m North of South, 200.0m West of East boundary of section 7-18-25W4"
+    },
+    "well_timing": {
+      "spud_date": {
+        "date": "2026-06-02",
+        "time": "07:15",
+        "depth": null
+      },
+      "surface_casing": {
+        "date": "2026-06-02",
+        "time": null,
+        "depth": 127.65203
+      },
+      "sample_point": {
+        "date": "2026-06-03",
+        "time": "19:15",
+        "depth": 760.7545
+      },
+      "kick_off_point": {
+        "date": "2026-06-03",
+        "time": "12:20",
+        "depth": 175.36036
+      },
+      "intermediate_casing_point": {
+        "date": null,
+        "time": null,
+        "depth": null
+      },
+      "heel": {
+        "date": null,
+        "time": null,
+        "depth": null
+      },
+      "final_td": {
+        "date": "2026-06-05",
+        "time": "11:05",
+        "depth": 1145.0
+      },
+      "rig_release_date": "2026-06-05"
+    },
+    "hole_sizes": [
+      {
+        "section": "SURFACE",
+        "bit_diameter": 222.0,
+        "from_depth": 26.30405,
+        "to_depth": 127.65203,
+        "interval": 101.34797
+      },
+      {
+        "section": "INTERMEDIATE",
+        "bit_diameter": null,
+        "from_depth": null,
+        "to_depth": null,
+        "interval": null
+      },
+      {
+        "section": "MAIN",
+        "bit_diameter": 159.0,
+        "from_depth": 127.65203,
+        "to_depth": 1145.0,
+        "interval": 1017.34797
+      }
+    ],
+    "mud": [
+      {
+        "section": "SURFACE",
+        "type": "Water",
+        "from_depth": 26.30405,
+        "to_depth": 127.65203
+      },
+      {
+        "section": "INTERMEDIATE",
+        "type": null,
+        "from_depth": null,
+        "to_depth": null
+      },
+      {
+        "section": "MAIN",
+        "type": "Polymer",
+        "from_depth": 127.65203,
+        "to_depth": 1145.0
+      }
+    ],
+    "casing_data": [
+      {
+        "section": "SURFACE CASING",
+        "size": 177.8,
+        "set_at": 127.65203,
+        "weight": 34.22,
+        "type": "J-55"
+      },
+      {
+        "section": "INTERMEDIATE CASING",
+        "size": null,
+        "set_at": null,
+        "weight": null,
+        "type": null
+      },
+      {
+        "section": "PRODUCTION CASING",
+        "size": 73.0,
+        "set_at": 1145.0,
+        "weight": 9.67,
+        "type": "J55"
+      }
+    ],
+    "services": {
+      "wellsite_geology": {
+        "company": "Chinook Consulting Services",
+        "geologists": [
+          "Melissa Chan, P.Geo",
+          "Trevor Wong B.Sc"
+        ]
+      },
+      "drilling_contractor": {
+        "company": "Trinidad Drilling Ltd.",
+        "rig": "Rig 42"
+      },
+      "drilling_supervision": "Warren Speer, Alicia Munro",
+      "gas_detection": "Pason",
+      "directional_drilling": "Horizon Directional",
+      "mwd_lwd_services": "Horizon Directional",
+      "mud": "Excel Mud Services",
+      "coring": "Cananera",
+      "wireline_logging": "Halliburton",
+      "testing": null
+    },
+    "geological_services": {
+      "samples_operator": "700m-1145m, 5m intervals, 1 set",
+      "samples_government": "1000 to 1145m, 5m intervals, 2 sets",
+      "cores": "none cut",
+      "dst": "none performed",
+      "logging_suite": "MWD Gamma"
+    },
+    "well_profile": [
+      {
+        "section": "Vertical",
+        "uwid": "100/07-14-018-25W4/00",
+        "start": {
+          "date": "2026-06-02",
+          "time": "00:00",
+          "depth": 5.80236
+        },
+        "end": {
+          "date": "2026-06-03",
+          "time": "23:59",
+          "depth": 1145.0
+        },
+        "duration_days": "2.0",
+        "length": 1139.19764
+      }
+    ],
+    "ba_codes": [
+      {
+        "ba_code": "A7ND",
+        "licensee": "ACCEL Canada Holdings Limited"
+      },
+      {
+        "ba_code": "A7GH",
+        "licensee": "ACCEL Energy Canada Limited"
+      },
+      {
+        "ba_code": "A8DJ",
+        "licensee": "Acceleware Ltd."
+      },
+      {
+        "ba_code": "A1CW",
+        "licensee": "Access Pipeline Inc."
+      },
+      {
+        "ba_code": "A7YA",
+        "licensee": "Acestes Ventures Ltd."
+      },
+      {
+        "ba_code": "A7N3",
+        "licensee": "Acquisition Oil Corp."
+      },
+      {
+        "ba_code": "0FC1",
+        "licensee": "Adanac Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A06P",
+        "licensee": "ADM Agri-Industries Company"
+      },
+      {
+        "ba_code": "0XG3",
+        "licensee": "Advance Drilling Ltd."
+      },
+      {
+        "ba_code": "0TD9",
+        "licensee": "Advantage Energy Ltd."
+      },
+      {
+        "ba_code": "A79H",
+        "licensee": "Aeneid Exploration Inc."
+      },
+      {
+        "ba_code": "0GX2",
+        "licensee": "Agrium Inc."
+      },
+      {
+        "ba_code": "0MK6",
+        "licensee": "Alexander Oilfield Services Ltd."
+      },
+      {
+        "ba_code": "A7H2",
+        "licensee": "AlphaBow Energy Ltd."
+      },
+      {
+        "ba_code": "A0WA",
+        "licensee": "Altagas Holdings Inc."
+      },
+      {
+        "ba_code": "A0TK",
+        "licensee": "AltaGas Ltd."
+      },
+      {
+        "ba_code": "A8M2",
+        "licensee": "Altair Energy Ltd."
+      },
+      {
+        "ba_code": "A669",
+        "licensee": "Altima Resources Ltd."
+      },
+      {
+        "ba_code": "A00G",
+        "licensee": "Amazon Energy Ltd."
+      },
+      {
+        "ba_code": "A7KF",
+        "licensee": "Amherst Energy Inc."
+      },
+      {
+        "ba_code": "A77G",
+        "licensee": "Amicus Petroleum Inc."
+      },
+      {
+        "ba_code": "A14L",
+        "licensee": "Andora Energy Corporation"
+      },
+      {
+        "ba_code": "0P92",
+        "licensee": "Andrich Resources Ltd."
+      },
+      {
+        "ba_code": "A6K6",
+        "licensee": "Anka Energy Inc."
+      },
+      {
+        "ba_code": "A1EJ",
+        "licensee": "Annex Petroleum Inc."
+      },
+      {
+        "ba_code": "A5PJ",
+        "licensee": "AOC (ELE) Corp."
+      },
+      {
+        "ba_code": "A7XC",
+        "licensee": "Apar Energy Inc."
+      },
+      {
+        "ba_code": "0XN6",
+        "licensee": "APL Oil & Gas (1998) Ltd."
+      },
+      {
+        "ba_code": "0M7P",
+        "licensee": "AQT Water Management Inc."
+      },
+      {
+        "ba_code": "0G30",
+        "licensee": "ARC Resources Ltd."
+      },
+      {
+        "ba_code": "A894",
+        "licensee": "Archer Exploration Corp."
+      },
+      {
+        "ba_code": "A5KN",
+        "licensee": "Arrow Exploration Corp."
+      },
+      {
+        "ba_code": "A77W",
+        "licensee": "Artis Exploration Ltd."
+      },
+      {
+        "ba_code": "A6F2",
+        "licensee": "Artisan Energy Corporation"
+      },
+      {
+        "ba_code": "A6MY",
+        "licensee": "Ascensun Oil and Gas Ltd."
+      },
+      {
+        "ba_code": "A74X",
+        "licensee": "Aspenleaf Energy Limited"
+      },
+      {
+        "ba_code": "0Z2W",
+        "licensee": "ATCO Energy Solutions Ltd."
+      },
+      {
+        "ba_code": "0144",
+        "licensee": "ATCO Gas And Pipelines Ltd."
+      },
+      {
+        "ba_code": "A28L",
+        "licensee": "Athabasca Oil Corporation"
+      },
+      {
+        "ba_code": "0PR3",
+        "licensee": "Atlantic Energy Ltd."
+      },
+      {
+        "ba_code": "0KX6",
+        "licensee": "Avalon Energy Ltd."
+      },
+      {
+        "ba_code": "A7NE",
+        "licensee": "Avila Exploration & Development Canada Ltd."
+      },
+      {
+        "ba_code": "A71K",
+        "licensee": "Axiom Oil and Gas Inc."
+      },
+      {
+        "ba_code": "A863",
+        "licensee": "B-32 Exploration Ltd."
+      },
+      {
+        "ba_code": "A73C",
+        "licensee": "Baccalieu Energy Inc."
+      },
+      {
+        "ba_code": "A07M",
+        "licensee": "Band Energy Resources Ltd."
+      },
+      {
+        "ba_code": "0LM7",
+        "licensee": "Barcomp Petroleum Ltd."
+      },
+      {
+        "ba_code": "A0BX",
+        "licensee": "Barlon Asset Management Ltd."
+      },
+      {
+        "ba_code": "0J66",
+        "licensee": "Barnwell of Canada, Limited"
+      },
+      {
+        "ba_code": "A854",
+        "licensee": "Barrel Oil Corp."
+      },
+      {
+        "ba_code": "A7WF",
+        "licensee": "Battle River Energy Ltd."
+      },
+      {
+        "ba_code": "A5NZ",
+        "licensee": "Bay Trail Resources Ltd."
+      },
+      {
+        "ba_code": "0RL9",
+        "licensee": "Baytex Energy Ltd."
+      },
+      {
+        "ba_code": "A611",
+        "licensee": "BDJ Energy Inc."
+      },
+      {
+        "ba_code": "0NL1",
+        "licensee": "Bearspaw Petroleum Ltd."
+      },
+      {
+        "ba_code": "A4XG",
+        "licensee": "Beatton Energy Inc."
+      },
+      {
+        "ba_code": "0RW4",
+        "licensee": "Beaver Lake Resources Corporation"
+      },
+      {
+        "ba_code": "A8DA",
+        "licensee": "Bench Creek Resources Ltd."
+      },
+      {
+        "ba_code": "A2XA",
+        "licensee": "Bering Exploration Company, ULC"
+      },
+      {
+        "ba_code": "A69W",
+        "licensee": "BG Solutions Ltd."
+      },
+      {
+        "ba_code": "A7BL",
+        "licensee": "Bighorn Energy Corporation"
+      },
+      {
+        "ba_code": "A12R",
+        "licensee": "Birchcliff Energy Ltd."
+      },
+      {
+        "ba_code": "A6WF",
+        "licensee": "Birchill Canada Corp."
+      },
+      {
+        "ba_code": "A5YL",
+        "licensee": "Birchwood Resources Inc."
+      },
+      {
+        "ba_code": "0LJ6",
+        "licensee": "Black Bear Management Corp."
+      },
+      {
+        "ba_code": "A7HL",
+        "licensee": "Black Crane Energy Corp."
+      },
+      {
+        "ba_code": "A0NE",
+        "licensee": "Black Diamond Energy Corporation"
+      },
+      {
+        "ba_code": "A7RD",
+        "licensee": "Black Horse Energy Corp."
+      },
+      {
+        "ba_code": "A618",
+        "licensee": "Black Swan Energy Ltd."
+      },
+      {
+        "ba_code": "A7YR",
+        "licensee": "Blackch Canada, Ulc"
+      },
+      {
+        "ba_code": "A5CT",
+        "licensee": "Blackhawk Resource Operating Corp."
+      },
+      {
+        "ba_code": "A6F7",
+        "licensee": "Blackspur Oil Corp."
+      },
+      {
+        "ba_code": "A5FJ",
+        "licensee": "Blacksteel Energy Inc."
+      },
+      {
+        "ba_code": "0NT2",
+        "licensee": "Blue Springs Energy Ltd."
+      },
+      {
+        "ba_code": "A774",
+        "licensee": "Blue Star Energy Inc."
+      },
+      {
+        "ba_code": "A5RX",
+        "licensee": "Bonavista Energy Corporation"
+      },
+      {
+        "ba_code": "0XZ4",
+        "licensee": "Bonterra Energy Corp."
+      },
+      {
+        "ba_code": "A8BP",
+        "licensee": "Bornite Energy Ltd."
+      },
+      {
+        "ba_code": "A73X",
+        "licensee": "Boulder Energy Ltd."
+      },
+      {
+        "ba_code": "0HP8",
+        "licensee": "Bounty Developments Ltd."
+      },
+      {
+        "ba_code": "A6N8",
+        "licensee": "Bow River Energy Ltd."
+      },
+      {
+        "ba_code": "A62D",
+        "licensee": "BP Canada Energy Group ULC"
+      },
+      {
+        "ba_code": "0PM4",
+        "licensee": "Brand S Resources Ltd."
+      },
+      {
+        "ba_code": "A7YK",
+        "licensee": "Briko Energy Corp."
+      },
+      {
+        "ba_code": "A5AZ",
+        "licensee": "Bristol Energy Ltd."
+      },
+      {
+        "ba_code": "0HM1",
+        "licensee": "Britt Resources Ltd."
+      },
+      {
+        "ba_code": "0WN1",
+        "licensee": "Brixton Energy Corp."
+      },
+      {
+        "ba_code": "A83J",
+        "licensee": "Broadbill Energy Inc."
+      },
+      {
+        "ba_code": "A5TA",
+        "licensee": "Broadview Energy Ltd."
+      },
+      {
+        "ba_code": "A7PF",
+        "licensee": "Brotherin Energy Ltd."
+      },
+      {
+        "ba_code": "A8DH",
+        "licensee": "Brox Energy Operations Inc."
+      },
+      {
+        "ba_code": "A76J",
+        "licensee": "Bruderheim Energy Terminal Ltd."
+      },
+      {
+        "ba_code": "A6E9",
+        "licensee": "BRW Petroleum Corp."
+      },
+      {
+        "ba_code": "A8C8",
+        "licensee": "Btg Energy Corporation"
+      },
+      {
+        "ba_code": "A857",
+        "licensee": "Burgess Creek Exploration Inc."
+      },
+      {
+        "ba_code": "A6YN",
+        "licensee": "C Group Energy Inc."
+      },
+      {
+        "ba_code": "A8CT",
+        "licensee": "Cabin Ridge Project Limited"
+      },
+      {
+        "ba_code": "A7PC",
+        "licensee": "Caledonian Midstream Corporation"
+      },
+      {
+        "ba_code": "A6WA",
+        "licensee": "Calgary Oil and Gas Intercontinental Group Ltd."
+      },
+      {
+        "ba_code": "A60R",
+        "licensee": "Caltex Resources Ltd."
+      },
+      {
+        "ba_code": "A81C",
+        "licensee": "Campus Energy Partners Operations Inc."
+      },
+      {
+        "ba_code": "0L99",
+        "licensee": "Canada Northwest Energy Limited"
+      },
+      {
+        "ba_code": "0PD1",
+        "licensee": "Canadian Coastal Resources Ltd."
+      },
+      {
+        "ba_code": "A71J",
+        "licensee": "Canadian Energy Services Inc."
+      },
+      {
+        "ba_code": "0HE9",
+        "licensee": "Canadian Natural Resources Limited"
+      },
+      {
+        "ba_code": "A7K5",
+        "licensee": "Canadian Natural Upgrading Limited"
+      },
+      {
+        "ba_code": "A6LB",
+        "licensee": "Canamax Energy Ltd."
+      },
+      {
+        "ba_code": "A214",
+        "licensee": "Cancen Oil Processors Inc."
+      },
+      {
+        "ba_code": "A7M1",
+        "licensee": "Canlin Energy Corporation"
+      },
+      {
+        "ba_code": "0L3B",
+        "licensee": "Canpar Holdings Ltd."
+      },
+      {
+        "ba_code": "A69G",
+        "licensee": "Canstone Energy Ltd."
+      },
+      {
+        "ba_code": "A60G",
+        "licensee": "Canuck North Resources Ltd."
+      },
+      {
+        "ba_code": "0L3H",
+        "licensee": "Canyon Oil & Gas Corporation"
+      },
+      {
+        "ba_code": "A6A7",
+        "licensee": "Cardinal Energy Ltd."
+      },
+      {
+        "ba_code": "A6AM",
+        "licensee": "Carrick Petroleum Inc."
+      },
+      {
+        "ba_code": "A7F3",
+        "licensee": "Castlegate Energy Ltd."
+      },
+      {
+        "ba_code": "A73Y",
+        "licensee": "Catapult Environmental Inc."
+      },
+      {
+        "ba_code": "A66T",
+        "licensee": "Cavalier Energy Inc."
+      },
+      {
+        "ba_code": "A5D4",
+        "licensee": "Cenovus Energy Inc."
+      },
+      {
+        "ba_code": "A629",
+        "licensee": "Cenovus TL ULC"
+      },
+      {
+        "ba_code": "A7J4",
+        "licensee": "Certus Oil And Gas Inc."
+      },
+      {
+        "ba_code": "A7C1",
+        "licensee": "CES Energy Solutions Corp."
+      },
+      {
+        "ba_code": "A63L",
+        "licensee": "Changhua Energy Canada Ltd."
+      },
+      {
+        "ba_code": "A6M0",
+        "licensee": "Check Energy Ltd."
+      },
+      {
+        "ba_code": "A620",
+        "licensee": "Chemtrade Logistics Inc."
+      },
+      {
+        "ba_code": "0045",
+        "licensee": "Chevron Canada Limited"
+      },
+      {
+        "ba_code": "A7YX",
+        "licensee": "Chronos Duvernay Gp Ltd."
+      },
+      {
+        "ba_code": "0150",
+        "licensee": "City Of Medicine Hat"
+      },
+      {
+        "ba_code": "A5J8",
+        "licensee": "Clampett Energy Ltd."
+      },
+      {
+        "ba_code": "A5RA",
+        "licensee": "Clearview Resources Ltd."
+      },
+      {
+        "ba_code": "A7BY",
+        "licensee": "Cleo Energy Corp."
+      },
+      {
+        "ba_code": "A85Z",
+        "licensee": "Closure Liability Management Inc."
+      },
+      {
+        "ba_code": "A715",
+        "licensee": "CMC Research Institutes, Inc."
+      },
+      {
+        "ba_code": "A6LC",
+        "licensee": "CNOOC Petroleum North America ULC"
+      },
+      {
+        "ba_code": "0HZ2",
+        "licensee": "CNPC International (Canada) Ltd."
+      },
+      {
+        "ba_code": "A5M1",
+        "licensee": "Coalspur Mines (Operations) Ltd."
+      },
+      {
+        "ba_code": "0PR1",
+        "licensee": "Coastal Resources Limited"
+      },
+      {
+        "ba_code": "A0AZ",
+        "licensee": "Cold Creek Resources Ltd."
+      },
+      {
+        "ba_code": "A85D",
+        "licensee": "Concourse Petroleum Inc."
+      },
+      {
+        "ba_code": "A2E5",
+        "licensee": "Condor Canada Petroleum Inc."
+      },
+      {
+        "ba_code": "A7WE",
+        "licensee": "Conflux Energy Corp."
+      },
+      {
+        "ba_code": "A8CW",
+        "licensee": "Conifer Energy Inc."
+      },
+      {
+        "ba_code": "0A9H",
+        "licensee": "Connacher Oil And Gas Limited"
+      },
+      {
+        "ba_code": "A5G3",
+        "licensee": "ConocoPhillips Canada Resources Corp."
+      },
+      {
+        "ba_code": "0GY1",
+        "licensee": "Contour Energy Ltd."
+      },
+      {
+        "ba_code": "0E9R",
+        "licensee": "Convega Energy Ltd."
+      },
+      {
+        "ba_code": "A21P",
+        "licensee": "Cool LNG Inc."
+      },
+      {
+        "ba_code": "A6Y2",
+        "licensee": "Cor4 Oil Corp."
+      },
+      {
+        "ba_code": "A2WH",
+        "licensee": "Corex Resources Ltd."
+      },
+      {
+        "ba_code": "A732",
+        "licensee": "Corinthian Oil Corp."
+      },
+      {
+        "ba_code": "A6NW",
+        "licensee": "Corse Energy Corp."
+      },
+      {
+        "ba_code": "A6G5",
+        "licensee": "Cote Resources Ltd."
+      },
+      {
+        "ba_code": "0ZB4",
+        "licensee": "CPC Canada Corp."
+      },
+      {
+        "ba_code": "A7M9",
+        "licensee": "Creenergy Oil & Gas Inc."
+      },
+      {
+        "ba_code": "A2J6",
+        "licensee": "Crescent Point Energy Corp."
+      },
+      {
+        "ba_code": "A7MZ",
+        "licensee": "Crest Jinn Petroleum Corporation"
+      },
+      {
+        "ba_code": "A7MT",
+        "licensee": "Crestwynd Exploration Ltd."
+      },
+      {
+        "ba_code": "A0C6",
+        "licensee": "Crew Energy Inc."
+      },
+      {
+        "ba_code": "A6AG",
+        "licensee": "Crimson Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "709B",
+        "licensee": "CrossAlta Gas Storage & Services Ltd."
+      },
+      {
+        "ba_code": "A5PT",
+        "licensee": "Croverro Energy Ltd."
+      },
+      {
+        "ba_code": "A6WG",
+        "licensee": "CSV Midstream Solutions Corp."
+      },
+      {
+        "ba_code": "A7X5",
+        "licensee": "Cutter Resources Ltd."
+      },
+      {
+        "ba_code": "A8AX",
+        "licensee": "Cvictus Inc."
+      },
+      {
+        "ba_code": "A74R",
+        "licensee": "Cynthia Custom Oil Processing Ltd."
+      },
+      {
+        "ba_code": "0LJ8",
+        "licensee": "D & R Oils Ltd."
+      },
+      {
+        "ba_code": "0P32",
+        "licensee": "D. L. Siemens Explorations Ltd."
+      },
+      {
+        "ba_code": "A7XY",
+        "licensee": "Danzig Resources Ltd."
+      },
+      {
+        "ba_code": "0XF2",
+        "licensee": "Dark Energy Ltd."
+      },
+      {
+        "ba_code": "A6AP",
+        "licensee": "Dark Warrior Resources Ltd."
+      },
+      {
+        "ba_code": "A7DB",
+        "licensee": "DCP Oil Corp."
+      },
+      {
+        "ba_code": "A64K",
+        "licensee": "Deckland Inc."
+      },
+      {
+        "ba_code": "A64N",
+        "licensee": "DeerGarden Resources Ltd."
+      },
+      {
+        "ba_code": "A6YA",
+        "licensee": "Deltastream Energy Corporation"
+      },
+      {
+        "ba_code": "A840",
+        "licensee": "Deltawest Energy Ltd."
+      },
+      {
+        "ba_code": "A7XT",
+        "licensee": "Deneb Energy Ltd."
+      },
+      {
+        "ba_code": "0K29",
+        "licensee": "Devon Canada Corporation"
+      },
+      {
+        "ba_code": "0NX3",
+        "licensee": "DGS Oil & Gas Co. Inc."
+      },
+      {
+        "ba_code": "A777",
+        "licensee": "Dienerian Resources Inc."
+      },
+      {
+        "ba_code": "A59W",
+        "licensee": "Discovery Resource Management Ltd."
+      },
+      {
+        "ba_code": "A8KB",
+        "licensee": "Discovery Resources Ltd."
+      },
+      {
+        "ba_code": "A63X",
+        "licensee": "Doag Energy Ltd."
+      },
+      {
+        "ba_code": "0F05",
+        "licensee": "Dow Chemical Canada ULC"
+      },
+      {
+        "ba_code": "A6Y1",
+        "licensee": "Dragonfountain Ltd."
+      },
+      {
+        "ba_code": "A74J",
+        "licensee": "Dragonwell Ltd."
+      },
+      {
+        "ba_code": "A2RJ",
+        "licensee": "Drakkar Energy Ltd."
+      },
+      {
+        "ba_code": "0MC7",
+        "licensee": "Dynatech Petroleum Consultants Ltd."
+      },
+      {
+        "ba_code": "A8KW",
+        "licensee": "E3 Metals Corp."
+      },
+      {
+        "ba_code": "A794",
+        "licensee": "Eagle Energy Inc."
+      },
+      {
+        "ba_code": "A1P7",
+        "licensee": "Eastcott Holdings Ltd."
+      },
+      {
+        "ba_code": "0YK8",
+        "licensee": "Eclipse Resources Ltd."
+      },
+      {
+        "ba_code": "A519",
+        "licensee": "Eco-Industrial Business Park Inc."
+      },
+      {
+        "ba_code": "A5F0",
+        "licensee": "Edalis Energy Inc."
+      },
+      {
+        "ba_code": "A5CR",
+        "licensee": "Eddie's Oil Ltd."
+      },
+      {
+        "ba_code": "A8CB",
+        "licensee": "Edge Lrm Operations Ltd."
+      },
+      {
+        "ba_code": "A67P",
+        "licensee": "Ellisboro Energy Ltd."
+      },
+      {
+        "ba_code": "A1H9",
+        "licensee": "Ember Resources Inc."
+      },
+      {
+        "ba_code": "A5YB",
+        "licensee": "Emerald Lake Energy Ltd."
+      },
+      {
+        "ba_code": "A6ET",
+        "licensee": "Enbridge G and P Canada Inc."
+      },
+      {
+        "ba_code": "0P55",
+        "licensee": "Enbridge Gas Distribution Inc."
+      },
+      {
+        "ba_code": "A1HH",
+        "licensee": "Enbridge Midstream Inc."
+      },
+      {
+        "ba_code": "0WL4",
+        "licensee": "Enbridge Pipelines (Athabasca) Inc."
+      },
+      {
+        "ba_code": "A5DZ",
+        "licensee": "Enbridge Pipelines (Woodland) Inc."
+      },
+      {
+        "ba_code": "0WH2",
+        "licensee": "Enbridge Pipelines Inc."
+      },
+      {
+        "ba_code": "0HR9",
+        "licensee": "Ener T Corporation"
+      },
+      {
+        "ba_code": "A73W",
+        "licensee": "Enercapita Energy Ltd."
+      },
+      {
+        "ba_code": "A73E",
+        "licensee": "Energetic Logistics Services Inc."
+      },
+      {
+        "ba_code": "A23W",
+        "licensee": "Energy Safety Canada"
+      },
+      {
+        "ba_code": "A84Z",
+        "licensee": "Energy Transfer Canada ULC"
+      },
+      {
+        "ba_code": "A5RD",
+        "licensee": "Enerplus Corporation"
+      },
+      {
+        "ba_code": "A216",
+        "licensee": "Enhance Energy Inc."
+      },
+      {
+        "ba_code": "A5FG",
+        "licensee": "Eni Canada Holding Ltd."
+      },
+      {
+        "ba_code": "A6XB",
+        "licensee": "Enmax Cavalier GP Inc."
+      },
+      {
+        "ba_code": "A7DT",
+        "licensee": "Entrada Resources Inc."
+      },
+      {
+        "ba_code": "A6P8",
+        "licensee": "Envolve Energy Services Corp."
+      },
+      {
+        "ba_code": "A327",
+        "licensee": "Equinor Canada Ltd."
+      },
+      {
+        "ba_code": "A8H3",
+        "licensee": "Erdol Resources Corp."
+      },
+      {
+        "ba_code": "A74K",
+        "licensee": "Essex Oil Corporation"
+      },
+      {
+        "ba_code": "A1H6",
+        "licensee": "E-T Energy Ltd."
+      },
+      {
+        "ba_code": "A81J",
+        "licensee": "Everest Canadian Resources Corp."
+      },
+      {
+        "ba_code": "A7KA",
+        "licensee": "Evolution Environmental Ltd."
+      },
+      {
+        "ba_code": "A6PA",
+        "licensee": "Executive Adventures 2008 Inc."
+      },
+      {
+        "ba_code": "A7KE",
+        "licensee": "Expander Energy Inc."
+      },
+      {
+        "ba_code": "0057",
+        "licensee": "ExxonMobil Canada Ltd."
+      },
+      {
+        "ba_code": "A0NG",
+        "licensee": "ExxonMobil Canada Resources Company"
+      },
+      {
+        "ba_code": "A7AB",
+        "licensee": "Falls Creek Resources Inc."
+      },
+      {
+        "ba_code": "0HH4",
+        "licensee": "Ferrybank Resources Ltd."
+      },
+      {
+        "ba_code": "A1Y8",
+        "licensee": "Ferus Inc."
+      },
+      {
+        "ba_code": "A73H",
+        "licensee": "Ferus Natural Gas Fuels Inc."
+      },
+      {
+        "ba_code": "0TY4",
+        "licensee": "Fire Creek Resources Ltd."
+      },
+      {
+        "ba_code": "A8A5",
+        "licensee": "Fiscal Energy Corp."
+      },
+      {
+        "ba_code": "A24D",
+        "licensee": "Flint Hills Resources Canada, ULC"
+      },
+      {
+        "ba_code": "0F9Y",
+        "licensee": "Flow-Back Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "0MF4",
+        "licensee": "Fontana Resources Ltd."
+      },
+      {
+        "ba_code": "A8A6",
+        "licensee": "Footstone Energy Canada Co. Ltd"
+      },
+      {
+        "ba_code": "A7XB",
+        "licensee": "Forden Energy Inc."
+      },
+      {
+        "ba_code": "0KK8",
+        "licensee": "Forestry, Lands & Wildlife"
+      },
+      {
+        "ba_code": "A76A",
+        "licensee": "Forge Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A1JY",
+        "licensee": "Fort Calgary Resources Ltd."
+      },
+      {
+        "ba_code": "0XP9",
+        "licensee": "Fort Hills Energy Corporation"
+      },
+      {
+        "ba_code": "A312",
+        "licensee": "Frank Energy Ltd."
+      },
+      {
+        "ba_code": "0KA2",
+        "licensee": "Free Rein Resources Ltd."
+      },
+      {
+        "ba_code": "A68A",
+        "licensee": "Freehold Royalties Ltd."
+      },
+      {
+        "ba_code": "A6DY",
+        "licensee": "G. Herman Group Inc."
+      },
+      {
+        "ba_code": "A7ME",
+        "licensee": "Gain Energy Ltd."
+      },
+      {
+        "ba_code": "A2JR",
+        "licensee": "Gear Energy Ltd."
+      },
+      {
+        "ba_code": "A7L3",
+        "licensee": "Ghost River Resources Inc."
+      },
+      {
+        "ba_code": "A70K",
+        "licensee": "GL Petroleum Corporation"
+      },
+      {
+        "ba_code": "A7YG",
+        "licensee": "Gmt Exploration Zama Inc."
+      },
+      {
+        "ba_code": "A63Z",
+        "licensee": "Golden Goose Energy Ltd."
+      },
+      {
+        "ba_code": "A0M1",
+        "licensee": "Golden Spike Energy Inc."
+      },
+      {
+        "ba_code": "A2K7",
+        "licensee": "Goldenkey Oil Inc."
+      },
+      {
+        "ba_code": "A7Y5",
+        "licensee": "Goose Creek Resources Ltd."
+      },
+      {
+        "ba_code": "A8ML",
+        "licensee": "Grafton Ventures Energy Holdings Corp."
+      },
+      {
+        "ba_code": "0XJ5",
+        "licensee": "Grand Rapids Petroleum Ltd."
+      },
+      {
+        "ba_code": "A6GL",
+        "licensee": "Grand Rapids Pipeline GP Ltd."
+      },
+      {
+        "ba_code": "A7KL",
+        "licensee": "Grand Valley Resources Corp."
+      },
+      {
+        "ba_code": "A2CC",
+        "licensee": "Grandview Exploration Inc."
+      },
+      {
+        "ba_code": "A1W3",
+        "licensee": "Graybeard Energy Ltd."
+      },
+      {
+        "ba_code": "A8LF",
+        "licensee": "Green Impact Operating Corp."
+      },
+      {
+        "ba_code": "0G4H",
+        "licensee": "Green Valley Energy Ltd."
+      },
+      {
+        "ba_code": "A8PA",
+        "licensee": "Greenfire Resources Operating Corporation"
+      },
+      {
+        "ba_code": "A29X",
+        "licensee": "Grizzly Oil Sands ULC"
+      },
+      {
+        "ba_code": "A0TX",
+        "licensee": "Grizzly Resources Ltd."
+      },
+      {
+        "ba_code": "A1BB",
+        "licensee": "Gryphon Petroleum Corp."
+      },
+      {
+        "ba_code": "A5FY",
+        "licensee": "Gunnarr Resources Inc."
+      },
+      {
+        "ba_code": "A77Y",
+        "licensee": "Halliburton Partners Canada ULC"
+      },
+      {
+        "ba_code": "A6GH",
+        "licensee": "Halo Exploration Ltd."
+      },
+      {
+        "ba_code": "A5T7",
+        "licensee": "Hammerhead Resources Inc."
+      },
+      {
+        "ba_code": "A8AW",
+        "licensee": "Hamptons Oil Ltd."
+      },
+      {
+        "ba_code": "0ZK3",
+        "licensee": "Hard Rock Resources Ltd."
+      },
+      {
+        "ba_code": "A04H",
+        "licensee": "Hardisty Caverns Ltd."
+      },
+      {
+        "ba_code": "0AF4",
+        "licensee": "Harvard International Resources Ltd."
+      },
+      {
+        "ba_code": "A8MA",
+        "licensee": "Harvest Energy Corporation"
+      },
+      {
+        "ba_code": "0Z0H",
+        "licensee": "Harvest Operations Corp."
+      },
+      {
+        "ba_code": "A8EK",
+        "licensee": "H-Bayn Thermo-Electric Corp."
+      },
+      {
+        "ba_code": "A77B",
+        "licensee": "HBC Energy Ltd."
+      },
+      {
+        "ba_code": "0G7C",
+        "licensee": "Headco Exploration Co. Ltd."
+      },
+      {
+        "ba_code": "A8DL",
+        "licensee": "Headwater Exploration Inc."
+      },
+      {
+        "ba_code": "A6LJ",
+        "licensee": "Heartland Pipeline Gp Ltd."
+      },
+      {
+        "ba_code": "A5ER",
+        "licensee": "Hell's Half-Acre Petroleum Corporation"
+      },
+      {
+        "ba_code": "A5E4",
+        "licensee": "Hemisphere Energy Corporation"
+      },
+      {
+        "ba_code": "A6R6",
+        "licensee": "HESC Energy Corporation"
+      },
+      {
+        "ba_code": "A7PD",
+        "licensee": "High Point Oil Inc."
+      },
+      {
+        "ba_code": "A69T",
+        "licensee": "Highvale Operating Corp."
+      },
+      {
+        "ba_code": "A6CG",
+        "licensee": "Highwood Oil Company Ltd."
+      },
+      {
+        "ba_code": "A697",
+        "licensee": "Hitic Energy Ltd."
+      },
+      {
+        "ba_code": "A8JB",
+        "licensee": "Huntington Capital Inc."
+      },
+      {
+        "ba_code": "A1HW",
+        "licensee": "Huntington Exploration Inc."
+      },
+      {
+        "ba_code": "A6YG",
+        "licensee": "Huron Resources Corp."
+      },
+      {
+        "ba_code": "A7WY",
+        "licensee": "Husky Midstream General Partner Inc."
+      },
+      {
+        "ba_code": "A6H2",
+        "licensee": "Hutton Energy Ltd."
+      },
+      {
+        "ba_code": "A8HW",
+        "licensee": "I3 Energy Canada Ltd."
+      },
+      {
+        "ba_code": "A6PN",
+        "licensee": "Imola Holdings Inc."
+      },
+      {
+        "ba_code": "A8K2",
+        "licensee": "Imperial Helium Corp."
+      },
+      {
+        "ba_code": "0007",
+        "licensee": "Imperial Oil Resources Limited"
+      },
+      {
+        "ba_code": "A6MB",
+        "licensee": "Incipient Exploration Ltd."
+      },
+      {
+        "ba_code": "0LJ4",
+        "licensee": "Indra Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "A6JK",
+        "licensee": "InPlay Oil Corp."
+      },
+      {
+        "ba_code": "A1FX",
+        "licensee": "Insignia Energy Ltd."
+      },
+      {
+        "ba_code": "0XP6",
+        "licensee": "Inter Pipeline (Corridor) Inc."
+      },
+      {
+        "ba_code": "A10L",
+        "licensee": "Inter Pipeline Extraction Ltd."
+      },
+      {
+        "ba_code": "A6LA",
+        "licensee": "Inter Pipeline Ltd."
+      },
+      {
+        "ba_code": "A7FH",
+        "licensee": "Inter Pipeline Offgas Ltd."
+      },
+      {
+        "ba_code": "A6GF",
+        "licensee": "Inter Pipeline Polaris Inc."
+      },
+      {
+        "ba_code": "A72F",
+        "licensee": "Inter Pipeline Propylene Ltd."
+      },
+      {
+        "ba_code": "A868",
+        "licensee": "Ipc Canada Ltd."
+      },
+      {
+        "ba_code": "A87C",
+        "licensee": "Ironbark Energy Ltd."
+      },
+      {
+        "ba_code": "0LN5",
+        "licensee": "Ish Energy Ltd."
+      },
+      {
+        "ba_code": "A8A9",
+        "licensee": "Islander Oil & Gas Inc."
+      },
+      {
+        "ba_code": "A6LD",
+        "licensee": "Jast Energy Ltd."
+      },
+      {
+        "ba_code": "A276",
+        "licensee": "Jayhawk Resources Ltd."
+      },
+      {
+        "ba_code": "A6PZ",
+        "licensee": "JBS Food Canada ULC"
+      },
+      {
+        "ba_code": "A86A",
+        "licensee": "Jixing Energy (canada) Ltd."
+      },
+      {
+        "ba_code": "A29C",
+        "licensee": "Joslyn Energy Development Incorporated"
+      },
+      {
+        "ba_code": "A2PH",
+        "licensee": "Journey Energy Inc."
+      },
+      {
+        "ba_code": "A5RH",
+        "licensee": "JRJ Energy Ltd."
+      },
+      {
+        "ba_code": "A2N1",
+        "licensee": "Just Freehold Energy Corp."
+      },
+      {
+        "ba_code": "A6TK",
+        "licensee": "K+S Windsor Salt Ltd./K+S Sel Windsor Ltee"
+      },
+      {
+        "ba_code": "A7JH",
+        "licensee": "Kaden Energy Ltd."
+      },
+      {
+        "ba_code": "A7H0",
+        "licensee": "Kaisen Energy Corp."
+      },
+      {
+        "ba_code": "A1RN",
+        "licensee": "Kaiser Exploration Ltd."
+      },
+      {
+        "ba_code": "0LC7",
+        "licensee": "Kam's Sand Coating Ltd."
+      },
+      {
+        "ba_code": "A730",
+        "licensee": "Kanata Energy Group Ltd."
+      },
+      {
+        "ba_code": "A7BT",
+        "licensee": "Karve Energy Inc."
+      },
+      {
+        "ba_code": "A5GJ",
+        "licensee": "Kasten Energy Inc."
+      },
+      {
+        "ba_code": "A7HZ",
+        "licensee": "Kaybob Energy Corp."
+      },
+      {
+        "ba_code": "A6D7",
+        "licensee": "Kelt Exploration Ltd."
+      },
+      {
+        "ba_code": "A0F2",
+        "licensee": "Keyano Pimee Exploration Company Ltd."
+      },
+      {
+        "ba_code": "A5X1",
+        "licensee": "Keyera Corp."
+      },
+      {
+        "ba_code": "A0C0",
+        "licensee": "Keyera Energy Ltd."
+      },
+      {
+        "ba_code": "A7HF",
+        "licensee": "Keyera Rimbey Ltd."
+      },
+      {
+        "ba_code": "A2PZ",
+        "licensee": "KinMerc Oil & Gas Inc."
+      },
+      {
+        "ba_code": "A23C",
+        "licensee": "Kinuso Mercantile Ltd."
+      },
+      {
+        "ba_code": "A8NW",
+        "licensee": "Kiwetinohk Energy Corp."
+      },
+      {
+        "ba_code": "A5T4",
+        "licensee": "Km Canada Terminals Ulc"
+      },
+      {
+        "ba_code": "A2FG",
+        "licensee": "Knowledge Energy Inc."
+      },
+      {
+        "ba_code": "A2N2",
+        "licensee": "Koch Oil Sands Operating ULC"
+      },
+      {
+        "ba_code": "A7LZ",
+        "licensee": "Komstar Resources Ltd."
+      },
+      {
+        "ba_code": "A8JZ",
+        "licensee": "Kop Exploration Corp"
+      },
+      {
+        "ba_code": "0RJ9",
+        "licensee": "Kosowan Hydrocarbons Ltd."
+      },
+      {
+        "ba_code": "0H7T",
+        "licensee": "Lakewood Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "A78R",
+        "licensee": "Lance Exploration Corp."
+      },
+      {
+        "ba_code": "0MM6",
+        "licensee": "Land Petroleum International Inc."
+      },
+      {
+        "ba_code": "A832",
+        "licensee": "Ledgend Royalty Trust Ltd."
+      },
+      {
+        "ba_code": "A8MM",
+        "licensee": "Letho Resources Corp."
+      },
+      {
+        "ba_code": "A6XJ",
+        "licensee": "Leucrotta Exploration Inc."
+      },
+      {
+        "ba_code": "0TB6",
+        "licensee": "Linde Canada Inc."
+      },
+      {
+        "ba_code": "A67B",
+        "licensee": "Logic Energy Ltd."
+      },
+      {
+        "ba_code": "A805",
+        "licensee": "Lone Tree Resources Inc."
+      },
+      {
+        "ba_code": "A5MR",
+        "licensee": "Long Lake Energy Ltd."
+      },
+      {
+        "ba_code": "A517",
+        "licensee": "Long Run Exploration Ltd."
+      },
+      {
+        "ba_code": "A6JF",
+        "licensee": "Long Term Asset Management Inc."
+      },
+      {
+        "ba_code": "A76W",
+        "licensee": "Longshore Resources Ltd."
+      },
+      {
+        "ba_code": "A7X9",
+        "licensee": "Loyal Energy (canada) Operating Ltd."
+      },
+      {
+        "ba_code": "A8FD",
+        "licensee": "Lucky Strike Energy Ltd."
+      },
+      {
+        "ba_code": "A0NH",
+        "licensee": "Luxur Resources Inc."
+      },
+      {
+        "ba_code": "A7AG",
+        "licensee": "Lynx Energy ULC"
+      },
+      {
+        "ba_code": "A8BA",
+        "licensee": "Maga Energy Ltd."
+      },
+      {
+        "ba_code": "A7D7",
+        "licensee": "MainSail Energy Ltd."
+      },
+      {
+        "ba_code": "A5EA",
+        "licensee": "Malak Energy Inc."
+      },
+      {
+        "ba_code": "A7FW",
+        "licensee": "Malibu Energy Ltd."
+      },
+      {
+        "ba_code": "0YT7",
+        "licensee": "Mancal Energy Inc."
+      },
+      {
+        "ba_code": "A5M4",
+        "licensee": "Manitok Energy Inc."
+      },
+      {
+        "ba_code": "A1RT",
+        "licensee": "Marksmen Energy Inc."
+      },
+      {
+        "ba_code": "A7BZ",
+        "licensee": "Marlboro Energy Ltd."
+      },
+      {
+        "ba_code": "0ZR6",
+        "licensee": "Mato Inc."
+      },
+      {
+        "ba_code": "A6W4",
+        "licensee": "Maximus 88 Exploration and Production Ltd."
+      },
+      {
+        "ba_code": "A6TW",
+        "licensee": "McLand Resources Ltd."
+      },
+      {
+        "ba_code": "0GZ6",
+        "licensee": "Medicine River Oil Recyclers Ltd."
+      },
+      {
+        "ba_code": "0Z9C",
+        "licensee": "MEG Energy Corp."
+      },
+      {
+        "ba_code": "A1MC",
+        "licensee": "MEGlobal Canada ULC"
+      },
+      {
+        "ba_code": "0L62",
+        "licensee": "Methanex Corporation"
+      },
+      {
+        "ba_code": "0YF6",
+        "licensee": "Midcoast Canada Operating Corporation"
+      },
+      {
+        "ba_code": "A87L",
+        "licensee": "Milner Power Ii Inc."
+      },
+      {
+        "ba_code": "A7LF",
+        "licensee": "Mjolnir Resources Corp."
+      },
+      {
+        "ba_code": "0L08",
+        "licensee": "Mont Resources Limited"
+      },
+      {
+        "ba_code": "A7TN",
+        "licensee": "Monterey Bay Exploration Ltd."
+      },
+      {
+        "ba_code": "A2BW",
+        "licensee": "Mooncor Energy Inc."
+      },
+      {
+        "ba_code": "A7TE",
+        "licensee": "Morning Star Petroleum Incorporated"
+      },
+      {
+        "ba_code": "0Z1K",
+        "licensee": "Muddy Petroleum Company Ltd."
+      },
+      {
+        "ba_code": "0063",
+        "licensee": "Murphy Oil Company Ltd."
+      },
+      {
+        "ba_code": "A6EH",
+        "licensee": "Myra Falls Mine Ltd."
+      },
+      {
+        "ba_code": "A73N",
+        "licensee": "N7 Energy Ltd."
+      },
+      {
+        "ba_code": "A6TX",
+        "licensee": "Nakoda Oil and Gas Inc."
+      },
+      {
+        "ba_code": "A6DF",
+        "licensee": "Nelson Bros. Oilfield Services 1997 Ltd."
+      },
+      {
+        "ba_code": "A637",
+        "licensee": "NEP Canada ULC"
+      },
+      {
+        "ba_code": "A68R",
+        "licensee": "New Star Energy Ltd."
+      },
+      {
+        "ba_code": "A71Y",
+        "licensee": "Newpark Canada Inc."
+      },
+      {
+        "ba_code": "A767",
+        "licensee": "Nine Ring Energy Development Inc."
+      },
+      {
+        "ba_code": "A7E2",
+        "licensee": "North 40 Resources Ltd."
+      },
+      {
+        "ba_code": "A8AK",
+        "licensee": "North Fork Resources Ltd"
+      },
+      {
+        "ba_code": "A6KE",
+        "licensee": "North West Redwater Holdings Corp."
+      },
+      {
+        "ba_code": "A6DC",
+        "licensee": "Northern Courier Pipeline Gp Ltd."
+      },
+      {
+        "ba_code": "A2CY",
+        "licensee": "Northern Hunter Energy Inc."
+      },
+      {
+        "ba_code": "A1KN",
+        "licensee": "NorthRiver Midstream Inc."
+      },
+      {
+        "ba_code": "A8GY",
+        "licensee": "Northrock Resources Partnership Ltd."
+      },
+      {
+        "ba_code": "A56D",
+        "licensee": "Norwegian Energy Inc."
+      },
+      {
+        "ba_code": "A8ME",
+        "licensee": "Notine Holdings Inc."
+      },
+      {
+        "ba_code": "0TB3",
+        "licensee": "NOVA Gas Transmission Ltd."
+      },
+      {
+        "ba_code": "0TA4",
+        "licensee": "Novagas Canada Ltd."
+      },
+      {
+        "ba_code": "A1RY",
+        "licensee": "Novus Energy Inc."
+      },
+      {
+        "ba_code": "A8GB",
+        "licensee": "Nps Industrial Power"
+      },
+      {
+        "ba_code": "A78Y",
+        "licensee": "N-Solv Corporation"
+      },
+      {
+        "ba_code": "A8CJ",
+        "licensee": "Nuova Strada Ventures Ltd."
+      },
+      {
+        "ba_code": "A0A7",
+        "licensee": "NuVista Energy Ltd."
+      },
+      {
+        "ba_code": "A6NT",
+        "licensee": "NVP Exploration Inc."
+      },
+      {
+        "ba_code": "A70Z",
+        "licensee": "Oak Resources Ltd."
+      },
+      {
+        "ba_code": "A29R",
+        "licensee": "Oban Energy Ltd."
+      },
+      {
+        "ba_code": "0BP8",
+        "licensee": "Obsidian Energy Ltd."
+      },
+      {
+        "ba_code": "A77M",
+        "licensee": "Oculus Transport Ltd."
+      },
+      {
+        "ba_code": "A6N5",
+        "licensee": "Ohana Resources Inc."
+      },
+      {
+        "ba_code": "0P83",
+        "licensee": "Omimex Canada, Ltd."
+      },
+      {
+        "ba_code": "A5Y7",
+        "licensee": "Optimal Resources Inc."
+      },
+      {
+        "ba_code": "A2DE",
+        "licensee": "ORLEN Upstream Canada Ltd."
+      },
+      {
+        "ba_code": "0MY3",
+        "licensee": "Orphan Well Association"
+      },
+      {
+        "ba_code": "A72X",
+        "licensee": "Outlier Resources Ltd."
+      },
+      {
+        "ba_code": "A77P",
+        "licensee": "Outpost Energy Ltd."
+      },
+      {
+        "ba_code": "0026",
+        "licensee": "Ovintiv Canada ULC"
+      },
+      {
+        "ba_code": "0KZ6",
+        "licensee": "Pachanga Energy Inc."
+      },
+      {
+        "ba_code": "A6HG",
+        "licensee": "Paleo Resources, Inc."
+      },
+      {
+        "ba_code": "A5WC",
+        "licensee": "Pamoco Resources Ltd."
+      },
+      {
+        "ba_code": "A08X",
+        "licensee": "Paramount Resources (ACPL) Ltd."
+      },
+      {
+        "ba_code": "0AW4",
+        "licensee": "Paramount Resources Ltd."
+      },
+      {
+        "ba_code": "A7JD",
+        "licensee": "Paredes Energy Corporation"
+      },
+      {
+        "ba_code": "0HY9",
+        "licensee": "Parkland Refining Ltd."
+      },
+      {
+        "ba_code": "A22M",
+        "licensee": "Pavilion Energy Corp."
+      },
+      {
+        "ba_code": "A71L",
+        "licensee": "Pele Energy Inc."
+      },
+      {
+        "ba_code": "A5A3",
+        "licensee": "Pembina Gas Services Ltd."
+      },
+      {
+        "ba_code": "A59Y",
+        "licensee": "Pembina Marketing Ltd."
+      },
+      {
+        "ba_code": "A68Y",
+        "licensee": "Pembina NGL Corporation"
+      },
+      {
+        "ba_code": "A1MP",
+        "licensee": "Pennant Energy Inc."
+      },
+      {
+        "ba_code": "A06M",
+        "licensee": "Pennine Petroleum Corporation"
+      },
+      {
+        "ba_code": "A7MP",
+        "licensee": "Perisson Petroleum Corporation"
+      },
+      {
+        "ba_code": "A5KH",
+        "licensee": "Perpetual Energy Inc."
+      },
+      {
+        "ba_code": "A1WD",
+        "licensee": "Perpetual Operating Corp."
+      },
+      {
+        "ba_code": "A84G",
+        "licensee": "Persist Oil And Gas Inc."
+      },
+      {
+        "ba_code": "A2D9",
+        "licensee": "Persta Resources Inc."
+      },
+      {
+        "ba_code": "A8C2",
+        "licensee": "Petra 9 Energy Ltd."
+      },
+      {
+        "ba_code": "A5LH",
+        "licensee": "PetroChina Canada Ltd."
+      },
+      {
+        "ba_code": "A7D1",
+        "licensee": "PetroFrontier Corp."
+      },
+      {
+        "ba_code": "0P89",
+        "licensee": "Petroglobe (Canada) Ltd."
+      },
+      {
+        "ba_code": "A62R",
+        "licensee": "Petroleo Resources Inc."
+      },
+      {
+        "ba_code": "A5XF",
+        "licensee": "Petroleum Processors Inc."
+      },
+      {
+        "ba_code": "A811",
+        "licensee": "Petrolia Canada Corporation"
+      },
+      {
+        "ba_code": "A7XH",
+        "licensee": "Petro-Lin Energy Corporation"
+      },
+      {
+        "ba_code": "A0YZ",
+        "licensee": "Petronas Energy Canada Ltd."
+      },
+      {
+        "ba_code": "A87T",
+        "licensee": "Petrosun Resources Inc."
+      },
+      {
+        "ba_code": "A6GM",
+        "licensee": "Petrox Resources Corp."
+      },
+      {
+        "ba_code": "A632",
+        "licensee": "Petrus Resources Corp."
+      },
+      {
+        "ba_code": "0YA2",
+        "licensee": "Peyto Exploration & Development Corp."
+      },
+      {
+        "ba_code": "A018",
+        "licensee": "Pine Cliff Border Pipelines Limited"
+      },
+      {
+        "ba_code": "A1GR",
+        "licensee": "Pine Cliff Energy Ltd."
+      },
+      {
+        "ba_code": "A81L",
+        "licensee": "Pioneer Pipeline Inc."
+      },
+      {
+        "ba_code": "A82B",
+        "licensee": "Pipestone Energy Corp."
+      },
+      {
+        "ba_code": "A7BP",
+        "licensee": "Pismo Energy Ltd."
+      },
+      {
+        "ba_code": "A8C5",
+        "licensee": "Pivotal Energy Partners Inc."
+      },
+      {
+        "ba_code": "A7TT",
+        "licensee": "PKM Canada Terminals GP ULC"
+      },
+      {
+        "ba_code": "A31G",
+        "licensee": "Plains Midstream Canada ULC"
+      },
+      {
+        "ba_code": "A7D0",
+        "licensee": "Point Bar Resources Inc."
+      },
+      {
+        "ba_code": "0WG8",
+        "licensee": "Pouce Coupe Pipe Line Ltd."
+      },
+      {
+        "ba_code": "0T82",
+        "licensee": "Prairie Provident Resources Canada Ltd."
+      },
+      {
+        "ba_code": "A7NA",
+        "licensee": "Prairie Thunder Resources Ltd."
+      },
+      {
+        "ba_code": "A7J6",
+        "licensee": "Predator Oil BC Ltd."
+      },
+      {
+        "ba_code": "0FL9",
+        "licensee": "Primrose Drilling Ventures Ltd."
+      },
+      {
+        "ba_code": "A1NL",
+        "licensee": "Procyon Energy Corp."
+      },
+      {
+        "ba_code": "A5TJ",
+        "licensee": "Pronghorn Resources Ltd."
+      },
+      {
+        "ba_code": "A709",
+        "licensee": "Pro-Pipe Service & Sales Ltd."
+      },
+      {
+        "ba_code": "0MM8",
+        "licensee": "Prospect Oil & Gas Management Ltd."
+      },
+      {
+        "ba_code": "A2R4",
+        "licensee": "Prosper Petroleum Ltd."
+      },
+      {
+        "ba_code": "A5BH",
+        "licensee": "Prospera Energy Inc."
+      },
+      {
+        "ba_code": "A807",
+        "licensee": "Providence Energy Incorporated"
+      },
+      {
+        "ba_code": "A7BX",
+        "licensee": "Pulse Oil Operating Corp."
+      },
+      {
+        "ba_code": "A7LH",
+        "licensee": "Pure Environmental Waste Management Ltd."
+      },
+      {
+        "ba_code": "0T23",
+        "licensee": "Pure Oil & Gas Co Ltd"
+      },
+      {
+        "ba_code": "A0G7",
+        "licensee": "Pursuit Energy Inc."
+      },
+      {
+        "ba_code": "0L3Z",
+        "licensee": "Questerre Energy Corporation"
+      },
+      {
+        "ba_code": "A5AF",
+        "licensee": "R.I.I. North America Inc."
+      },
+      {
+        "ba_code": "A0D2",
+        "licensee": "Ramdar Resource Management Ltd."
+      },
+      {
+        "ba_code": "0W91",
+        "licensee": "Ramier Resources Ltd."
+      },
+      {
+        "ba_code": "A5MC",
+        "licensee": "Rampart Oil Inc."
+      },
+      {
+        "ba_code": "A0WL",
+        "licensee": "Ranchwest Energy Ltd."
+      },
+      {
+        "ba_code": "A7YW",
+        "licensee": "Rangeland Midstream Canada Ltd."
+      },
+      {
+        "ba_code": "A7L1",
+        "licensee": "Razor Energy Corp."
+      },
+      {
+        "ba_code": "0ZG8",
+        "licensee": "Reconn Resources Ltd."
+      },
+      {
+        "ba_code": "A78G",
+        "licensee": "Recover Energy Services Inc."
+      },
+      {
+        "ba_code": "A7N7",
+        "licensee": "Red Angus Energy Inc."
+      },
+      {
+        "ba_code": "0FE8",
+        "licensee": "Regco Petroleums Ltd."
+      },
+      {
+        "ba_code": "A7JT",
+        "licensee": "Regnum Energy Ltd."
+      },
+      {
+        "ba_code": "A7TH",
+        "licensee": "Reilin Energy Inc."
+      },
+      {
+        "ba_code": "A85L",
+        "licensee": "Relentless Resources Ltd."
+      },
+      {
+        "ba_code": "0XW8",
+        "licensee": "Remedx Remediation Services Inc."
+      },
+      {
+        "ba_code": "A6MG",
+        "licensee": "Renergy Petroleum (Canada) Co., Ltd."
+      },
+      {
+        "ba_code": "0039",
+        "licensee": "Repsol Oil & Gas Canada Inc."
+      },
+      {
+        "ba_code": "A6Y0",
+        "licensee": "Reserve Royalty GP #2 Ltd."
+      },
+      {
+        "ba_code": "A6GN",
+        "licensee": "Resourceful Petroleum Canada Limited"
+      },
+      {
+        "ba_code": "0PG9",
+        "licensee": "Response Energy Corporation"
+      },
+      {
+        "ba_code": "A87A",
+        "licensee": "Revitalize Energy Inc."
+      },
+      {
+        "ba_code": "A6X3",
+        "licensee": "Revival Energy Inc."
+      },
+      {
+        "ba_code": "A89A",
+        "licensee": "Revolution Oil & Gas Corporation"
+      },
+      {
+        "ba_code": "A7RJ",
+        "licensee": "Rex Energy Ltd."
+      },
+      {
+        "ba_code": "0Z3G",
+        "licensee": "Ribbon Creek Resources Inc."
+      },
+      {
+        "ba_code": "A1B5",
+        "licensee": "Richards Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A8K9",
+        "licensee": "Ricochet Oil Corp."
+      },
+      {
+        "ba_code": "0TP8",
+        "licensee": "Ridal Resource Ltd."
+      },
+      {
+        "ba_code": "A7G2",
+        "licensee": "Ridgeback Resources Inc."
+      },
+      {
+        "ba_code": "0PK4",
+        "licensee": "Ridgeway Petroleum Corp."
+      },
+      {
+        "ba_code": "0DZ7",
+        "licensee": "Rife Resources Ltd."
+      },
+      {
+        "ba_code": "A5NW",
+        "licensee": "Rimfire Energy Inc."
+      },
+      {
+        "ba_code": "A7CZ",
+        "licensee": "Rising Star Resources Ltd."
+      },
+      {
+        "ba_code": "A80E",
+        "licensee": "Rj Enterprises Inc."
+      },
+      {
+        "ba_code": "A6TE",
+        "licensee": "RKSmith Energy Corp."
+      },
+      {
+        "ba_code": "A89Z",
+        "licensee": "Road 53 Resources Inc."
+      },
+      {
+        "ba_code": "A7G9",
+        "licensee": "Robus Resources Inc."
+      },
+      {
+        "ba_code": "A6M1",
+        "licensee": "Rockeast Energy Corp."
+      },
+      {
+        "ba_code": "A26Z",
+        "licensee": "Rockpoint Gas Storage Canada Ltd."
+      },
+      {
+        "ba_code": "0YE4",
+        "licensee": "Rocky Layman Energy Inc."
+      },
+      {
+        "ba_code": "A7YP",
+        "licensee": "Rocky Mountain Gtl Inc."
+      },
+      {
+        "ba_code": "A6W2",
+        "licensee": "Rolling Hills Energy Ltd."
+      },
+      {
+        "ba_code": "A5AD",
+        "licensee": "RON Resources Ltd."
+      },
+      {
+        "ba_code": "A61W",
+        "licensee": "Roswell Petroleum Corporation"
+      },
+      {
+        "ba_code": "0K12",
+        "licensee": "Rundle Petroleums Ltd."
+      },
+      {
+        "ba_code": "A7NX",
+        "licensee": "Rush Energy Services Inc."
+      },
+      {
+        "ba_code": "0PW3",
+        "licensee": "Rustum Petroleums (1993) Limited"
+      },
+      {
+        "ba_code": "0EK5",
+        "licensee": "Rustum Petroleums Limited"
+      },
+      {
+        "ba_code": "0HZ8",
+        "licensee": "Sabre Energy Ltd."
+      },
+      {
+        "ba_code": "0GG3",
+        "licensee": "Saddlebrook Industrial Park Ltd."
+      },
+      {
+        "ba_code": "A1R3",
+        "licensee": "Sahara Energy Ltd."
+      },
+      {
+        "ba_code": "A7EN",
+        "licensee": "Salida Energy Inc."
+      },
+      {
+        "ba_code": "A56R",
+        "licensee": "Samoth Oilfield Inc."
+      },
+      {
+        "ba_code": "A8CM",
+        "licensee": "Sanexen Environmental Services Inc."
+      },
+      {
+        "ba_code": "A7KN",
+        "licensee": "Sansum Energy Inc."
+      },
+      {
+        "ba_code": "A83E",
+        "licensee": "Saturn Oil & Gas Inc."
+      },
+      {
+        "ba_code": "A1R8",
+        "licensee": "Scavenger Energy GP Inc."
+      },
+      {
+        "ba_code": "A70J",
+        "licensee": "SCCC Petroleum Corporation"
+      },
+      {
+        "ba_code": "0M07",
+        "licensee": "Schlumberger Canada Limited"
+      },
+      {
+        "ba_code": "A78E",
+        "licensee": "Scollard Energy Ltd."
+      },
+      {
+        "ba_code": "A8MG",
+        "licensee": "Score Energy International Ltd."
+      },
+      {
+        "ba_code": "A744",
+        "licensee": "SDF Energy Ltd."
+      },
+      {
+        "ba_code": "A20X",
+        "licensee": "Second Wave Petroleum Inc."
+      },
+      {
+        "ba_code": "A267",
+        "licensee": "Secure Energy Services Inc."
+      },
+      {
+        "ba_code": "0JH1",
+        "licensee": "Seffian Petroleums Ltd."
+      },
+      {
+        "ba_code": "A851",
+        "licensee": "Seol Energy Inc."
+      },
+      {
+        "ba_code": "0Z5F",
+        "licensee": "Sequoia Resources Corp."
+      },
+      {
+        "ba_code": "A6E6",
+        "licensee": "Sextant Energy Corp."
+      },
+      {
+        "ba_code": "0A8E",
+        "licensee": "Shackleton Exploration Ltd."
+      },
+      {
+        "ba_code": "A75H",
+        "licensee": "Shale Petroleum Ltd."
+      },
+      {
+        "ba_code": "0T03",
+        "licensee": "Shell Canada Limited"
+      },
+      {
+        "ba_code": "A6YC",
+        "licensee": "Shield Energy Ltd."
+      },
+      {
+        "ba_code": "A8GG",
+        "licensee": "Shot Point Resources Ltd."
+      },
+      {
+        "ba_code": "A72R",
+        "licensee": "SHS Holdings Ltd."
+      },
+      {
+        "ba_code": "A727",
+        "licensee": "Sifton Petroleum Inc."
+      },
+      {
+        "ba_code": "0R89",
+        "licensee": "Signalta Resources Limited"
+      },
+      {
+        "ba_code": "0KC1",
+        "licensee": "Silver Bay Resources Ltd."
+      },
+      {
+        "ba_code": "0KB2",
+        "licensee": "Silver Blaze Energy Ltd."
+      },
+      {
+        "ba_code": "A7G6",
+        "licensee": "SILVERLEAF RESOURCES INC."
+      },
+      {
+        "ba_code": "A6GD",
+        "licensee": "Sinopec Daylight Energy Ltd."
+      },
+      {
+        "ba_code": "A6WR",
+        "licensee": "Sintana Energy Inc."
+      },
+      {
+        "ba_code": "A7L2",
+        "licensee": "Skye Asset Retirement Inc."
+      },
+      {
+        "ba_code": "0RY8",
+        "licensee": "Softrock Minerals Ltd."
+      },
+      {
+        "ba_code": "0NX1",
+        "licensee": "Sogar Resources Ltd."
+      },
+      {
+        "ba_code": "A5GZ",
+        "licensee": "Sojourn Energy Inc."
+      },
+      {
+        "ba_code": "A8HR",
+        "licensee": "Spartan Delta Corp."
+      },
+      {
+        "ba_code": "A8C0",
+        "licensee": "Specoil Canada Inc."
+      },
+      {
+        "ba_code": "A8FY",
+        "licensee": "Spoke Resources Ltd."
+      },
+      {
+        "ba_code": "A7HD",
+        "licensee": "Sprocket Energy Corporation"
+      },
+      {
+        "ba_code": "A7GR",
+        "licensee": "Spur Petroleum Ltd."
+      },
+      {
+        "ba_code": "A6KL",
+        "licensee": "Steel Reef Infrastructure Corp."
+      },
+      {
+        "ba_code": "A89K",
+        "licensee": "Steeple Oil and Gas Ltd."
+      },
+      {
+        "ba_code": "0TF8",
+        "licensee": "Stonewater Resources Inc."
+      },
+      {
+        "ba_code": "A22T",
+        "licensee": "Strata Power Corporation"
+      },
+      {
+        "ba_code": "A8FG",
+        "licensee": "Strathcona Resources Ltd."
+      },
+      {
+        "ba_code": "A22X",
+        "licensee": "Strong Energy Resources Ltd."
+      },
+      {
+        "ba_code": "A23E",
+        "licensee": "Styx Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A6PL",
+        "licensee": "Success Energy Ltd."
+      },
+      {
+        "ba_code": "A50K",
+        "licensee": "Success Resources Ltd."
+      },
+      {
+        "ba_code": "A21Z",
+        "licensee": "Sugarbud Craft Growers Corp."
+      },
+      {
+        "ba_code": "A5MT",
+        "licensee": "Summerland Energy Inc."
+      },
+      {
+        "ba_code": "0RZ4",
+        "licensee": "Sun Century Petroleum Corporation"
+      },
+      {
+        "ba_code": "0054",
+        "licensee": "Suncor Energy Inc."
+      },
+      {
+        "ba_code": "A5XA",
+        "licensee": "Suncor Energy Logistics Corporation"
+      },
+      {
+        "ba_code": "A2TF",
+        "licensee": "Sunshine Oilsands Ltd."
+      },
+      {
+        "ba_code": "A7DW",
+        "licensee": "Supreme Energy Inc."
+      },
+      {
+        "ba_code": "0ND1",
+        "licensee": "Surat Energy Inc."
+      },
+      {
+        "ba_code": "0YK4",
+        "licensee": "Surge Energy Inc."
+      },
+      {
+        "ba_code": "A6CA",
+        "licensee": "Surmont Energy Ltd."
+      },
+      {
+        "ba_code": "0M9E",
+        "licensee": "Sutton Energy Ltd."
+      },
+      {
+        "ba_code": "A31K",
+        "licensee": "Swan Hills Synfuels Ltd."
+      },
+      {
+        "ba_code": "0362",
+        "licensee": "Syncrude Canada Ltd."
+      },
+      {
+        "ba_code": "A7TL",
+        "licensee": "Taak Energy Resources Inc."
+      },
+      {
+        "ba_code": "A848",
+        "licensee": "Taiga Energy Corp."
+      },
+      {
+        "ba_code": "0NG8",
+        "licensee": "Taku Gas Limited"
+      },
+      {
+        "ba_code": "A7HE",
+        "licensee": "Tallahassee Exploration Inc."
+      },
+      {
+        "ba_code": "A63N",
+        "licensee": "Tallahassee Resources Inc."
+      },
+      {
+        "ba_code": "A04N",
+        "licensee": "Tamarack Valley Energy Ltd."
+      },
+      {
+        "ba_code": "A7TG",
+        "licensee": "Tanglefoot Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "A2TG",
+        "licensee": "TAQA North Ltd."
+      },
+      {
+        "ba_code": "A83B",
+        "licensee": "Taurex Energy Ltd."
+      },
+      {
+        "ba_code": "A7GY",
+        "licensee": "Tayson Resources Inc."
+      },
+      {
+        "ba_code": "A6J5",
+        "licensee": "TC Terminals GP Ltd."
+      },
+      {
+        "ba_code": "A64M",
+        "licensee": "Teck Resources Limited"
+      },
+      {
+        "ba_code": "A5L8",
+        "licensee": "Teine Energy Ltd."
+      },
+      {
+        "ba_code": "A49K",
+        "licensee": "Tenax Energy Inc."
+      },
+      {
+        "ba_code": "A8PH",
+        "licensee": "Tenaz Energy Corp."
+      },
+      {
+        "ba_code": "A26C",
+        "licensee": "Tenth Avenue Petroleum Corp."
+      },
+      {
+        "ba_code": "0PP6",
+        "licensee": "Terroco Industries Ltd."
+      },
+      {
+        "ba_code": "0FT3",
+        "licensee": "The Land Group Inc."
+      },
+      {
+        "ba_code": "0Z3H",
+        "licensee": "The Locke Stock & Barrel Company Ltd."
+      },
+      {
+        "ba_code": "A61G",
+        "licensee": "Thor Resources Inc."
+      },
+      {
+        "ba_code": "A306",
+        "licensee": "Thoroughbred Energy Ltd."
+      },
+      {
+        "ba_code": "0L3C",
+        "licensee": "Tians Oil Ltd."
+      },
+      {
+        "ba_code": "A74Y",
+        "licensee": "Tidewater Midstream and Infrastructure Ltd."
+      },
+      {
+        "ba_code": "A86F",
+        "licensee": "Tidewater Pipestone Infrastructure Corp."
+      },
+      {
+        "ba_code": "A8M6",
+        "licensee": "Tidewater Renewables Ltd."
+      },
+      {
+        "ba_code": "0YD4",
+        "licensee": "Tiger Calcium Services Inc."
+      },
+      {
+        "ba_code": "A5N0",
+        "licensee": "Top Oil Production Ltd."
+      },
+      {
+        "ba_code": "A772",
+        "licensee": "Topanga Resources Ltd."
+      },
+      {
+        "ba_code": "A628",
+        "licensee": "Tori Resources Inc."
+      },
+      {
+        "ba_code": "A7NW",
+        "licensee": "Torxen Energy Ltd."
+      },
+      {
+        "ba_code": "A7K7",
+        "licensee": "Torxen Resources Ltd."
+      },
+      {
+        "ba_code": "0N3A",
+        "licensee": "TotalEnergies EP Canada Ltd."
+      },
+      {
+        "ba_code": "A573",
+        "licensee": "Tourmaline Oil Corp."
+      },
+      {
+        "ba_code": "A64Y",
+        "licensee": "Tower Ridge Enterprises Corp."
+      },
+      {
+        "ba_code": "A7WG",
+        "licensee": "Trace Water Solutions Ltd."
+      },
+      {
+        "ba_code": "A0DT",
+        "licensee": "Transaction Oil & Gas Ventures Inc."
+      },
+      {
+        "ba_code": "A0XL",
+        "licensee": "Transalta Corporation"
+      },
+      {
+        "ba_code": "0NPM",
+        "licensee": "TransCanada Energy Ltd."
+      },
+      {
+        "ba_code": "0YM4",
+        "licensee": "Transcanada Gas Liquids Ltd."
+      },
+      {
+        "ba_code": "0XG7",
+        "licensee": "TransCanada Pipeline Ventures Ltd."
+      },
+      {
+        "ba_code": "0L55",
+        "licensee": "TransCanada PipeLines Limited"
+      },
+      {
+        "ba_code": "0YH6",
+        "licensee": "TransGlobe Energy Corporation"
+      },
+      {
+        "ba_code": "0F9L",
+        "licensee": "Traverse Energy Ltd."
+      },
+      {
+        "ba_code": "A7PW",
+        "licensee": "Tri-Energy Resources Ltd."
+      },
+      {
+        "ba_code": "A6YX",
+        "licensee": "Triland Energy Inc."
+      },
+      {
+        "ba_code": "A7X2",
+        "licensee": "Triple 555 Oil Company Ltd."
+      },
+      {
+        "ba_code": "A7YM",
+        "licensee": "True North Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A7P7",
+        "licensee": "Tsuu T'ina Energy Corporation"
+      },
+      {
+        "ba_code": "A8H4",
+        "licensee": "Tuscany Petroleum Ltd."
+      },
+      {
+        "ba_code": "A7LG",
+        "licensee": "TWP50 Resources Ltd."
+      },
+      {
+        "ba_code": "A2D8",
+        "licensee": "Tyee Energy Corp."
+      },
+      {
+        "ba_code": "A1M4",
+        "licensee": "Tykewest Limited"
+      },
+      {
+        "ba_code": "0HE4",
+        "licensee": "Unit 18 Corp."
+      },
+      {
+        "ba_code": "A1KW",
+        "licensee": "Valeura Energy Inc."
+      },
+      {
+        "ba_code": "A11W",
+        "licensee": "Value Creation Inc."
+      },
+      {
+        "ba_code": "A1P9",
+        "licensee": "Vanrena Resources Ltd."
+      },
+      {
+        "ba_code": "A7PA",
+        "licensee": "Vantage Point Resources Inc."
+      },
+      {
+        "ba_code": "A8K8",
+        "licensee": "Velocity Oil & Gas Ltd."
+      },
+      {
+        "ba_code": "A734",
+        "licensee": "Veresen Midstream General Partner Inc."
+      },
+      {
+        "ba_code": "A6FW",
+        "licensee": "Vermilion Energy Inc."
+      },
+      {
+        "ba_code": "A8B7",
+        "licensee": "Vertex Resource Services Ltd."
+      },
+      {
+        "ba_code": "A0L1",
+        "licensee": "Vesta Energy Ltd."
+      },
+      {
+        "ba_code": "A7P5",
+        "licensee": "Viceroy Canadian Resources Corp."
+      },
+      {
+        "ba_code": "A6YL",
+        "licensee": "Vital Energy Inc."
+      },
+      {
+        "ba_code": "A56X",
+        "licensee": "Vulture Energy Ltd."
+      },
+      {
+        "ba_code": "0EM6",
+        "licensee": "Ward Chemical Incorporated"
+      },
+      {
+        "ba_code": "A68H",
+        "licensee": "Warwick Gas Storage Ltd."
+      },
+      {
+        "ba_code": "A6RZ",
+        "licensee": "Weil Group Canada, Ltd."
+      },
+      {
+        "ba_code": "A8G6",
+        "licensee": "Welltech Energy Ltd."
+      },
+      {
+        "ba_code": "A590",
+        "licensee": "Wescan Energy Corp."
+      },
+      {
+        "ba_code": "A65Y",
+        "licensee": "Wesjan Ranch Ltd."
+      },
+      {
+        "ba_code": "A8C3",
+        "licensee": "West 5 Resources Inc."
+      },
+      {
+        "ba_code": "A1B0",
+        "licensee": "West Fraser Mills Ltd."
+      },
+      {
+        "ba_code": "0RZ8",
+        "licensee": "West Isle Energy Inc."
+      },
+      {
+        "ba_code": "A7H7",
+        "licensee": "West Lake Energy Corp."
+      },
+      {
+        "ba_code": "0TW5",
+        "licensee": "West Star Oil & Gas Co. Ltd."
+      },
+      {
+        "ba_code": "A5WB",
+        "licensee": "Westbrick Energy Ltd."
+      },
+      {
+        "ba_code": "0G92",
+        "licensee": "Westcoast Energy Inc."
+      },
+      {
+        "ba_code": "0EE3",
+        "licensee": "Westdrum Energy Ltd."
+      },
+      {
+        "ba_code": "A8LJ",
+        "licensee": "White Horse Resources Ltd."
+      },
+      {
+        "ba_code": "A70G",
+        "licensee": "White Owl Energy Services Inc."
+      },
+      {
+        "ba_code": "A7K8",
+        "licensee": "White Owl Energy Services Ltd."
+      },
+      {
+        "ba_code": "A85T",
+        "licensee": "White Spruce Pipeline Gp Ltd."
+      },
+      {
+        "ba_code": "A6T6",
+        "licensee": "White Swan Environmental Ltd."
+      },
+      {
+        "ba_code": "A5BE",
+        "licensee": "Whitecap Resources Inc."
+      },
+      {
+        "ba_code": "A7FF",
+        "licensee": "Whitehaven Beach Capital Corp."
+      },
+      {
+        "ba_code": "A7JF",
+        "licensee": "Whitehot Energy Ltd."
+      },
+      {
+        "ba_code": "A2KE",
+        "licensee": "Whitemud Creek Resources Ltd."
+      },
+      {
+        "ba_code": "A79B",
+        "licensee": "Whitetail Gas-Fired Peaking Project GP Inc."
+      },
+      {
+        "ba_code": "A5YX",
+        "licensee": "Wilcox Energy Corp."
+      },
+      {
+        "ba_code": "A5EN",
+        "licensee": "Wildcat Rentals Ltd."
+      },
+      {
+        "ba_code": "A684",
+        "licensee": "Wildcat Royalty Corporation"
+      },
+      {
+        "ba_code": "A8JJ",
+        "licensee": "Windsor Salt Ltd/sel Windsor Ltee"
+      },
+      {
+        "ba_code": "A5YY",
+        "licensee": "Windtalker Energy Corp."
+      },
+      {
+        "ba_code": "A65J",
+        "licensee": "WLA Investment Ltd."
+      },
+      {
+        "ba_code": "A7Y0",
+        "licensee": "Wolf Carbon Solutions Inc."
+      },
+      {
+        "ba_code": "A8BW",
+        "licensee": "Wolf NGL Inc."
+      },
+      {
+        "ba_code": "A80M",
+        "licensee": "Wolverine Energy And Infrastructure Inc."
+      },
+      {
+        "ba_code": "A8KA",
+        "licensee": "Woodcote Oil & Gas Inc."
+      },
+      {
+        "ba_code": "A8P7",
+        "licensee": "Woodsman Energy Corp."
+      },
+      {
+        "ba_code": "0TR5",
+        "licensee": "Writers Oil & Gas Limited"
+      },
+      {
+        "ba_code": "A8KF",
+        "licensee": "Wyatt Resources Ltd."
+      },
+      {
+        "ba_code": "A7PN",
+        "licensee": "Xenotime Energy Inc."
+      },
+      {
+        "ba_code": "A707",
+        "licensee": "XS Energy Ltd."
+      },
+      {
+        "ba_code": "A6GB",
+        "licensee": "XTO Energy Canada ULC"
+      },
+      {
+        "ba_code": "0LN7",
+        "licensee": "Yangarra Resources Corp."
+      },
+      {
+        "ba_code": "A1NT",
+        "licensee": "Yangarra Resources Ltd."
+      },
+      {
+        "ba_code": "A1B6",
+        "licensee": "Yoho Resources Inc."
+      },
+      {
+        "ba_code": "A7PX",
+        "licensee": "Zafer Energy Inc."
+      },
+      {
+        "ba_code": "A5B0",
+        "licensee": "ZNX Energy Ltd."
+      },
+      {
+        "ba_code": "A62G",
+        "licensee": "Zoneda Energy Ltd."
+      },
+      {
+        "ba_code": "A85E",
+        "licensee": "Zyzygy Resources Ltd."
+      }
+    ]
+  },
+  "tops": {
+    "formations": [
+      {
+        "formation": "JUDITH RIVER",
+        "prognosis": {
+          "md": 183.68998,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 634.21002
+        },
+        "samples": {
+          "md": 192.10762,
+          "tvd": 192.10097,
+          "isopach": 65.15434,
+          "subsea": 625.79903
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -8.48836
+      },
+      {
+        "formation": "LEA PARK",
+        "prognosis": {
+          "md": 253.76965,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 564.13035
+        },
+        "samples": {
+          "md": 257.52183,
+          "tvd": 257.25531,
+          "isopach": 73.82763,
+          "subsea": 560.64469
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -3.75644
+      },
+      {
+        "formation": "RIBSTONE CREEK",
+        "prognosis": {
+          "md": 330.33508,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 487.56492
+        },
+        "samples": {
+          "md": 331.93874,
+          "tvd": 331.08294,
+          "isopach": 178.55971,
+          "subsea": 486.81706
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -1.50861
+      },
+      {
+        "formation": "MILK RIVER",
+        "prognosis": {
+          "md": 511.23992,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 306.66008
+        },
+        "samples": {
+          "md": 511.50769,
+          "tvd": 509.64265,
+          "isopach": 171.81287,
+          "subsea": 308.25735
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -0.32395
+      },
+      {
+        "formation": "COLORADO",
+        "prognosis": {
+          "md": 681.24921,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 136.65079
+        },
+        "samples": {
+          "md": 684.29223,
+          "tvd": 681.45552,
+          "isopach": 92.96678,
+          "subsea": 136.44448
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -3.22354
+      },
+      {
+        "formation": "2ND WHITE SPECS",
+        "prognosis": {
+          "md": 775.46672,
+          "tvd": null,
+          "isopach": null,
+          "subsea": 42.43328
+        },
+        "samples": {
+          "md": 777.77477,
+          "tvd": 774.4223,
+          "isopach": 65.82909,
+          "subsea": 43.4777
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -2.57883
+      },
+      {
+        "formation": "BFS",
+        "prognosis": {
+          "md": 835.68238,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -17.78238
+        },
+        "samples": {
+          "md": 844.03447,
+          "tvd": 840.25139,
+          "isopach": 85.87909,
+          "subsea": -22.35139
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -8.57909
+      },
+      {
+        "formation": "VIKING SS",
+        "prognosis": {
+          "md": 926.65056,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -108.75056
+        },
+        "samples": {
+          "md": 930.65285,
+          "tvd": 926.13048,
+          "isopach": 26.65515,
+          "subsea": -108.23048
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -4.07023
+      },
+      {
+        "formation": "JOLI FOU",
+        "prognosis": {
+          "md": 954.55349,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -136.65349
+        },
+        "samples": {
+          "md": 957.51936,
+          "tvd": 952.78563,
+          "isopach": 31.07009,
+          "subsea": -134.88563
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -3.00297
+      },
+      {
+        "formation": "MANNVILLE",
+        "prognosis": {
+          "md": 993.22303,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -175.32303
+        },
+        "samples": {
+          "md": 988.81103,
+          "tvd": 983.85572,
+          "isopach": 23.048,
+          "subsea": -165.95572
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": 4.35149
+      },
+      {
+        "formation": "MCLAREN",
+        "prognosis": {
+          "md": 1009.70175,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -191.80175
+        },
+        "samples": {
+          "md": 1011.80349,
+          "tvd": 1006.90372,
+          "isopach": 22.08408,
+          "subsea": -189.00372
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -2.32095
+      },
+      {
+        "formation": "VIKING SS",
+        "prognosis": {
+          "md": 1026.05152,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -208.15152
+        },
+        "samples": {
+          "md": 1034.23347,
+          "tvd": 1028.9878,
+          "isopach": 2.44082,
+          "subsea": -211.0878
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -8.15841
+      },
+      {
+        "formation": "START CORE",
+        "prognosis": {
+          "md": 1026.05152,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -208.15152
+        },
+        "samples": {
+          "md": 1036.68919,
+          "tvd": 1031.42862,
+          "isopach": 4.43271,
+          "subsea": -213.52862
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -10.59923
+      },
+      {
+        "formation": "VIKING SS CHANNEL TOP",
+        "prognosis": {
+          "md": 1027.99854,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -210.09854
+        },
+        "samples": {
+          "md": 1041.15032,
+          "tvd": 1035.86133,
+          "isopach": 19.38188,
+          "subsea": -217.96133
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -13.09782
+      },
+      {
+        "formation": "VIKING SS O/W CONTACT",
+        "prognosis": {
+          "md": 1058.2353,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -240.3353
+        },
+        "samples": {
+          "md": 1060.6723,
+          "tvd": 1055.24322,
+          "isopach": 6.9113,
+          "subsea": -237.34322
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -2.43635
+      },
+      {
+        "formation": "END CORE",
+        "prognosis": {
+          "md": 1066.15231,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -248.25231
+        },
+        "samples": {
+          "md": 1067.63514,
+          "tvd": 1062.15452,
+          "isopach": 17.08303,
+          "subsea": -244.25452
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -1.48222
+      },
+      {
+        "formation": "VIKING SS CHANNEL BASE",
+        "prognosis": {
+          "md": 1066.15231,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -248.25231
+        },
+        "samples": {
+          "md": 1084.83917,
+          "tvd": 1079.23754,
+          "isopach": 20.1313,
+          "subsea": -261.33754
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -18.56525
+      },
+      {
+        "formation": "LLOYDMINSTER COAL",
+        "prognosis": {
+          "md": 1096.7759,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -278.8759
+        },
+        "samples": {
+          "md": 1105.10672,
+          "tvd": 1099.36885,
+          "isopach": 12.68434,
+          "subsea": -281.46885
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -8.26637
+      },
+      {
+        "formation": "CUMMINGS COAL",
+        "prognosis": {
+          "md": 1109.24454,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -291.34454
+        },
+        "samples": {
+          "md": 1117.8732,
+          "tvd": 1112.05319,
+          "isopach": 10.77304,
+          "subsea": -294.15319
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -8.57234
+      },
+      {
+        "formation": "DETRITAL",
+        "prognosis": {
+          "md": 1126.62584,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -308.72584
+        },
+        "samples": {
+          "md": 1128.71423,
+          "tvd": 1122.82624,
+          "isopach": 16.18365,
+          "subsea": -304.92624
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -2.06723
+      },
+      {
+        "formation": "TOTAL DEPT",
+        "prognosis": {
+          "md": 1135.20045,
+          "tvd": null,
+          "isopach": null,
+          "subsea": -317.30045
+        },
+        "samples": {
+          "md": 1145.0,
+          "tvd": 1139.00988,
+          "isopach": null,
+          "subsea": -321.10988
+        },
+        "mwd_gamma": {
+          "md": null,
+          "tvd": null,
+          "isopach": null,
+          "subsea": null
+        },
+        "difference_m": -9.74074
+      }
+    ]
+  },
+  "reservoir_data": [
+    {
+      "leg_name": "Lateral",
+      "survey": {
+        "sheet_name": "Surveys1",
+        "section_name": "Lateral",
+        "markers": [
+          {
+            "md": 175.36036,
+            "inclination_deg": 0.8885744456177402,
+            "azimuth_deg": 327.78136219640965,
+            "tvd": 175.35762,
+            "north_south": 0.71123,
+            "east_west": -0.37656,
+            "vertical_section": 0.74161,
+            "subsea": 642.54238,
+            "event": "Kick Off Point"
+          },
+          {
+            "md": 1034.23347,
+            "inclination_deg": 6.266161314828345,
+            "azimuth_deg": 350.79071146822497,
+            "tvd": 1028.98525,
+            "north_south": 92.99825,
+            "east_west": -9.86465,
+            "vertical_section": 93.50559,
+            "subsea": -211.08525,
+            "event": "VIKING SS"
+          },
+          {
+            "md": 1145.0,
+            "inclination_deg": 6.42,
+            "azimuth_deg": 358.48,
+            "tvd": 1139.00988,
+            "north_south": 105.76511,
+            "east_west": -10.55836,
+            "vertical_section": 106.28396,
+            "subsea": -321.10988,
+            "event": "Last Survey"
+          }
+        ],
+        "survey_points": [
+          {
+            "md": 0.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0,
+            "tvd": 0.0,
+            "north_south": 0.0,
+            "east_west": 0.0,
+            "vertical_section": 0.0,
+            "dogleg_severity": 0.0,
+            "subsea": 817.9,
+            "remarks": null
+          },
+          {
+            "md": 5.80236,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0,
+            "tvd": 5.80236,
+            "north_south": 0.0,
+            "east_west": 0.0,
+            "vertical_section": 0.0,
+            "dogleg_severity": 0.0,
+            "subsea": 812.09764,
+            "remarks": null
+          },
+          {
+            "md": 14.38986,
+            "inclination_deg": 0.22,
+            "azimuth_deg": 14.12,
+            "tvd": 14.38984,
+            "north_south": 0.01599,
+            "east_west": 0.00402,
+            "vertical_section": 0.01557,
+            "dogleg_severity": 0.990990990989878,
+            "subsea": 803.51016,
+            "remarks": null
+          },
+          {
+            "md": 26.02038,
+            "inclination_deg": 0.22,
+            "azimuth_deg": 355.84,
+            "tvd": 26.02028,
+            "north_south": 0.05991,
+            "east_west": 0.00785,
+            "vertical_section": 0.05899,
+            "dogleg_severity": 0.23245901915672654,
+            "subsea": 791.87972,
+            "remarks": null
+          },
+          {
+            "md": 38.23114,
+            "inclination_deg": 0.31,
+            "azimuth_deg": 5.25,
+            "tvd": 38.2309,
+            "north_south": 0.11619,
+            "east_west": 0.00917,
+            "vertical_section": 0.11493,
+            "dogleg_severity": 0.3157655285454857,
+            "subsea": 779.6691,
+            "remarks": null
+          },
+          {
+            "md": 50.51926,
+            "inclination_deg": 0.4,
+            "azimuth_deg": 15.27,
+            "tvd": 50.51878,
+            "north_south": 0.19067,
+            "east_west": 0.02351,
+            "vertical_section": 0.18786,
+            "dogleg_severity": 0.3431511869798035,
+            "subsea": 767.38122,
+            "remarks": null
+          },
+          {
+            "md": 62.34319,
+            "inclination_deg": 0.4,
+            "azimuth_deg": 338.09,
+            "tvd": 62.34245,
+            "north_south": 0.26878,
+            "east_west": 0.01898,
+            "vertical_section": 0.26606,
+            "dogleg_severity": 0.8343508770569918,
+            "subsea": 755.55755,
+            "remarks": null
+          },
+          {
+            "md": 74.29606,
+            "inclination_deg": 0.26,
+            "azimuth_deg": 331.32,
+            "tvd": 74.29512,
+            "north_south": 0.33128,
+            "east_west": -0.00961,
+            "vertical_section": 0.33084,
+            "dogleg_severity": 0.46953782563998664,
+            "subsea": 743.60488,
+            "remarks": null
+          },
+          {
+            "md": 86.5455,
+            "inclination_deg": 0.22,
+            "azimuth_deg": 322.09,
+            "tvd": 86.54445,
+            "north_south": 0.37422,
+            "east_west": -0.03739,
+            "vertical_section": 0.37606,
+            "dogleg_severity": 0.17529004173613658,
+            "subsea": 731.35555,
+            "remarks": null
+          },
+          {
+            "md": 98.88519,
+            "inclination_deg": 0.22,
+            "azimuth_deg": 331.32,
+            "tvd": 98.88405,
+            "north_south": 0.41369,
+            "east_west": -0.06332,
+            "vertical_section": 0.41766,
+            "dogleg_severity": 0.11097887057572563,
+            "subsea": 719.01595,
+            "remarks": null
+          },
+          {
+            "md": 107.0214,
+            "inclination_deg": 0.13,
+            "azimuth_deg": 296.08,
+            "tvd": 107.02022,
+            "north_south": 0.43146,
+            "east_west": -0.07911,
+            "vertical_section": 0.43674,
+            "dogleg_severity": 0.6480996634568974,
+            "subsea": 710.87978,
+            "remarks": null
+          },
+          {
+            "md": 127.65203,
+            "inclination_deg": 0.24,
+            "azimuth_deg": 307.41,
+            "tvd": 127.65074,
+            "north_south": 0.46799,
+            "east_west": -0.13445,
+            "vertical_section": 0.47801,
+            "dogleg_severity": 0.2163659980172009,
+            "subsea": 690.24926,
+            "remarks": null
+          },
+          {
+            "md": 139.55332,
+            "inclination_deg": 0.31,
+            "azimuth_deg": 310.14,
+            "tvd": 139.5519,
+            "north_south": 0.50389,
+            "east_west": -0.17886,
+            "vertical_section": 0.51768,
+            "dogleg_severity": 0.23140640764071466,
+            "subsea": 678.3481,
+            "remarks": null
+          },
+          {
+            "md": 151.81565,
+            "inclination_deg": 0.35,
+            "azimuth_deg": 310.14,
+            "tvd": 151.81403,
+            "north_south": 0.54942,
+            "east_west": -0.23285,
+            "vertical_section": 0.56779,
+            "dogleg_severity": 0.12618296529910147,
+            "subsea": 666.08597,
+            "remarks": null
+          },
+          {
+            "md": 163.94904,
+            "inclination_deg": 0.44,
+            "azimuth_deg": 311.1,
+            "tvd": 163.94713,
+            "north_south": 0.60394,
+            "east_west": -0.29629,
+            "vertical_section": 0.62768,
+            "dogleg_severity": 0.28769348274619466,
+            "subsea": 653.95287,
+            "remarks": null
+          },
+          {
+            "md": 176.1598,
+            "inclination_deg": 0.92,
+            "azimuth_deg": 328.95,
+            "tvd": 176.157,
+            "north_south": 0.71874,
+            "east_west": -0.38218,
+            "vertical_section": 0.7496,
+            "dogleg_severity": 1.6441691444483686,
+            "subsea": 641.743,
+            "remarks": null
+          },
+          {
+            "md": 188.24161,
+            "inclination_deg": 1.41,
+            "azimuth_deg": 336.07,
+            "tvd": 188.23628,
+            "north_south": 0.93771,
+            "east_west": -0.49251,
+            "vertical_section": 0.97743,
+            "dogleg_severity": 1.632881812464875,
+            "subsea": 629.66372,
+            "remarks": null
+          },
+          {
+            "md": 200.5942,
+            "inclination_deg": 2.07,
+            "azimuth_deg": 351.89,
+            "tvd": 200.58318,
+            "north_south": 1.29749,
+            "east_west": -0.58563,
+            "vertical_section": 1.34401,
+            "dogleg_severity": 2.5375772139082935,
+            "subsea": 617.31682,
+            "remarks": null
+          },
+          {
+            "md": 212.55997,
+            "inclination_deg": 3.43,
+            "azimuth_deg": 4.54,
+            "tvd": 212.53499,
+            "north_south": 1.86829,
+            "east_west": -0.58778,
+            "vertical_section": 1.91278,
+            "dogleg_severity": 4.788467330079484,
+            "subsea": 605.36501,
+            "remarks": null
+          },
+          {
+            "md": 224.56441,
+            "inclination_deg": 5.1,
+            "azimuth_deg": 3.75,
+            "tvd": 224.50577,
+            "north_south": 2.75876,
+            "east_west": -0.52445,
+            "vertical_section": 2.79422,
+            "dogleg_severity": 5.3845121931855155,
+            "subsea": 593.39423,
+            "remarks": null
+          },
+          {
+            "md": 236.7107,
+            "inclination_deg": 6.46,
+            "azimuth_deg": 1.38,
+            "tvd": 236.59003,
+            "north_south": 3.98062,
+            "east_west": -0.47269,
+            "vertical_section": 4.00677,
+            "dogleg_severity": 4.3964902141737845,
+            "subsea": 581.30997,
+            "remarks": null
+          },
+          {
+            "md": 248.54752,
+            "inclination_deg": 6.99,
+            "azimuth_deg": 0.85,
+            "tvd": 248.34538,
+            "north_south": 5.36648,
+            "east_west": -0.44596,
+            "vertical_section": 5.38491,
+            "dogleg_severity": 1.7438433446022017,
+            "subsea": 569.55462,
+            "remarks": null
+          },
+          {
+            "md": 260.47461,
+            "inclination_deg": 7.08,
+            "azimuth_deg": 0.41,
+            "tvd": 260.18267,
+            "north_south": 6.82716,
+            "east_west": -0.42994,
+            "vertical_section": 6.8385,
+            "dogleg_severity": 0.3402148562646932,
+            "subsea": 557.71733,
+            "remarks": null
+          },
+          {
+            "md": 272.46616,
+            "inclination_deg": 7.12,
+            "azimuth_deg": 2.61,
+            "tvd": 272.08229,
+            "north_south": 8.30855,
+            "east_west": -0.39081,
+            "vertical_section": 8.3107,
+            "dogleg_severity": 0.8865554002332786,
+            "subsea": 545.81771,
+            "remarks": null
+          },
+          {
+            "md": 290.07956,
+            "inclination_deg": 7.25,
+            "azimuth_deg": 1.47,
+            "tvd": 289.55739,
+            "north_south": 10.51002,
+            "east_west": -0.31259,
+            "vertical_section": 10.49674,
+            "dogleg_severity": 0.42374477664881377,
+            "subsea": 528.34261,
+            "remarks": null
+          },
+          {
+            "md": 307.68007,
+            "inclination_deg": 7.3,
+            "azimuth_deg": 2.35,
+            "tvd": 307.01621,
+            "north_south": 12.7375,
+            "east_west": -0.23825,
+            "vertical_section": 12.70903,
+            "dogleg_severity": 0.2684342793901281,
+            "subsea": 510.88379,
+            "remarks": null
+          },
+          {
+            "md": 325.24189,
+            "inclination_deg": 7.25,
+            "azimuth_deg": 0.94,
+            "tvd": 324.43667,
+            "north_south": 14.9603,
+            "east_west": -0.17432,
+            "vertical_section": 14.91757,
+            "dogleg_severity": 0.4084014347130966,
+            "subsea": 493.46333,
+            "remarks": null
+          },
+          {
+            "md": 342.68767,
+            "inclination_deg": 6.55,
+            "azimuth_deg": 359.36,
+            "tvd": 341.756,
+            "north_south": 17.05596,
+            "east_west": -0.16737,
+            "vertical_section": 17.00448,
+            "dogleg_severity": 1.60801385489745,
+            "subsea": 476.144,
+            "remarks": null
+          },
+          {
+            "md": 360.30107,
+            "inclination_deg": 6.55,
+            "azimuth_deg": 358.3,
+            "tvd": 359.25444,
+            "north_south": 19.06462,
+            "east_west": -0.2084,
+            "vertical_section": 19.00896,
+            "dogleg_severity": 0.2655477387060852,
+            "subsea": 458.64556,
+            "remarks": null
+          },
+          {
+            "md": 377.95315,
+            "inclination_deg": 6.55,
+            "azimuth_deg": 357.07,
+            "tvd": 376.79131,
+            "north_south": 21.07644,
+            "east_west": -0.28973,
+            "vertical_section": 21.02013,
+            "dogleg_severity": 0.30745884181310174,
+            "subsea": 441.10869,
+            "remarks": null
+          },
+          {
+            "md": 395.59234,
+            "inclination_deg": 6.42,
+            "azimuth_deg": 356.46,
+            "tvd": 394.31764,
+            "north_south": 23.06546,
+            "east_west": -0.40205,
+            "vertical_section": 23.01132,
+            "dogleg_severity": 0.32264459969436626,
+            "subsea": 423.58236,
+            "remarks": null
+          },
+          {
+            "md": 413.23153,
+            "inclination_deg": 5.89,
+            "azimuth_deg": 352.33,
+            "tvd": 411.85517,
+            "north_south": 24.94673,
+            "east_west": -0.58373,
+            "vertical_section": 24.90128,
+            "dogleg_severity": 1.513852260208465,
+            "subsea": 406.04483,
+            "remarks": null
+          },
+          {
+            "md": 430.88361,
+            "inclination_deg": 5.8,
+            "azimuth_deg": 352.15,
+            "tvd": 429.41548,
+            "north_south": 26.72792,
+            "east_west": -0.82644,
+            "vertical_section": 26.69692,
+            "dogleg_severity": 0.2012732320496873,
+            "subsea": 388.48452,
+            "remarks": null
+          },
+          {
+            "md": 448.50991,
+            "inclination_deg": 5.8,
+            "azimuth_deg": 350.74,
+            "tvd": 446.95155,
+            "north_south": 28.48922,
+            "east_west": -1.09139,
+            "vertical_section": 28.4747,
+            "dogleg_severity": 0.3126974836891087,
+            "subsea": 370.94845,
+            "remarks": null
+          },
+          {
+            "md": 466.07173,
+            "inclination_deg": 5.71,
+            "azimuth_deg": 351.45,
+            "tvd": 464.42486,
+            "north_south": 30.22895,
+            "east_west": -1.36407,
+            "vertical_section": 30.23168,
+            "dogleg_severity": 0.25276114290295093,
+            "subsea": 353.47514,
+            "remarks": null
+          },
+          {
+            "md": 483.68514,
+            "inclination_deg": 5.67,
+            "azimuth_deg": 352.41,
+            "tvd": 481.95148,
+            "north_south": 31.95789,
+            "east_west": -1.60926,
+            "vertical_section": 31.9755,
+            "dogleg_severity": 0.2267398654768784,
+            "subsea": 335.94852,
+            "remarks": null
+          },
+          {
+            "md": 501.32432,
+            "inclination_deg": 5.63,
+            "azimuth_deg": 351.1,
+            "tvd": 499.50498,
+            "north_south": 33.67644,
+            "east_west": -1.85822,
+            "vertical_section": 33.70929,
+            "dogleg_severity": 0.296114896667391,
+            "subsea": 318.39502,
+            "remarks": null
+          },
+          {
+            "md": 518.9893,
+            "inclination_deg": 5.54,
+            "azimuth_deg": 350.22,
+            "tvd": 517.0861,
+            "north_south": 35.37282,
+            "east_west": -2.13712,
+            "vertical_section": 35.42363,
+            "dogleg_severity": 0.272046428350441,
+            "subsea": 300.8139,
+            "remarks": null
+          },
+          {
+            "md": 536.57691,
+            "inclination_deg": 5.32,
+            "azimuth_deg": 349.95,
+            "tvd": 534.59478,
+            "north_south": 37.01227,
+            "east_west": -2.42361,
+            "vertical_section": 37.08194,
+            "dogleg_severity": 0.48712184474152453,
+            "subsea": 283.30522,
+            "remarks": null
+          },
+          {
+            "md": 554.16453,
+            "inclination_deg": 5.32,
+            "azimuth_deg": 352.41,
+            "tvd": 552.10666,
+            "north_south": 38.62331,
+            "east_west": -2.67359,
+            "vertical_section": 38.70873,
+            "dogleg_severity": 0.5016186808985305,
+            "subsea": 265.79334,
+            "remarks": null
+          },
+          {
+            "md": 571.80372,
+            "inclination_deg": 6.24,
+            "azimuth_deg": 359.27,
+            "tvd": 569.65619,
+            "north_south": 40.3925,
+            "east_west": -2.79382,
+            "vertical_section": 40.48163,
+            "dogleg_severity": 2.5196589103035048,
+            "subsea": 248.24381,
+            "remarks": null
+          },
+          {
+            "md": 589.43001,
+            "inclination_deg": 5.93,
+            "azimuth_deg": 357.95,
+            "tvd": 587.18316,
+            "north_south": 42.26029,
+            "east_west": -2.83859,
+            "vertical_section": 42.34611,
+            "dogleg_severity": 0.7463707691141116,
+            "subsea": 230.71684,
+            "remarks": null
+          },
+          {
+            "md": 607.04341,
+            "inclination_deg": 5.85,
+            "azimuth_deg": 356.54,
+            "tvd": 604.70358,
+            "north_south": 44.06554,
+            "east_west": -2.92531,
+            "vertical_section": 44.15199,
+            "dogleg_severity": 0.36309634763148546,
+            "subsea": 213.19642,
+            "remarks": null
+          },
+          {
+            "md": 624.75997,
+            "inclination_deg": 5.8,
+            "azimuth_deg": 352.59,
+            "tvd": 622.32873,
+            "north_south": 45.85449,
+            "east_west": -3.09525,
+            "vertical_section": 45.94895,
+            "dogleg_severity": 0.8819027604613798,
+            "subsea": 195.57127,
+            "remarks": null
+          },
+          {
+            "md": 642.55389,
+            "inclination_deg": 6.86,
+            "azimuth_deg": 345.47,
+            "tvd": 640.01419,
+            "north_south": 47.77485,
+            "east_west": -3.47784,
+            "vertical_section": 47.89554,
+            "dogleg_severity": 2.8632722191827438,
+            "subsea": 177.88581,
+            "remarks": null
+          },
+          {
+            "md": 660.16729,
+            "inclination_deg": 6.81,
+            "azimuth_deg": 344.5,
+            "tvd": 657.50242,
+            "north_south": 49.79941,
+            "east_west": -4.02082,
+            "vertical_section": 49.96003,
+            "dogleg_severity": 0.2762838034921282,
+            "subsea": 160.39758,
+            "remarks": null
+          },
+          {
+            "md": 677.81937,
+            "inclination_deg": 6.37,
+            "azimuth_deg": 340.72,
+            "tvd": 675.03791,
+            "north_south": 51.73225,
+            "east_west": -4.62384,
+            "vertical_section": 51.93845,
+            "dogleg_severity": 1.3535433814835134,
+            "subsea": 142.86209,
+            "remarks": null
+          },
+          {
+            "md": 695.44566,
+            "inclination_deg": 5.85,
+            "azimuth_deg": 342.31,
+            "tvd": 692.56403,
+            "north_south": 53.51103,
+            "east_west": -5.21965,
+            "vertical_section": 53.76278,
+            "dogleg_severity": 1.1999940564020086,
+            "subsea": 125.33597,
+            "remarks": null
+          },
+          {
+            "md": 713.07196,
+            "inclination_deg": 5.89,
+            "azimuth_deg": 351.27,
+            "tvd": 710.09827,
+            "north_south": 55.26079,
+            "east_west": -5.62989,
+            "vertical_section": 55.54185,
+            "dogleg_severity": 2.0108973586613836,
+            "subsea": 107.80173,
+            "remarks": null
+          },
+          {
+            "md": 730.72404,
+            "inclination_deg": 6.46,
+            "azimuth_deg": 354.17,
+            "tvd": 727.64791,
+            "north_south": 57.14391,
+            "east_west": -5.86823,
+            "vertical_section": 57.43864,
+            "dogleg_severity": 1.4235200089130813,
+            "subsea": 90.25209,
+            "remarks": null
+          },
+          {
+            "md": 748.31166,
+            "inclination_deg": 6.11,
+            "azimuth_deg": 354.61,
+            "tvd": 745.12979,
+            "north_south": 59.06004,
+            "east_west": -6.05665,
+            "vertical_section": 59.36392,
+            "dogleg_severity": 0.7770450696623855,
+            "subsea": 72.77021,
+            "remarks": null
+          },
+          {
+            "md": 765.88637,
+            "inclination_deg": 6.9,
+            "azimuth_deg": 354.79,
+            "tvd": 762.59122,
+            "north_south": 61.04256,
+            "east_west": -6.24037,
+            "vertical_section": 61.35492,
+            "dogleg_severity": 1.7393885120259274,
+            "subsea": 55.30878,
+            "remarks": null
+          },
+          {
+            "md": 783.52556,
+            "inclination_deg": 6.46,
+            "azimuth_deg": 349.07,
+            "tvd": 780.11082,
+            "north_south": 63.07207,
+            "east_west": -6.52474,
+            "vertical_section": 63.40158,
+            "dogleg_severity": 1.7481821582362898,
+            "subsea": 37.78918,
+            "remarks": null
+          },
+          {
+            "md": 801.24212,
+            "inclination_deg": 6.77,
+            "azimuth_deg": 348.72,
+            "tvd": 797.7094,
+            "north_south": 65.07471,
+            "east_west": -6.91797,
+            "vertical_section": 65.43106,
+            "dogleg_severity": 0.6825536003969194,
+            "subsea": 20.1906,
+            "remarks": null
+          },
+          {
+            "md": 818.85552,
+            "inclination_deg": 6.11,
+            "azimuth_deg": 347.93,
+            "tvd": 815.21157,
+            "north_south": 67.00949,
+            "east_west": -7.31705,
+            "vertical_section": 67.39346,
+            "dogleg_severity": 1.462458300405544,
+            "subsea": 2.68843,
+            "remarks": null
+          },
+          {
+            "md": 836.44313,
+            "inclination_deg": 5.98,
+            "azimuth_deg": 347.58,
+            "tvd": 832.70138,
+            "north_south": 68.8195,
+            "east_west": -7.70982,
+            "vertical_section": 69.23102,
+            "dogleg_severity": 0.2971925779451917,
+            "subsea": -14.80138,
+            "remarks": null
+          },
+          {
+            "md": 854.03074,
+            "inclination_deg": 6.99,
+            "azimuth_deg": 354.08,
+            "tvd": 850.17647,
+            "north_south": 70.77875,
+            "east_west": -8.01725,
+            "vertical_section": 71.20972,
+            "dogleg_severity": 2.7428596560188003,
+            "subsea": -32.27647,
+            "remarks": null
+          },
+          {
+            "md": 871.66993,
+            "inclination_deg": 8.0,
+            "azimuth_deg": 358.74,
+            "tvd": 867.66489,
+            "north_south": 73.07357,
+            "east_west": -8.15495,
+            "vertical_section": 73.50776,
+            "dogleg_severity": 2.5833604046388463,
+            "subsea": -49.76489,
+            "remarks": null
+          },
+          {
+            "md": 889.3478,
+            "inclination_deg": 7.78,
+            "azimuth_deg": 358.74,
+            "tvd": 885.1754,
+            "north_south": 75.49965,
+            "east_west": -8.20831,
+            "vertical_section": 75.92912,
+            "dogleg_severity": 0.4814004376362196,
+            "subsea": -67.2754,
+            "remarks": null
+          },
+          {
+            "md": 906.92252,
+            "inclination_deg": 7.52,
+            "azimuth_deg": 356.81,
+            "tvd": 902.59372,
+            "north_south": 77.83716,
+            "east_west": -8.29846,
+            "vertical_section": 78.26548,
+            "dogleg_severity": 0.8044594856925298,
+            "subsea": -84.69372,
+            "remarks": null
+          },
+          {
+            "md": 924.51014,
+            "inclination_deg": 7.3,
+            "azimuth_deg": 355.31,
+            "tvd": 920.03446,
+            "north_south": 80.09988,
+            "east_west": -8.45387,
+            "vertical_section": 80.53311,
+            "dogleg_severity": 0.644295891114409,
+            "subsea": -102.13446,
+            "remarks": null
+          },
+          {
+            "md": 942.11064,
+            "inclination_deg": 7.25,
+            "azimuth_deg": 356.37,
+            "tvd": 937.49328,
+            "north_south": 82.3227,
+            "east_west": -8.61561,
+            "vertical_section": 82.76153,
+            "dogleg_severity": 0.3148070481884021,
+            "subsea": -119.59328,
+            "remarks": null
+          },
+          {
+            "md": 959.68536,
+            "inclination_deg": 6.99,
+            "azimuth_deg": 354.44,
+            "tvd": 954.93249,
+            "north_south": 84.49379,
+            "east_west": -8.78943,
+            "vertical_section": 84.9395,
+            "dogleg_severity": 0.7775628000989018,
+            "subsea": -137.03249,
+            "remarks": null
+          },
+          {
+            "md": 977.26008,
+            "inclination_deg": 6.77,
+            "azimuth_deg": 353.82,
+            "tvd": 972.38065,
+            "north_south": 86.58802,
+            "east_west": -9.00456,
+            "vertical_section": 87.04453,
+            "dogleg_severity": 0.5110677630158883,
+            "subsea": -154.48065,
+            "remarks": null
+          },
+          {
+            "md": 994.87348,
+            "inclination_deg": 6.55,
+            "azimuth_deg": 353.2,
+            "tvd": 989.87518,
+            "north_south": 88.61767,
+            "east_west": -9.23527,
+            "vertical_section": 89.08662,
+            "dogleg_severity": 0.5083085031017842,
+            "subsea": -171.97518,
+            "remarks": null
+          },
+          {
+            "md": 1013.47973,
+            "inclination_deg": 6.59,
+            "azimuth_deg": 352.06,
+            "tvd": 1008.35925,
+            "north_south": 90.72884,
+            "east_west": -9.5084,
+            "vertical_section": 91.21364,
+            "dogleg_severity": 0.2836347054373276,
+            "subsea": -190.45925,
+            "remarks": null
+          },
+          {
+            "md": 1030.0616,
+            "inclination_deg": 6.07,
+            "azimuth_deg": 348.9,
+            "tvd": 1024.84002,
+            "north_south": 92.53155,
+            "east_west": -9.80863,
+            "vertical_section": 93.03577,
+            "dogleg_severity": 1.459737783161136,
+            "subsea": -206.94002,
+            "remarks": null
+          },
+          {
+            "md": 1047.71368,
+            "inclination_deg": 6.9,
+            "azimuth_deg": 356.9,
+            "tvd": 1042.37936,
+            "north_south": 94.50624,
+            "east_west": -10.04566,
+            "vertical_section": 95.02366,
+            "dogleg_severity": 2.6844730838128616,
+            "subsea": -224.47936,
+            "remarks": null
+          },
+          {
+            "md": 1065.31419,
+            "inclination_deg": 6.99,
+            "azimuth_deg": 356.81,
+            "tvd": 1059.85073,
+            "north_south": 96.63123,
+            "east_west": -10.16243,
+            "vertical_section": 97.15068,
+            "dogleg_severity": 0.19924290381717163,
+            "subsea": -241.95073,
+            "remarks": null
+          },
+          {
+            "md": 1082.9147,
+            "inclination_deg": 6.68,
+            "azimuth_deg": 356.28,
+            "tvd": 1077.32613,
+            "north_south": 98.72205,
+            "east_west": -10.28844,
+            "vertical_section": 99.24448,
+            "dogleg_severity": 0.6952717415482981,
+            "subsea": -259.42613,
+            "remarks": null
+          },
+          {
+            "md": 1100.5152,
+            "inclination_deg": 6.64,
+            "azimuth_deg": 357.25,
+            "tvd": 1094.80787,
+            "north_south": 100.75999,
+            "east_west": -10.40368,
+            "vertical_section": 101.28465,
+            "dogleg_severity": 0.26240868848337445,
+            "subsea": -276.90787,
+            "remarks": null
+          },
+          {
+            "md": 1118.1286,
+            "inclination_deg": 6.42,
+            "azimuth_deg": 358.48,
+            "tvd": 1112.307,
+            "north_south": 102.76152,
+            "east_west": -10.47866,
+            "vertical_section": 103.28501,
+            "dogleg_severity": 0.5725290688535345,
+            "subsea": -294.407,
+            "remarks": null
+          },
+          {
+            "md": 1145.0,
+            "inclination_deg": 6.42,
+            "azimuth_deg": 358.48,
+            "tvd": 1139.00988,
+            "north_south": 105.76511,
+            "east_west": -10.55836,
+            "vertical_section": 106.28396,
+            "dogleg_severity": 0.0,
+            "subsea": -321.10988,
+            "remarks": "TD"
+          }
+        ],
+        "prognosed_survey": [
+          {
+            "md": 0.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 30.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 60.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 90.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 100.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 120.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 130.0,
+            "inclination_deg": 0.0,
+            "azimuth_deg": 0.0
+          },
+          {
+            "md": 142.46,
+            "inclination_deg": 1.25,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 150.0,
+            "inclination_deg": 2.0,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 180.0,
+            "inclination_deg": 5.0,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 194.93,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 196.81,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 210.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 216.94,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 240.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 256.19,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 270.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 300.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 330.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 360.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 390.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 396.49,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 420.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 450.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 480.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 510.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 528.34,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 540.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 570.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 600.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 601.41,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 630.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 648.11,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 660.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 690.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 718.66,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 720.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 740.3,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 750.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 770.29,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 780.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 783.07,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 792.23,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 795.75,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 797.26,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 810.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 820.71,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 826.85,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 840.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 850.6,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 860.27,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 870.0,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 873.75,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          },
+          {
+            "md": 880.4,
+            "inclination_deg": 6.49,
+            "azimuth_deg": 354.95
+          }
+        ],
+        "slides": []
+      },
+      "log_data": null
+    }
+  ],
+  "synopsis": {
+    "well_summary": [
+      "The PRAIRIE FALCON CARSLAND 7-14-18-25W4 well was spud on June 02, 2026 at 07:15 hours and reached a total depth of 1145.00m on June 05, 2026 at 11:05 hours. The well is a vertical well and targeted the VIKING SS.",
+      "The drilling contractor was Trinidad Drilling Ltd. and Horizon Directional provided directional services. Geological supervision was provided by Melissa Chan, P.Geo and Trevor Wong B.Sc on behalf of Chinook Consulting Services.",
+      "The well was drilled from surface location 7-14-018-25W4. Surface coordinates were 150.0m North of South, 200.0m West of East boundary of section 7-18-25W4, situated at a ground level elevation of 812.40m (Reference: Sea Level). Bottomhole coordinates were 150.0m North of South, 200.0m West of East boundary of section 7-18-25W4 at a true vertical depth (TVD) of 1139.00m from kelly bushing (817.90m). Total depth was reached at 1145.0m, in the MANNVILLE.",
+      "A total of 4 drilling bits were used to drill the well, with a cumulative drill time of 8.25 hours, resulting in an average penetration rate of 138.8m/hr.",
+      "Total gas was monitored using a Pason gas detector. Drill cutting samples were collected over the interval 700m-1145m, 5m intervals, 1 set for Prairie Falcon Resources Inc. and 1000 to 1145m, 5m intervals, 2 sets for the SEM.",
+      "Wireline logs were run by Halliburton. MWD Gamma was recorded."
+    ],
+    "well_profile": [
+      "Kick Off Point reached at 175.36m, Inc 0.89\u00ba, Azi327.78\u00ba, TVD 175.36m, VS 0.74m.",
+      "VIKING SS reached at 1034.23m, Inc 6.27\u00ba, Azi350.79\u00ba, TVD 1028.99m, VS 93.51m.",
+      "Last Survey reached at 1145.00m, Inc 6.42\u00ba, Azi358.48\u00ba, TVD 1139.01m, VS 106.28m.",
+      "Leg 1 Statistics"
+    ],
+    "formation_evaluation": [
+      "Objectives: The primary objective of the PRAIRIE FALCON CARSLAND 7-14-18-25W4 well was the VIKING SS Formation.",
+      "It was encountered at a measured depth of 1034.23m (True Vertical Depth 1028.99m, Subsea -211.09m). MWD Gamma confirmed the top of the formation at measured depth of 1034.23m (True Vertical Depth 1028.99m, Subsea -211.09m).",
+      "CONCLUSIONS",
+      "The PRAIRIE FALCON CARSLAND 7-14-18-25W4 well was completed as a cased vertical VIKING SS crude oil production well."
+    ]
+  },
+  "daily": [
+    {
+      "date": "2026-06-02",
+      "depth": 128,
+      "progress": 128,
+      "drilling_hours": 1.5,
+      "rop": 85.10135,
+      "operations_summary": "Move rig on location. Rig up. Pick up BHA at 16:30hrs Spud well at 17:00 and Drill 222mm hole from 4.5m to 99.0m at 19:37hrs. Condition and circulate. Back ream to run casing. Laydown directional tools at 22:15hrs. Rig to and run casing at 23:45hrs. Condition and circulate.",
+      "tag": "Jun 02: drilled to 128m in 1.5 hrs, ROP 85m/hr"
+    },
+    {
+      "date": "2026-06-03",
+      "depth": 1037,
+      "progress": 909,
+      "drilling_hours": 4.5,
+      "rop": 202.00826,
+      "operations_summary": "Rig in cementers and cement casing. Plug down at 01:21hrs. Wait on cement. Cut casing and weld bowl. Nipple up BOP's. Rig up flare and degasser lines. Pressure test at 07:15hrs.  Make up directional tools and BHA. Trip in the hole at 10:45hs. Drill out cement, float and shoe at 11:00hrs.  Drill ahead 159mm vertical hole to 804mMD reached at 23:15. Reem back to the shoe, TIH to bottom, condition and circulate, TOOH.",
+      "tag": "Jun 03: drilled to 1037m in 4.5 hrs, ROP 202m/hr"
+    },
+    {
+      "date": "2026-06-04",
+      "depth": 1068,
+      "progress": 31,
+      "drilling_hours": 1.5,
+      "rop": 20.63063,
+      "operations_summary": "Continue to trip out of the hole. Layout directional tools 07:00hrs. Pick up core barrel, make up bit. Slip and cut. Trip in the hole to Core Point of 804mMD. Circulate, drop ball. Core from 804m to 816mMD at 12:26hrs to 16:17hrs. Pull out of the hole with Core #1. Handle and process Core #1. Reload core barrel / inspect bit and run in for Core #2. Cut Core # 2. Core from 816 to 828mMD from 18:00hrs to 22:45hrs, Pull out of the hole.",
+      "tag": "Jun 04: drilled to 1068m in 1.5 hrs, ROP 21m/hr"
+    },
+    {
+      "date": "2026-06-05",
+      "depth": 1145,
+      "progress": 77,
+      "drilling_hours": 0.75,
+      "rop": 103.15315,
+      "operations_summary": "Trip out with Core #2. Handle Core #2 at 02:15hrs. Pick up directional tools at 03:45hrs. Trip in the hole to 804mMD and log to 828mMD. Drill ahead to Total Depth of 888mMD at 07:39hrs. Condition and circulate. Back ream to core point. Pull out of the hole. Laydown directional tools at 12:00hrs. Rig up wireliners at 13:00hrs and log well. Rig out wireliner. Rig to and run casing 18:45. Condition and circulate. Rig in cementers. Cement.",
+      "tag": "Jun 05: drilled to 1145m in 0.8 hrs, ROP 103m/hr"
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": "Continue cementing. Plug down at 01:42hrs. Nipple down BOP's. Rig out flare and degasser lines. Lower mast. tear down rig for location move. Rig release at 04:00hrs.",
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    },
+    {
+      "date": "2026-06-06",
+      "depth": null,
+      "progress": null,
+      "drilling_hours": null,
+      "rop": 0.0,
+      "operations_summary": null,
+      "tag": null
+    }
+  ],
+  "mud_log": [
+    {
+      "date": "2026-06-02",
+      "depth": 127.65203,
+      "mud_type": "Polymer",
+      "density": 1090.0,
+      "viscosity": 60.0,
+      "wl": null,
+      "ph": null,
+      "remarks": null
+    },
+    {
+      "date": "2026-06-04",
+      "depth": 1052.16216,
+      "mud_type": "Polymer",
+      "density": 1080.0,
+      "viscosity": 48.0,
+      "wl": 7.0,
+      "ph": 0.0,
+      "remarks": null
+    },
+    {
+      "date": "2026-06-05",
+      "depth": 1145.0,
+      "mud_type": "Polymer",
+      "density": 1080.0,
+      "viscosity": 73.0,
+      "wl": 6.0,
+      "ph": 7.0,
+      "remarks": null
+    }
+  ],
+  "bits": [
+    {
+      "bit_number": 1,
+      "size": 222.0,
+      "make": "J&L",
+      "type": "TRICONE",
+      "depth_in": null,
+      "depth_out": 5.80236,
+      "progress": 127.65203,
+      "hours": 94.5,
+      "wob": 1.5,
+      "rpm": 7.0,
+      "rop": 64.47072,
+      "remarks": 63
+    },
+    {
+      "bit_number": 2,
+      "size": 159.0,
+      "make": "Ulterra",
+      "type": "M323",
+      "depth_in": null,
+      "depth_out": 127.65203,
+      "progress": 1052.16216,
+      "hours": 717.0,
+      "wob": 4.5,
+      "rpm": 6.0,
+      "rop": 64.47072,
+      "remarks": 159.33333333333334
+    },
+    {
+      "bit_number": "3RR",
+      "size": 159.0,
+      "make": "NOV",
+      "type": "TK3-K1",
+      "depth_in": null,
+      "depth_out": 1052.16216,
+      "progress": 1067.63514,
+      "hours": 12.0,
+      "wob": 2.5,
+      "rpm": 0.8,
+      "rop": 58.02365,
+      "remarks": 4.8
+    },
+    {
+      "bit_number": "4RR",
+      "size": 159.0,
+      "make": "NOV",
+      "type": "TK3-K1",
+      "depth_in": null,
+      "depth_out": 1067.63514,
+      "progress": 1145.0,
+      "hours": 60.0,
+      "wob": 0.75,
+      "rpm": 6.0,
+      "rop": 64.47072,
+      "remarks": 80
+    }
+  ]
+}
