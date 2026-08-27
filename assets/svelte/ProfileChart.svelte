@@ -287,6 +287,7 @@
         axisLabel: { color: textColor, fontSize: 9 },
         axisLine: { lineStyle: { color: axisColor } },
         splitLine: { lineStyle: { color: gridColor, type: 'dashed' as const } },
+        boundaryGap: ['5%', '5%'],
       },
       yAxis: {
         type: 'value',
@@ -298,6 +299,7 @@
         axisLabel: { color: textColor, fontSize: 9 },
         axisLine: { lineStyle: { color: axisColor } },
         splitLine: { lineStyle: { color: gridColor, type: 'dashed' as const } },
+        boundaryGap: ['1%', '1%'],
       },
       series,
     }
