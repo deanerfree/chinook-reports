@@ -36,6 +36,9 @@ chinook_reports-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Tidewave CLI binary (installed by the devcontainer, not tracked).
+/tidewave
+
 # Python
 __pycache__/
 *.pyc

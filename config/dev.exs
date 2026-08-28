@@ -52,6 +52,11 @@ config :chinook_reports, ChinookReportsWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
+# Docker Desktop bind mounts don't deliver inotify events, so the default
+# file_system backend never fires. Use the polling backend for live reload.
+config :phoenix_live_reload, :backend, :fs_poll
+config :phoenix_live_reload, :backend_opts, interval: 500
+
 # Watch static and templates for browser reloading.
 config :chinook_reports, ChinookReportsWeb.Endpoint,
   live_reload: [
@@ -78,7 +83,10 @@ config :phoenix, :plug_init_mode, :runtime
 config :phoenix_vite, PhoenixVite.Npm,
   default: [
     args: ~w(run dev),
-    cd: Path.expand("../assets", __DIR__)
+    cd: Path.expand("../assets", __DIR__),
+    # Docker Desktop bind mounts don't deliver inotify events; force the Vite
+    # (Rollup) watcher to poll so Svelte edits are picked up without a restart.
+    env: %{"VITE_USE_POLLING" => "true"}
   ]
 
 config :phoenix_live_view,

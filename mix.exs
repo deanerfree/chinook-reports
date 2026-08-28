@@ -33,6 +33,7 @@ defmodule ChinookReports.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:tidewave, "~> 0.9", only: [:dev]},
       # ── Core Phoenix (generated, keep these) ──────────────────────────────
 
       {:phoenix, "~> 1.8.5"},
