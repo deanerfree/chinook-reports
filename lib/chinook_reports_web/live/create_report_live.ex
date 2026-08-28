@@ -9,10 +9,10 @@ defmodule ChinookReportsWeb.CreateReportLive do
   alias ChinookReports.Reports.Report.ReportData.{ProfileSection, FormationTop, SurveyPoint}
 
   # entry type: manual vs file upload
-  @entry_types [
-    %{id: :manual, label: "Manual Entry"},
-    %{id: :file, label: "File Upload"}
-  ]
+  # @entry_types [
+  #   %{id: :manual, label: "Manual Entry"},
+  #   %{id: :file, label: "File Upload"}
+  # ]
 
   # The whole step list lives here so the stepper, the navigation handlers,
   # and any future "which fields belong to which step" logic all read from
@@ -34,7 +34,11 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{field: :country, label: "Country", placeholder: "Canada"},
     %{field: :province, label: "Province", placeholder: "Alberta"},
     %{field: :geometry, label: "Well Geometry", input: :select, options: &Report.geometries/0},
-    %{field: :target_formation, label: "Primary Target", placeholder: "Enter the target formation"},
+    %{
+      field: :target_formation,
+      label: "Primary Target",
+      placeholder: "Enter the target formation"
+    },
     %{field: :secondary_target, label: "Secondary target if applicable"},
     %{field: :units, label: "Unit System", input: :select, options: &Report.units/0}
   ]
@@ -96,7 +100,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
   @step_guards %{
     1 => [:well_name, :unique_well_id]
   }
-  IO.inspect(@current_step, label: "<<<<< Current step in CreateReportLive >>>>>")
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
@@ -189,18 +193,18 @@ defmodule ChinookReportsWeb.CreateReportLive do
     """
   end
 
-  defp select_entry_type(assigns) do
-    ~H"""
-    <%= case @entry_type do %>
-      <% :manual -> %>
-        <p class="text-sm text-copy-secondary">User will fill out the form fields manually.</p>
-      <% :file -> %>
-        <p class="text-sm text-copy-secondary">
-          User will upload a file to pre-populate the form fields.
-        </p>
-    <% end %>
-    """
-  end
+  # defp select_entry_type(assigns) do
+  #   ~H"""
+  #   <%= case @entry_type do %>
+  #     <% :manual -> %>
+  #       <p class="text-sm text-copy-secondary">User will fill out the form fields manually.</p>
+  #     <% :file -> %>
+  #       <p class="text-sm text-copy-secondary">
+  #         User will upload a file to pre-populate the form fields.
+  #       </p>
+  #   <% end %>
+  #   """
+  # end
 
   defp step_content(assigns) do
     ~H"""

@@ -26,6 +26,181 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
+  # ── Tab dispatch (redesigned report page) ───────────────────────────────
+
+  @doc """
+  Renders the body of one non-Summary tab on the redesigned report page,
+  reusing the existing section components. The Summary tab is handled by
+  `ChinookReportsWeb.ReportSummaryComponents`.
+  """
+  attr :tab, :string, required: true
+  attr :report, :map, required: true
+
+  def tab_content(assigns) do
+    assigns =
+      assign(assigns,
+        data: assigns.report.report_data,
+        import: assigns.report.import_data || %{}
+      )
+
+    ~H"""
+    <div class="flex flex-col gap-8 pt-6">
+      <%= case @tab do %>
+        <% "well_data" -> %>
+          <.well_summary_section report={@report} />
+          <%= if @data do %>
+            <.elevations_location_section report={@report} data={@data} />
+            <.configuration_section data={@data} />
+          <% end %>
+          <%= if wd = @import["welldata"] do %>
+            <.welldata_section report={wd} />
+          <% end %>
+        <% "formation_tops" -> %>
+          <%= if tops = @import["tops"] do %>
+            <.tops_section tops={tops} />
+          <% end %>
+          <%= if @data && @data.formation_tops != [] do %>
+            <.formation_tops_section rows={@data.formation_tops} />
+          <% end %>
+        <% "reservoir" -> %>
+          <%= if reservoir = @import["reservoir_data"] do %>
+            <.reservoir_section reservoir={reservoir} />
+          <% end %>
+        <% "synopsis" -> %>
+          <%= if synopsis = @import["synopsis"] do %>
+            <.synopsis_section synopsis={synopsis} legs={@import["reservoir_data"] || []} />
+          <% end %>
+        <% "surveys" -> %>
+          <.surveys_import_section legs={@import["reservoir_data"] || []} />
+          <%= if @data && @data.surveys != [] do %>
+            <.surveys_section rows={@data.surveys} />
+          <% end %>
+        <% "timing" -> %>
+          <%= if wd = @import["welldata"] do %>
+            <.well_timing_section report={wd} />
+          <% end %>
+        <% "hole_casing_mud_bits" -> %>
+          <%= if wd = @import["welldata"] do %>
+            <.hole_mud_casing_section report={wd} />
+          <% end %>
+          <%= if bits = @import["bits"] do %>
+            <.bits_section bits={bits} />
+          <% end %>
+        <% "mud_log" -> %>
+          <%= if mud = @import["mud_log"] do %>
+            <.mud_section mud={mud} />
+          <% end %>
+        <% "daily_reports" -> %>
+          <%= if daily = @import["daily"] do %>
+            <.daily_section daily={daily} />
+          <% end %>
+        <% _ -> %>
+          <p class="text-sm text-muted">Nothing to show here.</p>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :report, :map, required: true
+
+  defp well_timing_section(assigns) do
+    ~H"""
+    <%= if timing = @report["well_timing"] do %>
+      <% timing_rows =
+        for(
+          {label, key} <- [
+            {"Spud Date", "spud_date"},
+            {"Surface Casing", "surface_casing"},
+            {"Sample Point", "sample_point"},
+            {"Kick Off Point", "kick_off_point"},
+            {"Intermediate Casing Point", "intermediate_casing_point"},
+            {"Heel", "heel"},
+            {"Final T.D.", "final_td"}
+          ],
+          event = timing[key],
+          do: %{
+            "milestone" => label,
+            "date" => event["date"],
+            "time" => event["time"],
+            "depth" => event["depth"]
+          }
+        ) ++
+          if rr = timing["rig_release_date"],
+            do: [%{"milestone" => "Rig Release", "date" => rr, "time" => nil, "depth" => nil}],
+            else: [] %>
+
+      <.flat_card_panel title="Well Timing">
+        <.table id="well_timing_table" rows={timing_rows}>
+          <:col :let={row} label="Milestone">{row["milestone"]}</:col>
+          <:col :let={row} label="Date">{row["date"]}</:col>
+          <:col :let={row} label="Time">{row["time"]}</:col>
+          <:col :let={row} label="Depth (m)">{row["depth"]}</:col>
+        </.table>
+      </.flat_card_panel>
+    <% end %>
+    """
+  end
+
+  attr :report, :map, required: true
+
+  defp hole_mud_casing_section(assigns) do
+    ~H"""
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <%= if holes = @report["hole_sizes"] do %>
+        <.table_panel title="Hole Sizes">
+          <.table id="hole_sizes_table" rows={holes}>
+            <:col :let={h} label="Section">{String.capitalize(h["section"] || "")}</:col>
+            <:col :let={h} label="Ø (mm)">{fmt_num(h["bit_diameter"])}</:col>
+            <:col :let={h} label="From">{fmt_num(h["from_depth"])}</:col>
+            <:col :let={h} label="To (m)">{fmt_num(h["to_depth"])}</:col>
+          </.table>
+        </.table_panel>
+      <% end %>
+
+      <%= if mud = @report["mud"] do %>
+        <.table_panel title="Mud">
+          <.table id="welldata_mud_table" rows={mud}>
+            <:col :let={m} label="Section">{String.capitalize(m["section"] || "")}</:col>
+            <:col :let={m} label="Type">{m["type"]}</:col>
+            <:col :let={m} label="From">{fmt_num(m["from_depth"])}</:col>
+            <:col :let={m} label="To (m)">{fmt_num(m["to_depth"])}</:col>
+          </.table>
+        </.table_panel>
+      <% end %>
+
+      <%= if casing = @report["casing_data"] do %>
+        <.table_panel title="Casing">
+          <.table id="casing_table" rows={casing}>
+            <:col :let={c} label="Section">{c["section"]}</:col>
+            <:col :let={c} label="Size (mm)">{fmt_num(c["size"])}</:col>
+            <:col :let={c} label="Set At (m)">{fmt_num(c["set_at"])}</:col>
+            <:col :let={c} label="Type">{c["type"]}</:col>
+          </.table>
+        </.table_panel>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :legs, :list, required: true
+
+  defp surveys_import_section(assigns) do
+    ~H"""
+    <%= for leg <- @legs, points = get_in(leg, ["survey", "survey_points"]) || [], points != [] do %>
+      <.table_panel title={"Directional Survey — #{leg["leg_name"] || "Leg"}"}>
+        <.table id={"survey_points_#{leg["leg_name"]}"} rows={points}>
+          <:col :let={p} label="MD (m)">{fmt_num(p["md"])}</:col>
+          <:col :let={p} label="Inc (°)">{fmt_num(p["inclination_deg"])}</:col>
+          <:col :let={p} label="Azi (°)">{fmt_num(p["azimuth_deg"])}</:col>
+          <:col :let={p} label="TVD (m)">{fmt_num(p["tvd"])}</:col>
+          <:col :let={p} label="VS (m)">{fmt_num(p["vertical_section"])}</:col>
+          <:col :let={p} label="Subsea (m)">{fmt_num(p["subsea"])}</:col>
+        </.table>
+      </.table_panel>
+    <% end %>
+    """
+  end
+
   # ── Imported JSON (Excel extraction / seeded test data) ──────────────────
 
   attr :import, :map, required: true
@@ -100,7 +275,9 @@ defmodule ChinookReportsWeb.ReportComponents do
               <span><strong>Depth:</strong> {event["depth"]} m</span>
               <span><strong>Drilling Hours:</strong> {event["drilling_hours"]} hrs</span>
             </div>
-            <span class="block p-2 rounded bg-bg text-sm text-text">{event["operations_summary"]}</span>
+            <span class="block p-2 rounded bg-bg text-sm text-text">
+              {event["operations_summary"]}
+            </span>
           </div>
         <% end %>
       </div>
@@ -471,9 +648,17 @@ defmodule ChinookReportsWeb.ReportComponents do
                         Geographic Coordinates
                       </p>
                       <p class="text-sm font-mono text-text">
-                        {abs(coords["latitude"])}° {coord_dir(coords["latitude"], coords["latitude_dir"], "N", "S")}, {abs(
-                          coords["longitude"]
-                        )}° {coord_dir(coords["longitude"], coords["longitude_dir"], "E", "W")}
+                        {abs(coords["latitude"])}° {coord_dir(
+                          coords["latitude"],
+                          coords["latitude_dir"],
+                          "N",
+                          "S"
+                        )}, {abs(coords["longitude"])}° {coord_dir(
+                          coords["longitude"],
+                          coords["longitude_dir"],
+                          "E",
+                          "W"
+                        )}
                         <span class="text-xs font-sans font-normal text-muted ml-1">
                           {coords["datum"]}
                         </span>
@@ -500,75 +685,10 @@ defmodule ChinookReportsWeb.ReportComponents do
       <% end %>
 
       <%!-- ── Well Timing ──────────────────────────────────────── --%>
-      <%= if timing = @report["well_timing"] do %>
-        <% timing_rows =
-          for(
-            {label, key} <- [
-              {"Spud Date", "spud_date"},
-              {"Surface Casing", "surface_casing"},
-              {"Sample Point", "sample_point"},
-              {"Kick Off Point", "kick_off_point"},
-              {"Intermediate Casing Point", "intermediate_casing_point"},
-              {"Heel", "heel"},
-              {"Final T.D.", "final_td"}
-            ],
-            event = timing[key],
-            do: %{
-              "milestone" => label,
-              "date" => event["date"],
-              "time" => event["time"],
-              "depth" => event["depth"]
-            }
-          ) ++
-            if rr = timing["rig_release_date"],
-              do: [%{"milestone" => "Rig Release", "date" => rr, "time" => nil, "depth" => nil}],
-              else: [] %>
-
-        <.flat_card_panel title="Well Timing">
-          <.table id="well_timing_table" rows={timing_rows}>
-            <:col :let={row} label="Milestone">{row["milestone"]}</:col>
-            <:col :let={row} label="Date">{row["date"]}</:col>
-            <:col :let={row} label="Time">{row["time"]}</:col>
-            <:col :let={row} label="Depth (m)">{row["depth"]}</:col>
-          </.table>
-        </.flat_card_panel>
-      <% end %>
+      <.well_timing_section report={@report} />
 
       <%!-- ── Hole Sizes / Mud / Casing ──────────────────────── --%>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <%= if holes = @report["hole_sizes"] do %>
-          <.table_panel title="Hole Sizes">
-            <.table id="hole_sizes_table" rows={holes}>
-              <:col :let={h} label="Section">{String.capitalize(h["section"] || "")}</:col>
-              <:col :let={h} label="Ø (mm)">{fmt_num(h["bit_diameter"])}</:col>
-              <:col :let={h} label="From">{fmt_num(h["from_depth"])}</:col>
-              <:col :let={h} label="To (m)">{fmt_num(h["to_depth"])}</:col>
-            </.table>
-          </.table_panel>
-        <% end %>
-
-        <%= if mud = @report["mud"] do %>
-          <.table_panel title="Mud">
-            <.table id="welldata_mud_table" rows={mud}>
-              <:col :let={m} label="Section">{String.capitalize(m["section"] || "")}</:col>
-              <:col :let={m} label="Type">{m["type"]}</:col>
-              <:col :let={m} label="From">{fmt_num(m["from_depth"])}</:col>
-              <:col :let={m} label="To (m)">{fmt_num(m["to_depth"])}</:col>
-            </.table>
-          </.table_panel>
-        <% end %>
-
-        <%= if casing = @report["casing_data"] do %>
-          <.table_panel title="Casing">
-            <.table id="casing_table" rows={casing}>
-              <:col :let={c} label="Section">{c["section"]}</:col>
-              <:col :let={c} label="Size (mm)">{fmt_num(c["size"])}</:col>
-              <:col :let={c} label="Set At (m)">{fmt_num(c["set_at"])}</:col>
-              <:col :let={c} label="Type">{c["type"]}</:col>
-            </.table>
-          </.table_panel>
-        <% end %>
-      </div>
+      <.hole_mud_casing_section report={@report} />
 
       <%!-- ── Services + Geological Services ─────────────────── --%>
 

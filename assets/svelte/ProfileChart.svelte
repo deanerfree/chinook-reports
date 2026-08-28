@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { init, use } from 'echarts/core'
   import type { ECharts } from 'echarts/core'
-  import { LineChart, ScatterChart } from 'echarts/charts'
+  import { LineChart, ScatterChart, CustomChart } from 'echarts/charts'
   import {
     GridComponent, TooltipComponent, LegendComponent,
     MarkAreaComponent, MarkLineComponent, DataZoomComponent, TitleComponent,
@@ -10,7 +10,7 @@
   import { CanvasRenderer } from 'echarts/renderers'
 
   use([
-    LineChart, ScatterChart,
+    LineChart, ScatterChart, CustomChart,
     GridComponent, TooltipComponent, LegendComponent,
     MarkAreaComponent, MarkLineComponent, DataZoomComponent, TitleComponent,
     CanvasRenderer,
@@ -43,9 +43,40 @@
 
   type Leg = { leg_name: string; survey: SurveyData | null; log_data: LogData | null }
 
+  type Casing = { section: string; size: number | null; set_at: number | null }
+  type FormationTop = {
+    formation: string
+    samples?: { md?: number | null; tvd?: number | null; subsea?: number | null }
+  }
+  type PlanPoint = { tvd: number; vertical_section: number }
+
   // ── Props ────────────────────────────────────────────────────────────────────
 
-  let { legs, dark = false }: { legs: Leg[]; dark?: boolean } = $props()
+  let {
+    legs,
+    dark = false,
+    layout = 'lateral',
+    casing = [],
+    tops = [],
+    elevations = {},
+    td = {},
+    plan = [],
+    show_curves = true,
+    overlay_curves = false,
+  }: {
+    legs: Leg[]
+    dark?: boolean
+    layout?: 'lateral' | 'vertical'
+    casing?: Casing[]
+    tops?: FormationTop[]
+    elevations?: Record<string, number>
+    td?: Record<string, number>
+    plan?: PlanPoint[]
+    show_curves?: boolean
+    overlay_curves?: boolean
+  } = $props()
+
+  let overlayOn = $state(true)
 
   // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -92,8 +123,12 @@
   )
   let vsContainer: HTMLDivElement
   let mdContainer: HTMLDivElement
+  let dcContainer!: HTMLDivElement
   let vsChart: ECharts | null = null
   let mdChart: ECharts | null = null
+  let dcChart: ECharts | null = null
+
+  const isVertical = $derived(layout === 'vertical')
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -149,6 +184,62 @@
 
     const series: object[] = []
     vsEventSeriesMap = new Map()
+
+    // Curve samples keyed by vertical section, for the hover tooltip over the
+    // Fig. 02 overlay (populated below when the overlay is on).
+    let curveTip: { vs: number; rop: number | null; gas: number | null; gamma: number | null }[] | null = null
+
+    // Full-height reservoir-quality stripes behind the whole plot, keyed by the
+    // vertical-section position of each reservoir interval.
+    {
+      const qLeg = legs[selectedLeg] ?? legs[0]
+      const qSp  = (qLeg?.survey?.survey_points ?? []).filter(
+        p => p.vertical_section != null && p.md != null
+      )
+      const qIvs = (qLeg?.log_data?.intervals ?? []).filter(
+        iv => iv.quality && QUALITY_COLORS[iv.quality]
+      )
+      if (qSp.length > 1 && qIvs.length) {
+        const toVs = (md: number) => {
+          const hit = interpolateSurvey(qSp, md)
+          return hit ? hit[0] : qSp[qSp.length - 1].vertical_section
+        }
+        series.push({
+          name: '_qualityBg',
+          type: 'line',
+          data: [],
+          silent: true,
+          z: 0,
+          symbol: 'none',
+          tooltip: { show: false },
+          markArea: {
+            silent: true,
+            data: qIvs.map(iv => {
+              const a = toVs(iv.from_depth)
+              const b = toVs(iv.to_depth)
+              return [
+                { xAxis: Math.min(a, b), itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: dark ? 0.22 : 0.16 } },
+                { xAxis: Math.max(a, b) },
+              ]
+            }),
+          },
+        })
+      }
+    }
+
+    if (plan.length > 1) {
+      series.push({
+        name: 'Plan',
+        type: 'line',
+        smooth: false,
+        symbol: 'none',
+        z: 2,
+        data: plan.map(p => [p.vertical_section, p.tvd]),
+        lineStyle: { width: 1.3, color: dark ? '#7d8a80' : '#93a995', type: 'dashed' as const },
+        itemStyle: { color: '#93a995' },
+        tooltip: { show: false },
+      })
+    }
 
     activeLegs.forEach((leg, i) => {
       const pts = leg.survey!.survey_points.filter(
@@ -266,16 +357,141 @@
       }
     })
 
+    // ── Fig. 02 overlay: drilling curves superimposed on the VS plot ──────────
+    if (overlay_curves && overlayOn) {
+      const leg = legs[selectedLeg] ?? legs[0]
+      const ld  = leg?.log_data
+      const sp  = (leg?.survey?.survey_points ?? []).filter(
+        p => p.vertical_section != null && p.md != null
+      )
+      const curves = ld?.curve_data_cleaned ?? []
+
+      if (ld && sp.length > 1 && curves.length) {
+        const nv   = ld.curve_metadata?.null_value ?? -999.25
+        const meta = (ld.curve_metadata ?? {}) as any
+        const mdToVs = (md: number): number => {
+          const hit = interpolateSurvey(sp, md)
+          return hit ? hit[0] : sp[sp.length - 1].vertical_section
+        }
+        const bands = [
+          { key: 'rop',   color: '#000000', label: 'ROP', hi: meta.rop?.max   ?? 300  },
+          { key: 'gas',   color: '#dc3545', label: 'GAS', hi: meta.gas?.max   ?? 2000 },
+          { key: 'gamma', color: '#176935', label: 'GR',  hi: meta.gamma?.max ?? 200  },
+        ]
+        const qb = (ld.intervals ?? []).filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
+
+        curveTip = curves
+          .map((p: any) => ({
+            vs: mdToVs(p.md),
+            rop: clean(p.rop, nv),
+            gas: clean(p.gas, nv),
+            gamma: clean(p.gamma, nv),
+          }))
+          .sort((a, b) => a.vs - b.vs)
+
+        series.push({
+          type: 'custom',
+          xAxisIndex: 0,
+          yAxisIndex: 0,
+          z: 6,
+          silent: true,
+          clip: true,
+          tooltip: { show: false },
+          data: [0],
+          renderItem: (params: any, api: any) => {
+            const cs = params.coordSys
+            const xPix = (vs: number) => api.coord([vs, 0])[0]
+            const x0 = xPix(mdToVs(curves[0].md))
+            const x1 = xPix(mdToVs(curves[curves.length - 1].md))
+            const bGap = 10
+            // const bH = 10
+            const bH = Math.max(40, Math.min(25, (cs.height - 20 - bGap * (bands.length - 1)) / bands.length))
+            const y0 = cs.y + 52
+            const children: any[] = []
+
+            bands.forEach((b, k) => {
+              const top = y0 + k * (bH + bGap)
+
+              children.push({
+                type: 'rect',
+                shape: { x: x0, y: top, width: x1 - x0, height: bH },
+                style: { fill: '#fff' },
+              })
+
+              qb.forEach(iv => {
+                const a = xPix(mdToVs(iv.from_depth))
+                const c = xPix(mdToVs(iv.to_depth))
+                children.push({
+                  type: 'rect',
+                  shape: { x: Math.min(a, c), y: top, width: Math.max(1, Math.abs(c - a)), height: bH },
+                  style: { fill: QUALITY_COLORS[iv.quality], opacity: 0.8 },
+                })
+              })
+
+              let seg: number[][] = []
+              const flush = () => {
+                if (seg.length > 1) {
+                  children.push({ type: 'polyline', shape: { points: seg.slice() }, style: { stroke: 'rgba(255,255,255,.9)', lineWidth: 2.6, fill: 'none' } })
+                  children.push({ type: 'polyline', shape: { points: seg.slice() }, style: { stroke: b.color, lineWidth: 1.2, fill: 'none' } })
+                }
+                seg = []
+              }
+              curves.forEach((p: any) => {
+                const v = p[b.key]
+                if (v == null || v === nv) { flush(); return }
+                const clamped = Math.max(0, Math.min(v, b.hi))
+                seg.push([xPix(mdToVs(p.md)), top + bH - (clamped / b.hi) * bH])
+              })
+              flush()
+
+              children.push({ type: 'rect', shape: { x: x0, y: top, width: x1 - x0, height: bH }, style: { fill: 'none', stroke: '#c9c9c5' } })
+              children.push({ type: 'rect', shape: { x: x0 + 3, y: top + 3, width: b.label.length * 7 + 12, height: 13 }, style: { fill: 'rgba(255,255,255,.85)' } })
+              children.push({ type: 'text', x: x0 + 7, y: top + 4, style: { text: b.label, fill: b.color, font: '700 9px Roboto, sans-serif' } })
+              children.push({ type: 'text', x: x1 - 4, y: top + 4, style: { text: String(Math.round(b.hi)), fill: '#a8b5ab', font: '8px Roboto, sans-serif', align: 'right' } })
+            })
+
+            return { type: 'group', children }
+          },
+        })
+      }
+    }
+
     return {
       backgroundColor: 'transparent',
       grid: { left: LEFT, right: RIGHT, top: 14, bottom: 30 },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', crossStyle: { color: axisColor } },
-        formatter: (params: { value: [number, number] }[]) => {
-          const p = Array.isArray(params) ? params[0] : params
-          if (!p?.value) return ''
-          return `VS ${(+p.value[0]).toFixed(1)} m east<br/>TVD ${(+p.value[1]).toFixed(1)} m`
+        formatter: (params: any) => {
+          const arr = Array.isArray(params) ? params : [params]
+          const wellPt = arr.find(p => p?.value?.length === 2)
+          const vs = wellPt ? +wellPt.value[0] : +(arr[0]?.axisValue ?? NaN)
+          if (!isFinite(vs)) return ''
+
+          const lines = [`VS ${vs.toFixed(1)} m east`]
+          if (wellPt) lines.push(`TVD ${(+wellPt.value[1]).toFixed(1)} m`)
+
+          if (curveTip && curveTip.length) {
+            let lo = 0, hi = curveTip.length - 1
+            while (lo < hi) {
+              const mid = (lo + hi) >> 1
+              if (curveTip[mid].vs < vs) lo = mid + 1
+              else hi = mid
+            }
+            const a = curveTip[Math.max(0, lo - 1)]
+            const b = curveTip[lo]
+            const near = Math.abs(a.vs - vs) <= Math.abs(b.vs - vs) ? a : b
+            const fmt = (label: string, v: number | null) =>
+              v == null ? null : `${label} <b>${v.toFixed(v >= 100 ? 0 : 1)}</b>`
+            const curveLines = [
+              fmt('ROP', near.rop),
+              fmt('Gas', near.gas),
+              fmt('GR', near.gamma),
+            ].filter(Boolean)
+            if (curveLines.length) lines.push('<span style="opacity:.6">— curves —</span>', ...curveLines as string[])
+          }
+
+          return lines.join('<br/>')
         },
       },
       xAxis: {
@@ -448,9 +664,111 @@
     }
   }
 
+  // ── Vertical depth column (profile + casing + formation tops) ────────────────
+
+  function buildDepthColumnOption() {
+    const leg = legs[selectedLeg] ?? legs[0]
+    const pts = (leg?.survey?.survey_points ?? []).filter(
+      p => p.tvd != null && p.vertical_section != null
+    )
+    if (!pts.length) return {}
+
+    const textColor  = dark ? '#a3b5a8' : '#555'
+    const mutedColor = dark ? '#6b8f74' : '#8d998f'
+    const gridColor  = dark ? '#1e2e24' : '#f4f4f2'
+    const axisColor  = dark ? '#2a3d30' : '#1b1b1b'
+
+    const maxTvd = Math.max(...pts.map(p => p.tvd), td?.tvd ?? 0) * 1.03
+
+    const mdToTvd = (md: number): number => {
+      const hit = interpolateSurvey(pts, md)
+      return hit ? hit[1] : md
+    }
+
+    const casingLines = (casing ?? [])
+      .filter(c => c.set_at != null)
+      .map(c => ({
+        yAxis: mdToTvd(c.set_at as number),
+        lineStyle: { color: dark ? '#86efac' : '#114a26', width: 1.4 },
+        label: {
+          show: true, position: 'insideStartTop' as const, fontSize: 8,
+          color: dark ? '#86efac' : '#114a26',
+          formatter: c.size != null ? `${Math.round(c.size)} mm` : (c.section ?? ''),
+        },
+      }))
+
+    const topLines = (tops ?? [])
+      .filter(t => t.samples?.tvd != null && (t.samples!.tvd as number) <= maxTvd)
+      .map(t => ({
+        yAxis: t.samples!.tvd as number,
+        lineStyle: { color: mutedColor, width: 1, type: 'dashed' as const },
+        label: {
+          show: true, position: 'insideEndTop' as const, fontSize: 8.5,
+          color: textColor, formatter: t.formation,
+        },
+      }))
+
+    return {
+      backgroundColor: 'transparent',
+      grid: { left: 52, right: 132, top: 24, bottom: 30 },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross' },
+        formatter: (params: { value: [number, number] }[]) => {
+          const p = Array.isArray(params) ? params[0] : params
+          if (!p?.value) return ''
+          return `TVD ${(+p.value[1]).toFixed(1)} m<br/>VS ${(+p.value[0]).toFixed(1)} m`
+        },
+      },
+      xAxis: {
+        type: 'value',
+        name: 'VS (m)',
+        nameLocation: 'middle' as const,
+        nameGap: 18,
+        nameTextStyle: { color: textColor, fontSize: 9 },
+        axisLabel: { color: mutedColor, fontSize: 9 },
+        axisLine: { lineStyle: { color: axisColor } },
+        splitLine: { lineStyle: { color: gridColor } },
+      },
+      yAxis: {
+        type: 'value',
+        inverse: true,
+        min: 0,
+        max: Math.ceil(maxTvd),
+        name: 'TVD (m)',
+        nameLocation: 'middle' as const,
+        nameGap: 40,
+        nameTextStyle: { color: textColor, fontSize: 9 },
+        axisLabel: { color: mutedColor, fontSize: 9 },
+        axisLine: { lineStyle: { color: axisColor } },
+        splitLine: { lineStyle: { color: gridColor } },
+      },
+      series: [
+        {
+          name: leg?.leg_name ?? 'Profile',
+          type: 'line',
+          smooth: false,
+          symbol: 'none',
+          data: pts.map(p => [p.vertical_section, p.tvd]),
+          lineStyle: { width: 1.6, color: dark ? '#4ade80' : '#114a26' },
+          itemStyle: { color: dark ? '#4ade80' : '#114a26' },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            data: [...casingLines, ...topLines],
+          },
+        },
+      ],
+    }
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
   function updateAll() {
+    if (isVertical) {
+      dcChart?.setOption(buildDepthColumnOption(), { notMerge: true })
+      return
+    }
     vsChart?.setOption(buildVSOption(), { notMerge: true })
     mdChart?.setOption(buildMDOption(), { notMerge: true })
   }
@@ -458,31 +776,49 @@
   $effect(() => {
     void legs
     void dark
+    void layout
+    void plan
+    void casing
+    void tops
     void selectedLeg
     void hiddenVsMarkers
+    void overlayOn
+    void overlay_curves
+    void show_curves
     updateAll()
   })
 
   onMount(() => {
-    vsChart = init(vsContainer)
-    mdChart = init(mdContainer)
+    if (isVertical) {
+      dcChart = init(dcContainer)
+    } else {
+      vsChart = init(vsContainer)
+      mdChart = init(mdContainer)
+
+      vsChart.on('click', (params: any) => {
+        if (params.componentType !== 'series') return
+        const markers = vsEventSeriesMap.get(params.seriesIndex)
+        if (!markers) return
+        const marker = markers[params.dataIndex]
+        if (marker) toggleVsMarker(marker.event)
+      })
+    }
     updateAll()
 
-    vsChart.on('click', (params: any) => {
-      if (params.componentType !== 'series') return
-      const markers = vsEventSeriesMap.get(params.seriesIndex)
-      if (!markers) return
-      const marker = markers[params.dataIndex]
-      if (marker) toggleVsMarker(marker.event)
+    const ro = new ResizeObserver(() => {
+      vsChart?.resize()
+      mdChart?.resize()
+      dcChart?.resize()
     })
-
-    const ro = new ResizeObserver(() => { vsChart?.resize(); mdChart?.resize() })
-    ro.observe(vsContainer)
-    ro.observe(mdContainer)
+    if (isVertical) ro.observe(dcContainer)
+    else {
+      ro.observe(vsContainer)
+      ro.observe(mdContainer)
+    }
     return () => ro.disconnect()
   })
 
-  onDestroy(() => { vsChart?.dispose(); mdChart?.dispose() })
+  onDestroy(() => { vsChart?.dispose(); mdChart?.dispose(); dcChart?.dispose() })
 </script>
 
 {#if legs.length > 1}
@@ -501,32 +837,72 @@
   </div>
 {/if}
 
-<p class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">
-  Vertical Section · Wellbore Profile
-</p>
-{#if hasQualityOnPath}
-  <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5" style="margin-left: {LEFT}px">
-    {#each QUALITY_ORDER as q}
-      <span class="flex items-center gap-1 text-xs text-gray-500">
-        <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
-              style="background: {QUALITY_COLORS[q]}"></span>
-        {q}
-      </span>
-    {/each}
+{#if isVertical}
+  <p class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">
+    Depth Column · Profile · Casing · Formation Tops
+  </p>
+  <div bind:this={dcContainer} style="width: 100%; height: 640px;"></div>
+{:else}
+  <div class="flex items-center justify-between gap-3 mb-1.5">
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0">
+      Vertical Section · Wellbore Profile
+    </p>
+    {#if overlay_curves}
+      <div class="flex items-center gap-3 text-[10px] text-gray-500">
+        <span class="flex items-center gap-1.5">
+          <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#93a995" stroke-width="1.4" stroke-dasharray="4 3" /></svg>
+          Plan
+        </span>
+        <span class="flex items-center gap-1.5">
+          <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
+          Actual
+        </span>
+        <button
+          type="button"
+          class="flex items-center gap-1.5 cursor-pointer"
+          onclick={() => { overlayOn = !overlayOn }}
+        >
+          <span class="font-bold uppercase tracking-wider text-gray-500">Fig. 02 overlay</span>
+          <span
+            class="relative inline-block w-7 h-3.5 transition-colors"
+            style="background: {overlayOn ? '#176935' : '#cfd6d1'}"
+          >
+            <span
+              class="absolute top-px w-3 h-3 bg-white transition-all"
+              style="left: {overlayOn ? '15px' : '1px'}"
+            ></span>
+          </span>
+          <span class="font-bold text-gray-800 w-6 text-left">{overlayOn ? 'On' : 'Off'}</span>
+        </button>
+      </div>
+    {/if}
   </div>
-{/if}
-<div bind:this={vsContainer} style="width: 100%; height: 340px;"></div>
+  {#if hasQualityOnPath}
+    <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5" style="margin-left: {LEFT}px">
+      {#each QUALITY_ORDER as q}
+        <span class="flex items-center gap-1 text-xs text-gray-500">
+          <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
+                style="background: {QUALITY_COLORS[q]}"></span>
+          {q}
+        </span>
+      {/each}
+    </div>
+  {/if}
+  <div bind:this={vsContainer} style="width: 100%; height: {overlay_curves ? 400 : 340}px;"></div>
 
-<p class="text-xs font-semibold uppercase tracking-wider text-muted mt-4 mb-1">
-  Drilling Curves vs Measured Depth · ROP · Gas · GR · quality bands
-</p>
-<div class="flex flex-wrap gap-x-3 gap-y-1 mb-1" style="margin-left: {LEFT}px">
-  {#each QUALITY_ORDER as q}
-    <span class="flex items-center gap-1 text-xs text-gray-500">
-      <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
-            style="background: {QUALITY_COLORS[q]}"></span>
-      {q}
-    </span>
-  {/each}
-</div>
-<div bind:this={mdContainer} style="width: 100%; height: {MD_H}px;"></div>
+  {#if show_curves}
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted mt-4 mb-1">
+      Drilling Curves vs Measured Depth · ROP · Gas · GR · quality bands
+    </p>
+    <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1" style="margin-left: {LEFT}px">
+      {#each QUALITY_ORDER as q}
+        <span class="flex items-center gap-1 text-xs text-gray-500">
+          <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
+                style="background: {QUALITY_COLORS[q]}"></span>
+          {q}
+        </span>
+      {/each}
+    </div>
+    <div bind:this={mdContainer} style="width: 100%; height: {MD_H}px;"></div>
+  {/if}
+{/if}
