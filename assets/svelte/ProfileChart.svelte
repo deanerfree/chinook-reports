@@ -93,7 +93,7 @@
   // VS-plot layer visibility (driven by the control cluster above the chart)
   let showBackdrop    = $state(true)   // full-height reservoir-quality stripes
   let backdropOpacity = $state(0.16)   // stripe fill opacity (0–1)
-  let pathOpacity = $state(1)   // path fill opacity (0–1) 
+  let pathOpacity = $state(1)   // quality-coloured path segment opacity (0–1)
   let showColors   = $state(true)   // quality-coloured segments on the wellbore path
   let curveShow    = $state({ rop: true, gas: true, gamma: true })
   // Reservoir-quality shading behind each Fig. 02 overlay band, per curve.
@@ -368,8 +368,8 @@
           smooth: false,
           symbol: 'none',
           data: segData,
-          lineStyle: { width: 3.5, color: QUALITY_COLORS[iv.quality] },
-          itemStyle: { color: QUALITY_COLORS[iv.quality] },
+          lineStyle: { width: 3.5, color: QUALITY_COLORS[iv.quality], opacity: pathOpacity },
+          itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: pathOpacity },
           z: 5,
           tooltip: { show: false },
         })
@@ -911,6 +911,7 @@
     void showBackdrop
     void backdropOpacity
     void showColors
+    void pathOpacity
     void curveShow.rop; void curveShow.gas; void curveShow.gamma
     void curveQuality.rop; void curveQuality.gas; void curveQuality.gamma
     void showTops
@@ -1081,6 +1082,18 @@
         {/if}
         <!-- <ToggleChip bind:pressed={showColors} label="Path colours" /> -->
         <Toggle bind:checked={showColors} label="Path colours" />
+        {#if showColors}
+          <div class="indent-2">
+            <RangeSlider
+              bind:value={pathOpacity}
+              min={0}
+              max={1}
+              step={0.02}
+              label="Opacity"
+              format={(v) => `${Math.round(v * 100)}`}
+            />
+          </div>
+        {/if}
       </DrawerSection>
     {/if}
 
