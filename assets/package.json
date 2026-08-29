@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --sourcemap=inline --no-minify",
     "build": "vite build",
     "deploy": "node build.js --deploy"
   },

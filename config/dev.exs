@@ -26,7 +26,9 @@ config :chinook_reports, ChinookReportsWeb.Endpoint,
   secret_key_base: "Erg2+igkSwsVSdkjvnoT89W3Plx9Azx/n02lhDco/LTftyOPD7EApejGoNFiUs8x",
   watchers: [
     tailwind: {Tailwind, :install_and_run, [:chinook_reports, ~w(--watch)]},
-    vite: {PhoenixVite.Npm, :run, [:default, ~w(--sourcemap=inline --watch)]}
+    # Flags live in the "dev" script in assets/package.json — npm rejects unknown
+    # flags passed here, so keep this arg list empty.
+    vite: {PhoenixVite.Npm, :run, [:default, []]}
   ]
 
 # ## SSL Support
@@ -56,6 +58,17 @@ config :chinook_reports, ChinookReportsWeb.Endpoint,
 # file_system backend never fires. Use the polling backend for live reload.
 config :phoenix_live_reload, :backend, :fs_poll
 config :phoenix_live_reload, :backend_opts, interval: 500
+
+# FSPoll stat-walks every file under each dir on every interval. The default
+# ("") is the project root, which on a Docker bind mount means ~14k slow stats
+# per pass (deps/, _build/, assets/node_modules/) — the poller falls behind and
+# never notices priv/static/assets/app.js changing, so the browser never
+# reloads after a Svelte/Vite rebuild. Scope it to the dirs that matter.
+config :phoenix_live_reload, :dirs, [
+  "priv/static",
+  "priv/gettext",
+  "lib/chinook_reports_web"
+]
 
 # Watch static and templates for browser reloading.
 config :chinook_reports, ChinookReportsWeb.Endpoint,
