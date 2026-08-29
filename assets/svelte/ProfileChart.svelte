@@ -14,6 +14,7 @@
   import RangeSlider from './lib/RangeSlider.svelte'
   import Drawer from './lib/Drawer.svelte'
   import DrawerSection from './lib/DrawerSection.svelte'
+  import { createProfileDesign } from './lib/profile-design.svelte'
 
   use([
     LineChart, ScatterChart, CustomChart,
@@ -82,22 +83,21 @@
     overlay_curves?: boolean
   } = $props()
 
-  let overlayOn = $state(true)
   let settingsOpen = $state(false)
 
-  // Formation tops on the profile. `showTops` is the master switch; `topVisible`
-  // holds the per-top state, keyed by formation name (absent key ⇒ visible).
-  let showTops = $state(true)
-  let topVisible = $state<Record<string, boolean>>({})
+  // All persisted design/style choices — one object, restored from localStorage
+  // on load and written back on every change. See lib/profile-design.svelte.ts.
+  //   design.style  — reservoir-quality styling on the VS plot
+  //   design.curves — Fig. 01 overlay: which curves, and per-curve quality shading
+  //   design.tops   — formation-top master switch + per-formation off-list
+  const design = createProfileDesign()
 
-  // VS-plot layer visibility (driven by the control cluster above the chart)
-  let showBackdrop    = $state(true)   // full-height reservoir-quality stripes
-  let backdropOpacity = $state(0.16)   // stripe fill opacity (0–1)
-  let pathOpacity = $state(1)   // quality-coloured path segment opacity (0–1)
-  let showColors   = $state(true)   // quality-coloured segments on the wellbore path
-  let curveShow    = $state({ rop: true, gas: true, gamma: true })
-  // Reservoir-quality shading behind each Fig. 02 overlay band, per curve.
-  let curveQuality = $state({ rop: true, gas: true, gamma: true })
+  function setTopHidden(formation: string, hidden: boolean) {
+    const next = new Set(design.tops.hidden)
+    if (hidden) next.add(formation)
+    else next.delete(formation)
+    design.tops.hidden = [...next]
+  }
 
   // Preserved Y-axis (TVD) zoom window, so control toggles don't reset the view.
   // Plain (non-reactive) on purpose: it is written from the chart's own dataZoom
@@ -169,7 +169,7 @@
 
   // Formation tops the user has kept visible (master switch + per-top state).
   const activeTops = $derived(
-    showTops ? topList.filter((f) => topVisible[f] !== false) : [],
+    design.tops.show ? topList.filter((f) => !design.tops.hidden.includes(f)) : [],
   )
   let vsContainer = $state<HTMLDivElement>()
   let mdContainer = $state<HTMLDivElement>()
@@ -249,7 +249,7 @@
       const qIvs = (qLeg?.log_data?.intervals ?? []).filter(
         iv => iv.quality && QUALITY_COLORS[iv.quality]
       )
-      if (showBackdrop && qSp.length > 1 && qIvs.length) {
+      if (design.style.showBackdrop && qSp.length > 1 && qIvs.length) {
         const toVs = (md: number) => {
           const hit = interpolateSurvey(qSp, md)
           return hit ? hit[0] : qSp[qSp.length - 1].vertical_section
@@ -268,7 +268,7 @@
               const a = toVs(iv.from_depth)
               const b = toVs(iv.to_depth)
               return [
-                { xAxis: Math.min(a, b), itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: backdropOpacity } },
+                { xAxis: Math.min(a, b), itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: design.style.backdropOpacity } },
                 { xAxis: Math.max(a, b) },
               ]
             }),
@@ -345,7 +345,7 @@
       })
 
       // Quality overlay: color each interval segment by reservoir quality
-      const intervals = showColors
+      const intervals = design.style.showColors
         ? (leg.log_data?.intervals ?? []).filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
         : []
 
@@ -368,8 +368,8 @@
           smooth: false,
           symbol: 'none',
           data: segData,
-          lineStyle: { width: 3.5, color: QUALITY_COLORS[iv.quality], opacity: pathOpacity },
-          itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: pathOpacity },
+          lineStyle: { width: 3.5, color: QUALITY_COLORS[iv.quality], opacity: design.style.pathOpacity },
+          itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: design.style.pathOpacity },
           z: 5,
           tooltip: { show: false },
         })
@@ -443,7 +443,7 @@
     }
 
     // ── Fig. 02 overlay: drilling curves superimposed on the VS plot ──────────
-    if (overlay_curves && overlayOn) {
+    if (overlay_curves && design.curves.overlayOn) {
       const leg = legs[selectedLeg] ?? legs[0]
       const ld  = leg?.log_data
       const sp  = (leg?.survey?.survey_points ?? []).filter(
@@ -459,7 +459,7 @@
           return hit ? hit[0] : sp[sp.length - 1].vertical_section
         }
         const bands = OVERLAY_BANDS
-          .filter(b => curveShow[b.key])
+          .filter(b => design.curves.show[b.key])
           .map(b => ({ ...b, hi: meta[b.key]?.max ?? OVERLAY_HI_FALLBACK[b.key] }))
         const qb = (ld.intervals ?? []).filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
 
@@ -498,7 +498,7 @@
 
             bands.forEach((b, k) => {
               const top = y0 + k * (bH + bGap)
-              const showQuality = curveQuality[b.key] && qb.length > 0
+              const showQuality = design.curves.quality[b.key] && qb.length > 0
 
               // Track fill + reservoir-quality shading. The rects are always
               // emitted — invisible when the toggle is off — so the group's
@@ -905,17 +905,11 @@
     void tops
     void selectedLeg
     void hiddenVsMarkers
-    void overlayOn
     void overlay_curves
     void show_curves
-    void showBackdrop
-    void backdropOpacity
-    void showColors
-    void pathOpacity
-    void curveShow.rop; void curveShow.gas; void curveShow.gamma
-    void curveQuality.rop; void curveQuality.gas; void curveQuality.gamma
-    void showTops
-    for (const k in topVisible) void topVisible[k]
+    // Deep-reads every branch of the persisted design object, so any nested
+    // style change (opacity slider, per-curve toggle, hidden top) triggers a rebuild.
+    $state.snapshot(design)
     updateAll()
   })
 
@@ -1066,12 +1060,11 @@
   <Drawer bind:open={settingsOpen} title="Chart Settings">
     {#if hasQualityOnPath}
       <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
-        <Toggle bind:checked={showBackdrop} label="Quality Backdrop" />
-        <!-- <ToggleChip bind:pressed={showBackdrop} label="Quality backdrop" /> -->
-        {#if showBackdrop}
+        <Toggle bind:checked={design.style.showBackdrop} label="Quality Backdrop" />
+        {#if design.style.showBackdrop}
           <div class="indent-2">
             <RangeSlider
-              bind:value={backdropOpacity}
+              bind:value={design.style.backdropOpacity}
               min={0}
               max={1}
               step={0.02}
@@ -1080,12 +1073,11 @@
             />
           </div>
         {/if}
-        <!-- <ToggleChip bind:pressed={showColors} label="Path colours" /> -->
-        <Toggle bind:checked={showColors} label="Path colours" />
-        {#if showColors}
+        <Toggle bind:checked={design.style.showColors} label="Path colours" />
+        {#if design.style.showColors}
           <div class="indent-2">
             <RangeSlider
-              bind:value={pathOpacity}
+              bind:value={design.style.pathOpacity}
               min={0}
               max={1}
               step={0.02}
@@ -1103,14 +1095,14 @@
         description="Formation tops picked from samples, drawn across the profile at their TVD."
         collapsible
       >
-        <Toggle bind:checked={showTops} label="Show tops" />
-        {#if showTops}
+        <Toggle bind:checked={design.tops.show} label="Show tops" />
+        {#if design.tops.show}
           <div class="flex flex-wrap gap-1.5">
             {#each topList as formation}
               <ToggleChip
-                pressed={topVisible[formation] !== false}
+                pressed={!design.tops.hidden.includes(formation)}
                 label={formation}
-                onchange={(v) => (topVisible[formation] = v)}
+                onchange={(v) => setTopHidden(formation, !v)}
               />
             {/each}
           </div>
@@ -1120,14 +1112,14 @@
 
     {#if overlay_curves}
       <DrawerSection title="Fig. 01 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
-        <Toggle bind:checked={overlayOn} label="Overlay" />
-        {#if overlayOn}
+        <Toggle bind:checked={design.curves.overlayOn} label="Overlay" />
+        {#if design.curves.overlayOn}
           <div class="flex flex-col gap-2">
             {#each OVERLAY_BANDS as band}
               <div class="flex flex-wrap items-center gap-1.5">
-                <ToggleChip bind:pressed={curveShow[band.key]} label={band.label} dotColor={band.color} />
-                {#if curveShow[band.key] && hasQualityOnPath}
-                  <ToggleChip bind:pressed={curveQuality[band.key]} label="Quality" />
+                <ToggleChip bind:pressed={design.curves.show[band.key]} label={band.label} dotColor={band.color} />
+                {#if design.curves.show[band.key] && hasQualityOnPath}
+                  <ToggleChip bind:pressed={design.curves.quality[band.key]} label="Quality" />
                 {/if}
               </div>
             {/each}
