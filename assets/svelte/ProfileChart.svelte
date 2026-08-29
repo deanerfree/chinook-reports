@@ -9,6 +9,12 @@
   } from 'echarts/components'
   import { CanvasRenderer } from 'echarts/renderers'
 
+  import Toggle from './lib/Toggle.svelte'
+  import ToggleChip from './lib/ToggleChip.svelte'
+  import RangeSlider from './lib/RangeSlider.svelte'
+  import Drawer from './lib/Drawer.svelte'
+  import DrawerSection from './lib/DrawerSection.svelte'
+
   use([
     LineChart, ScatterChart, CustomChart,
     GridComponent, TooltipComponent, LegendComponent,
@@ -77,10 +83,36 @@
   } = $props()
 
   let overlayOn = $state(true)
+  let settingsOpen = $state(false)
+
+  // Formation tops on the profile. `showTops` is the master switch; `topVisible`
+  // holds the per-top state, keyed by formation name (absent key ⇒ visible).
+  let showTops = $state(true)
+  let topVisible = $state<Record<string, boolean>>({})
+
+  // VS-plot layer visibility (driven by the control cluster above the chart)
+  let showBackdrop    = $state(true)   // full-height reservoir-quality stripes
+  let backdropOpacity = $state(0.16)   // stripe fill opacity (0–0.5)
+  let showColors   = $state(true)   // quality-coloured segments on the wellbore path
+  let curveShow    = $state({ rop: true, gas: true, gamma: true })
+  // Reservoir-quality shading behind each Fig. 02 overlay band, per curve.
+  let curveQuality = $state({ rop: true, gas: true, gamma: true })
+
+  // Preserved Y-axis (TVD) zoom window, so control toggles don't reset the view.
+  // Plain (non-reactive) on purpose: it is written from the chart's own dataZoom
+  // event and only re-read when some *other* state triggers a rebuild.
+  let vsYZoom: { start: number; end: number } | null = null
 
   // ── Constants ────────────────────────────────────────────────────────────────
 
   const LEG_COLORS     = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444']
+
+  const OVERLAY_BANDS = [
+    { key: 'rop',   label: 'ROP', color: '#000000' },
+    { key: 'gas',   label: 'GAS', color: '#dc3545' },
+    { key: 'gamma', label: 'GR',  color: '#176935' },
+  ] as const
+  const OVERLAY_HI_FALLBACK: Record<'rop' | 'gas' | 'gamma', number> = { rop: 300, gas: 2000, gamma: 200 }
 
   const QUALITY_COLORS: Record<string, string> = {
     'Very Good': '#176935',
@@ -93,7 +125,7 @@
 
   // MD log grid layout (pixels)
   const LEFT    = 62
-  const RIGHT   = 20
+  const RIGHT   = 38   // wide enough to seat the VS chart's TVD zoom slider
   const Q_TOP   = 32
   const Q_H     = 38
   const GAP     = 14
@@ -121,9 +153,26 @@
       l.log_data?.intervals?.some(iv => iv.quality && QUALITY_COLORS[iv.quality])
     )
   )
-  let vsContainer: HTMLDivElement
-  let mdContainer: HTMLDivElement
-  let dcContainer!: HTMLDivElement
+  // Formations that carry a usable TVD, in file order — the candidates for the
+  // profile overlay and the drawer's per-top toggles.
+  const topList = $derived(
+    (tops ?? []).filter((t) => t?.samples?.tvd != null).map((t) => t.formation),
+  )
+  const hasTops = $derived(topList.length > 0)
+
+  const hasSettings = $derived(
+    layout === 'vertical'
+      ? hasTops
+      : hasQualityOnPath || overlay_curves || hasTops,
+  )
+
+  // Formation tops the user has kept visible (master switch + per-top state).
+  const activeTops = $derived(
+    showTops ? topList.filter((f) => topVisible[f] !== false) : [],
+  )
+  let vsContainer = $state<HTMLDivElement>()
+  let mdContainer = $state<HTMLDivElement>()
+  let dcContainer = $state<HTMLDivElement>()
   let vsChart: ECharts | null = null
   let mdChart: ECharts | null = null
   let dcChart: ECharts | null = null
@@ -199,7 +248,7 @@
       const qIvs = (qLeg?.log_data?.intervals ?? []).filter(
         iv => iv.quality && QUALITY_COLORS[iv.quality]
       )
-      if (qSp.length > 1 && qIvs.length) {
+      if (showBackdrop && qSp.length > 1 && qIvs.length) {
         const toVs = (md: number) => {
           const hit = interpolateSurvey(qSp, md)
           return hit ? hit[0] : qSp[qSp.length - 1].vertical_section
@@ -218,7 +267,7 @@
               const a = toVs(iv.from_depth)
               const b = toVs(iv.to_depth)
               return [
-                { xAxis: Math.min(a, b), itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: dark ? 0.22 : 0.16 } },
+                { xAxis: Math.min(a, b), itemStyle: { color: QUALITY_COLORS[iv.quality], opacity: backdropOpacity } },
                 { xAxis: Math.max(a, b) },
               ]
             }),
@@ -295,8 +344,9 @@
       })
 
       // Quality overlay: color each interval segment by reservoir quality
-      const intervals = (leg.log_data?.intervals ?? [])
-        .filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
+      const intervals = showColors
+        ? (leg.log_data?.intervals ?? []).filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
+        : []
 
       intervals.forEach(iv => {
         const start   = interpolateSurvey(pts, iv.from_depth)
@@ -357,6 +407,40 @@
       }
     })
 
+    // ── Formation tops: horizontal TVD markers across the whole plot ──────────
+    if (activeTops.length) {
+      const shownTops = new Set(activeTops)
+      const topLines = (tops ?? [])
+        .filter(t => shownTops.has(t.formation) && t.samples?.tvd != null)
+        .map(t => ({
+          yAxis: t.samples!.tvd as number,
+          lineStyle: { color: dark ? '#7d8a80' : '#9aa39c', width: 1, type: 'dashed' as const },
+          label: {
+            show: true, position: 'insideEndTop' as const, fontSize: 8.5,
+            color: textColor, formatter: t.formation,
+          },
+        }))
+      if (topLines.length) {
+        series.push({
+          name: '_tops',
+          type: 'line',
+          data: [],
+          silent: true,
+          z: 1,
+          symbol: 'none',
+          tooltip: { show: false },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            // No grow-in animation — the horizontal rule would otherwise wipe
+            // left-to-right on every rebuild.
+            animation: false,
+            data: topLines,
+          },
+        })
+      }
+    }
+
     // ── Fig. 02 overlay: drilling curves superimposed on the VS plot ──────────
     if (overlay_curves && overlayOn) {
       const leg = legs[selectedLeg] ?? legs[0]
@@ -373,11 +457,9 @@
           const hit = interpolateSurvey(sp, md)
           return hit ? hit[0] : sp[sp.length - 1].vertical_section
         }
-        const bands = [
-          { key: 'rop',   color: '#000000', label: 'ROP', hi: meta.rop?.max   ?? 300  },
-          { key: 'gas',   color: '#dc3545', label: 'GAS', hi: meta.gas?.max   ?? 2000 },
-          { key: 'gamma', color: '#176935', label: 'GR',  hi: meta.gamma?.max ?? 200  },
-        ]
+        const bands = OVERLAY_BANDS
+          .filter(b => curveShow[b.key])
+          .map(b => ({ ...b, hi: meta[b.key]?.max ?? OVERLAY_HI_FALLBACK[b.key] }))
         const qb = (ld.intervals ?? []).filter(iv => iv.quality && QUALITY_COLORS[iv.quality])
 
         curveTip = curves
@@ -389,13 +471,17 @@
           }))
           .sort((a, b) => a.vs - b.vs)
 
-        series.push({
+        if (bands.length) series.push({
           type: 'custom',
           xAxisIndex: 0,
           yAxisIndex: 0,
           z: 6,
           silent: true,
           clip: true,
+          // No enter/update transition: toggling curves changes the child list
+          // of the returned group, and ECharts' element diffing otherwise
+          // strands ghost rectangles at interpolated positions.
+          animation: false,
           tooltip: { show: false },
           data: [0],
           renderItem: (params: any, api: any) => {
@@ -411,20 +497,24 @@
 
             bands.forEach((b, k) => {
               const top = y0 + k * (bH + bGap)
+              const showQuality = curveQuality[b.key] && qb.length > 0
 
+              // Track fill + reservoir-quality shading. The rects are always
+              // emitted — invisible when the toggle is off — so the group's
+              // child list stays fixed across re-renders. When quality is off
+              // the track is transparent and the VS plot shows through.
               children.push({
                 type: 'rect',
                 shape: { x: x0, y: top, width: x1 - x0, height: bH },
-                style: { fill: '#fff' },
+                style: { fill: showQuality ? '#fff' : 'transparent' },
               })
-
               qb.forEach(iv => {
                 const a = xPix(mdToVs(iv.from_depth))
                 const c = xPix(mdToVs(iv.to_depth))
                 children.push({
                   type: 'rect',
                   shape: { x: Math.min(a, c), y: top, width: Math.max(1, Math.abs(c - a)), height: bH },
-                  style: { fill: QUALITY_COLORS[iv.quality], opacity: 0.8 },
+                  style: { fill: QUALITY_COLORS[iv.quality], opacity: showQuality ? 0.8 : 0 },
                 })
               })
 
@@ -459,6 +549,36 @@
     return {
       backgroundColor: 'transparent',
       grid: { left: LEFT, right: RIGHT, top: 14, bottom: 30 },
+      dataZoom: [
+        {
+          id: 'vsY',
+          type: 'inside',
+          yAxisIndex: 0,
+          filterMode: 'none',
+          zoomOnMouseWheel: false,
+          moveOnMouseMove: true,
+          moveOnMouseWheel: false,
+          ...(vsYZoom ?? {}),
+        },
+        {
+          id: 'vsYSlider',
+          type: 'slider',
+          yAxisIndex: 0,
+          right: 4,
+          width: 14,
+          filterMode: 'none',
+          showDetail: false,
+          brushSelect: false,
+          handleSize: '80%',
+          handleStyle:    { color: dark ? '#475569' : '#94a3b8' },
+          moveHandleSize:  4,
+          textStyle:      { color: textColor, fontSize: 8 },
+          borderColor:    axisColor,
+          fillerColor:    dark ? 'rgba(59,130,246,0.14)' : 'rgba(59,130,246,0.10)',
+          dataBackground: { lineStyle: { color: axisColor }, areaStyle: { color: 'transparent' } },
+          ...(vsYZoom ?? {}),
+        },
+      ],
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', crossStyle: { color: axisColor } },
@@ -697,8 +817,9 @@
         },
       }))
 
+    const shownTops = new Set(activeTops)
     const topLines = (tops ?? [])
-      .filter(t => t.samples?.tvd != null && (t.samples!.tvd as number) <= maxTvd)
+      .filter(t => shownTops.has(t.formation) && (t.samples!.tvd as number) <= maxTvd)
       .map(t => ({
         yAxis: t.samples!.tvd as number,
         lineStyle: { color: mutedColor, width: 1, type: 'dashed' as const },
@@ -755,6 +876,7 @@
           markLine: {
             silent: true,
             symbol: 'none',
+            animation: false,
             data: [...casingLines, ...topLines],
           },
         },
@@ -785,22 +907,50 @@
     void overlayOn
     void overlay_curves
     void show_curves
+    void showBackdrop
+    void backdropOpacity
+    void showColors
+    void curveShow.rop; void curveShow.gas; void curveShow.gamma
+    void curveQuality.rop; void curveQuality.gas; void curveQuality.gamma
+    void showTops
+    for (const k in topVisible) void topVisible[k]
     updateAll()
   })
 
   onMount(() => {
+    // Each container is conditionally rendered: dc only in vertical layout, md
+    // only when there are drilling curves. init() throws on a missing DOM node,
+    // so guard every call on the container actually being present.
     if (isVertical) {
-      dcChart = init(dcContainer)
+      if (dcContainer) dcChart = init(dcContainer)
     } else {
-      vsChart = init(vsContainer)
-      mdChart = init(mdContainer)
+      if (vsContainer) vsChart = init(vsContainer)
+      if (mdContainer) mdChart = init(mdContainer)
 
-      vsChart.on('click', (params: any) => {
+      vsChart?.on('click', (params: any) => {
         if (params.componentType !== 'series') return
         const markers = vsEventSeriesMap.get(params.seriesIndex)
         if (!markers) return
         const marker = markers[params.dataIndex]
         if (marker) toggleVsMarker(marker.event)
+      })
+
+      // Remember the TVD (Y-axis) window the user drags to, so unrelated
+      // control toggles (which rebuild the option) don't snap it back.
+      vsChart?.on('dataZoom', () => {
+        const dz = ((vsChart?.getOption() as any)?.dataZoom as any[])
+          ?.find(d => d.id === 'vsYSlider')
+        if (!dz) return
+        vsYZoom = (dz.start <= 0.05 && dz.end >= 99.95)
+          ? null
+          : { start: dz.start, end: dz.end }
+      })
+
+      // Double-click anywhere on the plot resets the Y-axis zoom.
+      vsChart?.getZr().on('dblclick', () => {
+        if (!vsYZoom) return
+        vsYZoom = null
+        updateAll()
       })
     }
     updateAll()
@@ -810,11 +960,9 @@
       mdChart?.resize()
       dcChart?.resize()
     })
-    if (isVertical) ro.observe(dcContainer)
-    else {
-      ro.observe(vsContainer)
-      ro.observe(mdContainer)
-    }
+    if (dcContainer) ro.observe(dcContainer)
+    if (vsContainer) ro.observe(vsContainer)
+    if (mdContainer) ro.observe(mdContainer)
     return () => ro.disconnect()
   })
 
@@ -837,46 +985,51 @@
   </div>
 {/if}
 
+{#snippet settingsButton()}
+  <button
+    type="button"
+    onclick={() => { settingsOpen = true }}
+    aria-haspopup="dialog"
+    aria-expanded={settingsOpen}
+    class="flex items-center gap-1 rounded-full border border-gray-300 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-600 transition-colors cursor-pointer hover:bg-gray-50"
+  >
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+    Settings
+  </button>
+{/snippet}
+
 {#if isVertical}
-  <p class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5">
-    Depth Column · Profile · Casing · Formation Tops
-  </p>
+  <div class="flex items-start justify-between gap-3 mb-1.5">
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0 pt-1">
+      Depth Column · Profile · Casing · Formation Tops
+    </p>
+    {#if hasSettings}{@render settingsButton()}{/if}
+  </div>
   <div bind:this={dcContainer} style="width: 100%; height: 640px;"></div>
 {:else}
-  <div class="flex items-center justify-between gap-3 mb-1.5">
-    <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0">
+  <div class="flex items-start justify-between gap-3 mb-1.5">
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0 pt-1">
       Vertical Section · Wellbore Profile
     </p>
-    {#if overlay_curves}
-      <div class="flex items-center gap-3 text-[10px] text-gray-500">
+    <div class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5 text-[10px] text-gray-500">
+      {#if plan.length > 1}
         <span class="flex items-center gap-1.5">
           <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#93a995" stroke-width="1.4" stroke-dasharray="4 3" /></svg>
           Plan
         </span>
-        <span class="flex items-center gap-1.5">
-          <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
-          Actual
-        </span>
-        <button
-          type="button"
-          class="flex items-center gap-1.5 cursor-pointer"
-          onclick={() => { overlayOn = !overlayOn }}
-        >
-          <span class="font-bold uppercase tracking-wider text-gray-500">Fig. 02 overlay</span>
-          <span
-            class="relative inline-block w-7 h-3.5 transition-colors"
-            style="background: {overlayOn ? '#176935' : '#cfd6d1'}"
-          >
-            <span
-              class="absolute top-px w-3 h-3 bg-white transition-all"
-              style="left: {overlayOn ? '15px' : '1px'}"
-            ></span>
-          </span>
-          <span class="font-bold text-gray-800 w-6 text-left">{overlayOn ? 'On' : 'Off'}</span>
-        </button>
-      </div>
-    {/if}
+      {/if}
+      <span class="flex items-center gap-1.5">
+        <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
+        Actual
+      </span>
+
+      {#if hasSettings}{@render settingsButton()}{/if}
+    </div>
   </div>
+
   {#if hasQualityOnPath}
     <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5" style="margin-left: {LEFT}px">
       {#each QUALITY_ORDER as q}
@@ -905,4 +1058,64 @@
     </div>
     <div bind:this={mdContainer} style="width: 100%; height: {MD_H}px;"></div>
   {/if}
+{/if}
+
+{#if hasSettings}
+  <Drawer bind:open={settingsOpen} title="Chart Settings">
+    {#if hasQualityOnPath}
+      <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
+        <ToggleChip bind:pressed={showBackdrop} label="Quality backdrop" />
+        {#if showBackdrop}
+          <RangeSlider
+            bind:value={backdropOpacity}
+            min={0}
+            max={1}
+            step={0.02}
+            label="Opacity"
+            format={(v) => `${Math.round(v * 100)}`}
+          />
+        {/if}
+        <ToggleChip bind:pressed={showColors} label="Path colours" />
+      </DrawerSection>
+    {/if}
+
+    {#if hasTops}
+      <DrawerSection
+        title="Formation Tops"
+        description="Formation tops picked from samples, drawn across the profile at their TVD."
+        collapsible
+      >
+        <Toggle bind:checked={showTops} label="Show tops" />
+        {#if showTops}
+          <div class="flex flex-wrap gap-1.5">
+            {#each topList as formation}
+              <ToggleChip
+                pressed={topVisible[formation] !== false}
+                label={formation}
+                onchange={(v) => (topVisible[formation] = v)}
+              />
+            {/each}
+          </div>
+        {/if}
+      </DrawerSection>
+    {/if}
+
+    {#if overlay_curves}
+      <DrawerSection title="Fig. 02 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
+        <Toggle bind:checked={overlayOn} label="Overlay" />
+        {#if overlayOn}
+          <div class="flex flex-col gap-2">
+            {#each OVERLAY_BANDS as band}
+              <div class="flex flex-wrap items-center gap-1.5">
+                <ToggleChip bind:pressed={curveShow[band.key]} label={band.label} dotColor={band.color} />
+                {#if curveShow[band.key] && hasQualityOnPath}
+                  <ToggleChip bind:pressed={curveQuality[band.key]} label="Quality" />
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </DrawerSection>
+    {/if}
+  </Drawer>
 {/if}
