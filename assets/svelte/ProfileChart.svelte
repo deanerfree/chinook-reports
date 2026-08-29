@@ -92,7 +92,8 @@
 
   // VS-plot layer visibility (driven by the control cluster above the chart)
   let showBackdrop    = $state(true)   // full-height reservoir-quality stripes
-  let backdropOpacity = $state(0.16)   // stripe fill opacity (0–0.5)
+  let backdropOpacity = $state(0.16)   // stripe fill opacity (0–1)
+  let pathOpacity = $state(1)   // path fill opacity (0–1) 
   let showColors   = $state(true)   // quality-coloured segments on the wellbore path
   let curveShow    = $state({ rop: true, gas: true, gamma: true })
   // Reservoir-quality shading behind each Fig. 02 overlay band, per curve.
@@ -1064,18 +1065,22 @@
   <Drawer bind:open={settingsOpen} title="Chart Settings">
     {#if hasQualityOnPath}
       <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
-        <ToggleChip bind:pressed={showBackdrop} label="Quality backdrop" />
+        <Toggle bind:checked={showBackdrop} label="Quality Backdrop" />
+        <!-- <ToggleChip bind:pressed={showBackdrop} label="Quality backdrop" /> -->
         {#if showBackdrop}
-          <RangeSlider
-            bind:value={backdropOpacity}
-            min={0}
-            max={1}
-            step={0.02}
-            label="Opacity"
-            format={(v) => `${Math.round(v * 100)}`}
-          />
+          <div class="indent-2">
+            <RangeSlider
+              bind:value={backdropOpacity}
+              min={0}
+              max={1}
+              step={0.02}
+              label="Opacity"
+              format={(v) => `${Math.round(v * 100)}`}
+            />
+          </div>
         {/if}
-        <ToggleChip bind:pressed={showColors} label="Path colours" />
+        <!-- <ToggleChip bind:pressed={showColors} label="Path colours" /> -->
+        <Toggle bind:checked={showColors} label="Path colours" />
       </DrawerSection>
     {/if}
 
@@ -1101,7 +1106,7 @@
     {/if}
 
     {#if overlay_curves}
-      <DrawerSection title="Fig. 02 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
+      <DrawerSection title="Fig. 01 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
         <Toggle bind:checked={overlayOn} label="Overlay" />
         {#if overlayOn}
           <div class="flex flex-col gap-2">
