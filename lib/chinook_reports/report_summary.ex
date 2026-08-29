@@ -173,8 +173,8 @@ defmodule ChinookReports.ReportSummary do
     common = [
       {"Primary target", well["primary_target"]},
       {"Terminating zone", well["terminating_zone"]},
-      {"Purpose", well["well_purpose"]},
-      {"Substance", well["substance"]},
+      {"Kelly Bottom", well["elevations"]["kelly_bushing"]},
+      {"Ground Level", well["elevations"]["ground_level"]},
       {"Spud", timing_event(timing["spud_date"])},
       {"Final T.D.", timing_event(timing["final_td"])}
     ]
