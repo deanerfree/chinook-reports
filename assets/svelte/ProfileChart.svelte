@@ -164,7 +164,8 @@
   const hasSettings = $derived(
     layout === 'vertical'
       ? hasTops
-      : hasQualityOnPath || overlay_curves || hasTops,
+      // Lateral layout always has at least the Plan/Actual legend to toggle.
+      : true,
   )
 
   // Formation tops the user has kept visible (master switch + per-top state).
@@ -1010,7 +1011,14 @@
     <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0 pt-1">
       Vertical Section · Wellbore Profile
     </p>
-    <div class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5 text-[10px] text-gray-500">
+    {#if hasSettings}{@render settingsButton()}{/if}
+  </div>
+
+  {#if design.legend.show}
+    <div
+      class="mb-1.5 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-gray-200 bg-white/70 px-2.5 py-1.5 text-[10px] text-gray-500"
+      style="margin-left: {LEFT}px"
+    >
       {#if plan.length > 1}
         <span class="flex items-center gap-1.5">
           <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#93a995" stroke-width="1.4" stroke-dasharray="4 3" /></svg>
@@ -1021,25 +1029,21 @@
         <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
         Actual
       </span>
-
-      {#if hasSettings}{@render settingsButton()}{/if}
-    </div>
-  </div>
-
-  {#if hasQualityOnPath}
-    <div class="flex flex-wrap gap-x-3 gap-y-1 mb-1.5" style="margin-left: {LEFT}px">
-      {#each QUALITY_ORDER as q}
-        <span class="flex items-center gap-1 text-xs text-gray-500">
-          <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
-                style="background: {QUALITY_COLORS[q]}"></span>
-          {q}
-        </span>
-      {/each}
+      {#if hasQualityOnPath}
+        <span class="mx-0.5 h-3 w-px self-center bg-gray-200"></span>
+        {#each QUALITY_ORDER as q}
+          <span class="flex items-center gap-1">
+            <span class="inline-block w-3 h-2.5 rounded-sm border border-black/10"
+                  style="background: {QUALITY_COLORS[q]}"></span>
+            {q}
+          </span>
+        {/each}
+      {/if}
     </div>
   {/if}
   <div bind:this={vsContainer} style="width: 100%; height: {overlay_curves ? 400 : 340}px;"></div>
 
-  {#if show_curves}
+  <!-- {#if show_curves}
     <p class="text-xs font-semibold uppercase tracking-wider text-muted mt-4 mb-1">
       Drilling Curves vs Measured Depth · ROP · Gas · GR · quality bands
     </p>
@@ -1053,11 +1057,17 @@
       {/each}
     </div>
     <div bind:this={mdContainer} style="width: 100%; height: {MD_H}px;"></div>
-  {/if}
+  {/if} -->
 {/if}
 
 {#if hasSettings}
   <Drawer bind:open={settingsOpen} title="Chart Settings">
+    {#if !isVertical}
+      <DrawerSection title="Legend" description="Key for the plan, actual and reservoir-quality traces, shown in a box above the plot.">
+        <Toggle bind:checked={design.legend.show} label="Show legend" />
+      </DrawerSection>
+    {/if}
+
     {#if hasQualityOnPath}
       <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
         <Toggle bind:checked={design.style.showBackdrop} label="Quality Backdrop" />
@@ -1116,7 +1126,7 @@
         {#if design.curves.overlayOn}
           <div class="flex flex-col gap-2">
             {#each OVERLAY_BANDS as band}
-              <div class="flex flex-wrap items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5 indent-1">
                 <ToggleChip bind:pressed={design.curves.show[band.key]} label={band.label} dotColor={band.color} />
                 {#if design.curves.show[band.key] && hasQualityOnPath}
                   <ToggleChip bind:pressed={design.curves.quality[band.key]} label="Quality" />

@@ -9,6 +9,9 @@ type CurveKey = 'rop' | 'gas' | 'gamma'
 
 export type ProfileDesign = {
   version: 1
+  legend: {
+    show: boolean
+  }
   style: {
     showBackdrop: boolean
     backdropOpacity: number
@@ -33,6 +36,7 @@ const KEY = 'chinook:profile-design'
 function defaults(): ProfileDesign {
   return {
     version: VERSION,
+    legend: { show: true },
     style: { showBackdrop: true, backdropOpacity: 0.16, showColors: true, pathOpacity: 1 },
     curves: {
       overlayOn: true,
@@ -50,6 +54,7 @@ function hydrate(saved: any): ProfileDesign {
   if (!saved || typeof saved !== 'object' || saved.version !== VERSION) return d
   return {
     version: VERSION,
+    legend: { ...d.legend, ...saved.legend },
     style: { ...d.style, ...saved.style },
     curves: {
       ...d.curves,
