@@ -113,6 +113,12 @@ defmodule ChinookReportsWeb.ReportComponents do
         <% "reservoir" -> %>
           <%= if reservoir = @import["reservoir_data"] do %>
             <.reservoir_section reservoir={reservoir} />
+            <.live_component
+              module={ChinookReportsWeb.ReservoirQualityLive}
+              id="reservoir-quality"
+              report={@report}
+              editable={@editable}
+            />
           <% end %>
         <% "synopsis" -> %>
           <%= if synopsis = @import["synopsis"] do %>

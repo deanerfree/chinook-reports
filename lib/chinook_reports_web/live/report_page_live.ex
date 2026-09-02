@@ -5,6 +5,7 @@ defmodule ChinookReportsWeb.ReportPageLive do
   alias ChinookReports.Reports
   alias ChinookReports.Reports.Editing
   alias ChinookReports.Reports.Report
+  alias ChinookReports.ReservoirQuality
   import ChinookReportsWeb.ReportSummaryComponents
 
   def mount(%{"id" => id}, _session, socket) do
@@ -136,6 +137,32 @@ defmodule ChinookReportsWeb.ReportPageLive do
   def handle_event("remove_row", %{"list" => list, "index" => index}, socket) do
     {:noreply,
      assign(socket, form: as_form(mutate_rows(socket, {:remove, String.to_integer(index)}, list)))}
+  end
+
+  # The Reservoir Quality picker (a Svelte component in ReservoirQualityLive)
+  # pushes its full section list here on every commit; we apply it, recompute
+  # the derived quality_summary and persist.
+  def handle_event("commit_intervals", %{"intervals" => list}, socket) when is_list(list) do
+    report = socket.assigns.report
+
+    with {:ok, legs} <- ReservoirQuality.commit_intervals(report, list),
+         {:ok, updated} <- Reports.update_import_section(report, "reservoir_data", legs) do
+      {:noreply,
+       socket
+       |> assign(report: updated, summary: ReportSummary.build(updated))
+       |> put_flash(:info, "Reservoir Quality saved.")}
+    else
+      {:error, :invalid} ->
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "That change left a section with a bad depth or quality — not saved."
+         )}
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Could not save Reservoir Quality.")}
+    end
   end
 
   # The Formation Tops editor (a LiveComponent) persists on its own and tells us

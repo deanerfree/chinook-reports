@@ -60,6 +60,50 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
     create_report(Map.merge(%{"status" => "active", "import_data" => import_data}, attrs))
   end
 
+  defp reservoir_report(attrs \\ %{}) do
+    import_data = %{
+      "reservoir_data" => [
+        %{
+          "leg_name" => "Lateral",
+          "log_data" => %{
+            "intervals" => [
+              %{
+                "from_depth" => 100.0,
+                "to_depth" => 140.0,
+                "interval" => 40.0,
+                "quality" => "Good",
+                "lithology" => "Sandstone",
+                "porosity" => "12-24%",
+                "gas" => 500.0,
+                "remarks" => "clean sand"
+              }
+            ]
+          }
+        }
+      ]
+    }
+
+    create_report(Map.merge(%{"status" => "active", "import_data" => import_data}, attrs))
+  end
+
+  # The picker is a Svelte component; drive its server round-trip by replaying
+  # the "commit_intervals" event it pushes to the ReservoirQualityLive component.
+  defp commit_intervals(view, intervals) do
+    render_hook(view, "commit_intervals", %{"intervals" => intervals})
+  end
+
+  # The picker is client-rendered (ssr disabled); its inputs are the JSON in the
+  # LiveSvelte wrapper's data-props.
+  defp picker_props(view) do
+    view
+    |> element(~s([data-name="ReservoirQualityPicker"]))
+    |> render()
+    |> Floki.parse_fragment!()
+    |> Floki.attribute("data-props")
+    |> List.first()
+    |> Jason.decode!()
+  end
+
   describe "edit affordance gating" do
     test "an active report shows per-section Edit buttons", %{conn: conn} do
       report = create_report(%{"status" => "active"})
@@ -273,6 +317,110 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
 
       assert html =~ "needs a fix" or html =~ "need a fix"
       assert has_element?(view, ~s(button[type="submit"][disabled]))
+    end
+  end
+
+  describe "Reservoir Quality (import_data) picker" do
+    test "renders the picker with existing sections", %{conn: conn} do
+      report = reservoir_report()
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      html = open_tab(view, "reservoir")
+
+      assert html =~ "Reservoir Quality"
+      assert has_element?(view, ~s([data-name="ReservoirQualityPicker"]))
+
+      props = picker_props(view)
+      assert props["editable"] == true
+      assert props["well_type"] == "horizontal"
+      assert [%{"id" => "0", "quality" => "Good", "from_depth" => 100.0}] = props["intervals"]
+    end
+
+    test "a non-active report renders the picker read-only", %{conn: conn} do
+      report = reservoir_report(%{"status" => "complete"})
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "reservoir")
+
+      assert has_element?(view, ~s([data-name="ReservoirQualityPicker"]))
+      assert picker_props(view)["editable"] == false
+    end
+
+    test "committing sections saves them and recomputes the quality summary", %{conn: conn} do
+      report = reservoir_report()
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "reservoir")
+
+      commit_intervals(view, [
+        %{
+          "id" => "0",
+          "from_depth" => 100,
+          "to_depth" => 150,
+          "quality" => "Very Good",
+          "lithology" => "Sandstone"
+        },
+        %{
+          "id" => nil,
+          "from_depth" => 200,
+          "to_depth" => 260,
+          "quality" => "Fair",
+          "lithology" => "Shale"
+        }
+      ])
+
+      assert render(view) =~ "Reservoir Quality saved."
+
+      [leg] = Reports.get_report!(report.id).import_data["reservoir_data"]
+      [a, b] = Enum.sort_by(leg["log_data"]["intervals"], & &1["from_depth"])
+
+      assert a["quality"] == "Very Good"
+      assert a["to_depth"] == 150.0
+      assert a["interval"] == 50.0
+      # fields the picker doesn't surface survive the round trip
+      assert a["porosity"] == "12-24%"
+      assert a["gas"] == 500.0
+      assert a["remarks"] == "clean sand"
+
+      assert b["quality"] == "Fair"
+      assert b["lithology"] == "Shale"
+      assert b["interval"] == 60.0
+      assert b["gas"] == nil
+
+      summary = leg["log_data"]["quality_summary"]
+      assert Enum.find(summary, &(&1["quality"] == "Very Good"))["metres"] == 50.0
+      assert Enum.find(summary, &(&1["quality"] == "Total"))["metres"] == 110.0
+    end
+
+    test "a commit with an inverted interval is rejected", %{conn: conn} do
+      report = reservoir_report()
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "reservoir")
+
+      commit_intervals(view, [
+        %{
+          "id" => "0",
+          "from_depth" => 140,
+          "to_depth" => 100,
+          "quality" => "Good",
+          "lithology" => "Sandstone"
+        }
+      ])
+
+      assert render(view) =~ "bad depth or quality"
+
+      [leg] = Reports.get_report!(report.id).import_data["reservoir_data"]
+      [interval] = leg["log_data"]["intervals"]
+      assert interval["from_depth"] == 100.0
+      assert interval["to_depth"] == 140.0
+    end
+
+    test "committing an empty list removes all sections", %{conn: conn} do
+      report = reservoir_report()
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "reservoir")
+
+      commit_intervals(view, [])
+
+      [leg] = Reports.get_report!(report.id).import_data["reservoir_data"]
+      assert leg["log_data"]["intervals"] == []
     end
   end
 end

@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(mix compile *)",
+      "Bash(MIX_ENV=dev mix run -e ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(git -C /workspaces/chinook_reports diff --stat)",
+      "Bash(git -C /workspaces/chinook_reports diff -- lib/chinook_reports_web/components/report_components.ex)"
     ]
   }
 }
