@@ -5,8 +5,8 @@ defmodule ChinookReportsWeb.CreateReportLive do
   import ChinookReportsWeb.Stepper
 
   alias ChinookReports.Reports
+  alias ChinookReports.Reports.Editing
   alias ChinookReports.Reports.Report
-  alias ChinookReports.Reports.Report.ReportData.{ProfileSection, FormationTop, SurveyPoint}
 
   # entry type: manual vs file upload
   # @entry_types [
@@ -375,24 +375,18 @@ defmodule ChinookReportsWeb.CreateReportLive do
   end
 
   def handle_event("add_row", %{"list" => list}, socket) do
-    list_atom = String.to_existing_atom(list)
-    changeset = current_changeset(socket)
-    existing = Ecto.Changeset.get_field(changeset, :report_data) |> Map.get(list_atom, [])
-    new_list = existing ++ [blank_row(list_atom)]
-
-    changeset = put_in_report_data(changeset, list_atom, new_list)
+    changeset = Editing.add_row(current_changeset(socket), String.to_existing_atom(list))
     {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("remove_row", %{"list" => list, "index" => index}, socket) do
-    list_atom = String.to_existing_atom(list)
-    index = String.to_integer(index)
+    changeset =
+      Editing.remove_row(
+        current_changeset(socket),
+        String.to_existing_atom(list),
+        String.to_integer(index)
+      )
 
-    changeset = current_changeset(socket)
-    existing = Ecto.Changeset.get_field(changeset, :report_data) |> Map.get(list_atom, [])
-    new_list = List.delete_at(existing, index)
-
-    changeset = put_in_report_data(changeset, list_atom, new_list)
     {:noreply, assign_form(socket, changeset)}
   end
 
@@ -443,26 +437,4 @@ defmodule ChinookReportsWeb.CreateReportLive do
     params = socket.assigns.form.params || %{}
     Reports.change_report(socket.assigns.form.source, params)
   end
-
-  # Update one nested list inside report_data and rebuild that embed.
-  #
-  # Ecto.Changeset.put_embed/3 on report_data with a plain, already-modified
-  # struct doesn't reliably register nested embeds_many changes (it diffs the
-  # embeds_one as a whole against the original, and that diff can come back
-  # empty even though a nested list clearly differs). Putting the list at its
-  # own nesting level, via a proper changeset for report_data, is what
-  # actually gets tracked.
-  defp put_in_report_data(changeset, list_atom, new_list) do
-    report_data_changeset =
-      changeset
-      |> Ecto.Changeset.get_field(:report_data)
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_embed(list_atom, new_list)
-
-    Ecto.Changeset.put_embed(changeset, :report_data, report_data_changeset)
-  end
-
-  defp blank_row(:profile_sections), do: %ProfileSection{}
-  defp blank_row(:formation_tops), do: %FormationTop{}
-  defp blank_row(:surveys), do: %SurveyPoint{}
 end
