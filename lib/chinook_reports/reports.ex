@@ -56,4 +56,20 @@ defmodule ChinookReports.Reports do
 
   @doc "Delete a report."
   def delete_draft(%Report{} = report), do: Repo.delete(report)
+
+  @doc """
+  Merge `data` into `report.import_data` under the top-level key `section` and
+  persist. The other import sections (welldata, synopsis, …) are left untouched.
+
+  Used by the on-page editors for the still-untyped `import_data` sections; the
+  caller is responsible for having recomputed any derived values first (see
+  `ChinookReports.FormationTops`).
+  """
+  def update_import_section(%Report{} = report, section, data) when is_binary(section) do
+    merged = Map.put(report.import_data || %{}, section, data)
+
+    report
+    |> Report.changeset(%{"import_data" => merged})
+    |> Repo.update()
+  end
 end

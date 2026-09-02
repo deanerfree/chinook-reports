@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "../vendor/heroicons.js";
 @variant dark (&:where(.dark, .dark *));
 
 @source "../../lib/chinook_reports_web.ex";
