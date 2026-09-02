@@ -3080,9 +3080,9 @@
         "formation": "Colorado",
         "prognosis": {
           "md": 274.7524,
-          "tvd": null,
+          "tvd": 278.32,
           "isopach": null,
-          "subsea": 353.5476
+          "subsea": 349.98
         },
         "samples": {
           "md": 276.92521,
@@ -3096,15 +3096,15 @@
           "isopach": 62.6857,
           "subsea": 351.48343
         },
-        "difference_m": -2.06417
+        "difference_m": 1.5034
       },
       {
         "formation": "Second White Specks",
         "prognosis": {
           "md": 334.5048,
-          "tvd": null,
+          "tvd": 337.5,
           "isopach": null,
-          "subsea": 293.7952
+          "subsea": 290.8
         },
         "samples": {
           "md": 341.67509,
@@ -3118,15 +3118,15 @@
           "isopach": 40.08843,
           "subsea": 288.79773
         },
-        "difference_m": -4.99747
+        "difference_m": -2.0023
       },
       {
         "formation": "Base Fish Scales",
         "prognosis": {
           "md": 381.9808,
-          "tvd": null,
+          "tvd": 382.09,
           "isopach": null,
-          "subsea": 246.3192
+          "subsea": 246.21
         },
         "samples": {
           "md": 385.56594,
@@ -3140,15 +3140,15 @@
           "isopach": 56.92774,
           "subsea": 248.7093
         },
-        "difference_m": -1.62961
+        "difference_m": 2.4993
       },
       {
         "formation": "Viking",
         "prognosis": {
           "md": 448.30596,
-          "tvd": null,
+          "tvd": 435.02,
           "isopach": null,
-          "subsea": 179.99404
+          "subsea": 193.28
         },
         "samples": {
           "md": 459.00707,
@@ -3162,15 +3162,15 @@
           "isopach": 23.24912,
           "subsea": 191.78156
         },
-        "difference_m": -6.4098
+        "difference_m": -1.4984
       },
       {
         "formation": "Joli Fou",
         "prognosis": {
           "md": 501.95275,
-          "tvd": null,
+          "tvd": 460.77,
           "isopach": null,
-          "subsea": 126.34725
+          "subsea": 167.53
         },
         "samples": {
           "md": 498.33502,
@@ -3184,15 +3184,15 @@
           "isopach": 19.44669,
           "subsea": 168.53244
         },
-        "difference_m": 2.9333
+        "difference_m": 1.0024
       },
       {
         "formation": "Mannville",
         "prognosis": {
           "md": 538.48863,
-          "tvd": null,
+          "tvd": 476.71,
           "isopach": null,
-          "subsea": 89.81137
+          "subsea": 151.59
         },
         "samples": {
           "md": 540.92218,
@@ -3206,15 +3206,15 @@
           "isopach": 15.53562,
           "subsea": 149.08575
         },
-        "difference_m": -0.21728
+        "difference_m": -2.5043
       },
       {
         "formation": "SPARKY",
         "prognosis": {
           "md": 620.84917,
-          "tvd": null,
+          "tvd": 496.75,
           "isopach": null,
-          "subsea": 7.45083
+          "subsea": 131.55
         },
         "samples": {
           "md": 607.41031,
@@ -3228,15 +3228,15 @@
           "isopach": 1.8143,
           "subsea": 133.55013
         },
-        "difference_m": 1.62961
+        "difference_m": 2.0001
       },
       {
         "formation": "ICP/HEEL",
         "prognosis": {
           "md": 656.00531,
-          "tvd": null,
+          "tvd": 495.56,
           "isopach": null,
-          "subsea": -27.70531
+          "subsea": 132.74
         },
         "samples": {
           "md": 663.79485,
@@ -3250,15 +3250,15 @@
           "isopach": -16.42648,
           "subsea": 131.73583
         },
-        "difference_m": 1.98813
+        "difference_m": -1.0042
       },
       {
         "formation": "Total Depth",
         "prognosis": {
           "md": 2151.09727,
-          "tvd": null,
+          "tvd": 480.64,
           "isopach": null,
-          "subsea": -1522.79727
+          "subsea": 147.66
         },
         "samples": {
           "md": 2150.0,
@@ -3272,7 +3272,7 @@
           "isopach": null,
           "subsea": 148.1623
         },
-        "difference_m": 18.4146
+        "difference_m": 0.5023
       }
     ]
   },
