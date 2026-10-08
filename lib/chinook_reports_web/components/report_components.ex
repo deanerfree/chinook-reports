@@ -5,8 +5,6 @@ defmodule ChinookReportsWeb.ReportComponents do
   import ChinookReportsWeb.ReportFormComponents
   import LiveSvelte
 
-  alias ChinookReports.Reports.Report
-
   attr :report, :map, required: true
 
   def report_details(assigns) do
@@ -53,41 +51,21 @@ defmodule ChinookReportsWeb.ReportComponents do
     <div class="flex flex-col gap-8 pt-6">
       <%= case @tab do %>
         <% "well_data" -> %>
-          <.editable_section key="identity" editing={@editing} form={@form}>
-            <:view>
-              <.well_summary_section report={@report}>
-                <:action :if={@editable}>
-                  <.edit_button section="identity" color="text-on-primary" />
-                </:action>
-              </.well_summary_section>
-            </:view>
-            <:edit :let={form}><.identity_form form={form} /></:edit>
-          </.editable_section>
-          <%= if @data do %>
-            <.editable_section key="elevations" editing={@editing} form={@form}>
-              <:view>
-                <.elevations_location_section report={@report} data={@data}>
-                  <:action :if={@editable}>
-                    <.edit_button section="elevations" />
-                  </:action>
-                </.elevations_location_section>
-              </:view>
-              <:edit :let={form}><.elevations_form form={form} /></:edit>
-            </.editable_section>
-            <.editable_section key="configuration" editing={@editing} form={@form}>
-              <:view>
-                <.configuration_section data={@data}>
-                  <:action :if={@editable}>
-                    <.edit_button section="configuration" />
-                  </:action>
-                </.configuration_section>
-              </:view>
-              <:edit :let={form}><.configuration_form form={form} /></:edit>
-            </.editable_section>
-          <% end %>
-          <%= if wd = @import["welldata"] do %>
-            <.welldata_section report={wd} />
-          <% end %>
+          <.live_component
+            :for={card <- ChinookReportsWeb.WellDataCardLive.cards()}
+            module={ChinookReportsWeb.WellDataCardLive}
+            id={"well-data-#{card}"}
+            card={card}
+            report={@report}
+            editable={@editable}
+          />
+          <.live_component
+            module={ChinookReportsWeb.ImportTableLive}
+            id="welldata-well_profile"
+            section="well_profile"
+            report={@report}
+            editable={@editable}
+          />
         <% "formation_tops" -> %>
           <%= if @import["tops"] do %>
             <.live_component
@@ -119,13 +97,34 @@ defmodule ChinookReportsWeb.ReportComponents do
               report={@report}
               editable={@editable}
             />
+            <.live_component
+              :if={ChinookReports.ReservoirQuality.leg_index(@report)}
+              module={ChinookReportsWeb.ImportTableLive}
+              id="reservoir-intervals"
+              section="intervals"
+              leg={ChinookReports.ReservoirQuality.leg_index(@report)}
+              report={@report}
+              editable={@editable}
+            />
           <% end %>
         <% "synopsis" -> %>
-          <%= if synopsis = @import["synopsis"] do %>
-            <.synopsis_section synopsis={synopsis} legs={@import["reservoir_data"] || []} />
-          <% end %>
+          <.live_component
+            module={ChinookReportsWeb.SynopsisLive}
+            id="synopsis-editor"
+            report={@report}
+            legs={@import["reservoir_data"] || []}
+            editable={@editable}
+          />
         <% "surveys" -> %>
-          <.surveys_import_section legs={@import["reservoir_data"] || []} />
+          <.live_component
+            :for={{_leg, i} <- Enum.with_index(@import["reservoir_data"] || [])}
+            module={ChinookReportsWeb.ImportTableLive}
+            id={"survey-#{i}"}
+            section="survey"
+            leg={i}
+            report={@report}
+            editable={@editable}
+          />
           <%= if @data do %>
             <.editable_section key="surveys" editing={@editing} form={@form}>
               <:view>
@@ -139,8 +138,14 @@ defmodule ChinookReportsWeb.ReportComponents do
             </.editable_section>
           <% end %>
         <% "timing" -> %>
-          <%= if wd = @import["welldata"] do %>
-            <.well_timing_section report={wd} />
+          <%= if @import["welldata"] do %>
+            <.live_component
+              module={ChinookReportsWeb.ImportTableLive}
+              id="well-timing"
+              section="well_timing"
+              report={@report}
+              editable={@editable}
+            />
           <% end %>
           <%= if @data do %>
             <.editable_section key="profile_sections" editing={@editing} form={@form}>
@@ -155,20 +160,41 @@ defmodule ChinookReportsWeb.ReportComponents do
             </.editable_section>
           <% end %>
         <% "hole_casing_mud_bits" -> %>
-          <%= if wd = @import["welldata"] do %>
-            <.hole_mud_casing_section report={wd} />
+          <%= if @import["welldata"] do %>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <.live_component
+                :for={section <- ~w(hole_sizes mud casing_data)}
+                module={ChinookReportsWeb.ImportTableLive}
+                id={"welldata-#{section}"}
+                section={section}
+                report={@report}
+                editable={@editable}
+              />
+            </div>
           <% end %>
-          <%= if bits = @import["bits"] do %>
-            <.bits_section bits={bits} />
-          <% end %>
+          <.live_component
+            module={ChinookReportsWeb.ImportTableLive}
+            id="import-bits"
+            section="bits"
+            report={@report}
+            editable={@editable}
+          />
         <% "mud_log" -> %>
-          <%= if mud = @import["mud_log"] do %>
-            <.mud_section mud={mud} />
-          <% end %>
+          <.live_component
+            module={ChinookReportsWeb.ImportTableLive}
+            id="import-mud_log"
+            section="mud_log"
+            report={@report}
+            editable={@editable}
+          />
         <% "daily_reports" -> %>
-          <%= if daily = @import["daily"] do %>
-            <.daily_section daily={daily} />
-          <% end %>
+          <.live_component
+            module={ChinookReportsWeb.ImportTableLive}
+            id="import-daily"
+            section="daily"
+            report={@report}
+            editable={@editable}
+          />
         <% _ -> %>
           <p class="text-sm text-muted">Nothing to show here.</p>
       <% end %>
@@ -199,10 +225,7 @@ defmodule ChinookReportsWeb.ReportComponents do
       <%= if @editing == @key do %>
         <.form for={@form} phx-change="validate" phx-submit="save_section">
           {render_slot(@edit, @form)}
-          <div class="mt-4 flex gap-2">
-            <button type="submit" class="btn-primary">Save changes</button>
-            <button type="button" phx-click="cancel_edit" class="btn-secondary">Cancel</button>
-          </div>
+          <.edit_actions cancel="cancel_edit" />
         </.form>
       <% else %>
         {render_slot(@view)}
@@ -243,48 +266,44 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
-  attr :form, Phoenix.HTML.Form, required: true
+  @doc """
+  The Save / Cancel bar every section editor ends with. It sticks to the bottom
+  of the viewport while the editor runs past it, so the buttons are always in
+  reach, and settles in place once the editor's end scrolls into view. Pressing
+  Escape anywhere fires the cancel event.
 
-  def identity_form(assigns) do
+  Sticky positioning only works when no ancestor between the bar and the page's
+  scroll container clips overflow — so render it *outside* `table_panel` /
+  `card_panel` (both set `overflow`), as the last child of the editor's form.
+
+  The inner block holds anything shown left of the buttons (add-row, hints,
+  error counts).
+  """
+  attr :cancel, :string, default: "cancel", doc: "event pushed by Cancel and by Escape"
+  attr :target, :any, default: nil, doc: "phx-target (a LiveComponent's @myself)"
+  attr :disabled, :boolean, default: false
+  attr :label, :string, default: "Save changes"
+  slot :inner_block
+
+  def edit_actions(assigns) do
     ~H"""
-    <.section_panel id="identity_edit" title="Well Summary">
-      <div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3">
-        <.report_field :for={spec <- identity_specs()} form={@form} spec={spec} />
+    <div
+      class="sticky bottom-0 z-20 mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-border-light bg-bg-card/95 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] backdrop-blur"
+      phx-window-keydown={@cancel}
+      phx-key="Escape"
+      phx-target={@target}
+    >
+      {render_slot(@inner_block)}
+      <div class="ml-auto flex items-center gap-2">
+        <span class="hidden text-[11px] text-muted sm:inline">Esc to cancel</span>
+        <button type="submit" disabled={@disabled} class="btn-primary disabled:opacity-50">
+          {@label}
+        </button>
+        <button type="button" phx-click={@cancel} phx-target={@target} class="btn-secondary">
+          Cancel
+        </button>
       </div>
-    </.section_panel>
-    """
-  end
-
-  attr :form, Phoenix.HTML.Form, required: true
-
-  def elevations_form(assigns) do
-    ~H"""
-    <.card_panel title="Elevations and Location">
-      <.inputs_for :let={data} field={@form[:report_data]}>
-        <div class="flex flex-col gap-4 px-5 py-4">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <.report_field :for={spec <- elevation_specs()} form={data} spec={spec} />
-          </div>
-          <div class="grid grid-cols-1 gap-4 border-t border-border-light pt-4 sm:grid-cols-3">
-            <.report_field :for={spec <- location_specs()} form={data} spec={spec} />
-          </div>
-        </div>
-      </.inputs_for>
-    </.card_panel>
-    """
-  end
-
-  attr :form, Phoenix.HTML.Form, required: true
-
-  def configuration_form(assigns) do
-    ~H"""
-    <.flat_card_panel title="Configuration">
-      <.inputs_for :let={data} field={@form[:report_data]}>
-        <div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3">
-          <.report_field :for={spec <- configuration_specs()} form={data} spec={spec} />
-        </div>
-      </.inputs_for>
-    </.flat_card_panel>
+    </div>
     """
   end
 
@@ -321,67 +340,16 @@ defmodule ChinookReportsWeb.ReportComponents do
 
   def surveys_form(assigns) do
     ~H"""
-    <.table_panel title="Directional Surveys">
+    <.table_panel title="Directional Program">
       <.inputs_for :let={data} field={@form[:report_data]}>
         <.editable_table form={data} list={:surveys} columns={survey_columns()} />
       </.inputs_for>
       <p class="mt-3 text-xs text-copy-secondary">
-        TVD, N/S, E/W and dogleg are computed from MD / Inc / Azi (minimum curvature).
+        The planned path. TVD, N/S, E/W and dogleg are computed from MD / Inc / Azi
+        (minimum curvature); a program that starts below surface is tied in vertically at the wellhead.
       </p>
     </.table_panel>
     """
-  end
-
-  defp identity_specs do
-    [
-      %{field: :well_name, label: "Well Name", wide: true},
-      %{field: :unique_well_id, label: "Unique Well ID"},
-      %{field: :operator, label: "Operator"},
-      %{field: :status, label: "Status", input: :select, options: &Report.statuses/0},
-      %{field: :spud_date, label: "Spud Date", placeholder: "YYYY-MM-DD"},
-      %{field: :final_td_date, label: "Final T.D. Date", placeholder: "YYYY-MM-DD"},
-      %{field: :geometry, label: "Geometry", input: :select, options: &Report.geometries/0},
-      %{field: :units, label: "Units", input: :select, options: &Report.units/0},
-      %{field: :target_formation, label: "Primary Target"},
-      %{field: :secondary_target, label: "Secondary Target"},
-      %{field: :country, label: "Country"},
-      %{field: :province, label: "Province"},
-      %{field: :latitude, label: "Latitude"},
-      %{field: :longitude, label: "Longitude"}
-    ]
-  end
-
-  defp elevation_specs do
-    [
-      %{field: :gl_elevation, label: "Ground Level", unit: "m"},
-      %{field: :kb_elevation, label: "Kelly Bushing", unit: "m"},
-      %{field: :kb_to_ground, label: "KB to Ground", unit: "m"}
-    ]
-  end
-
-  defp location_specs do
-    [
-      %{field: :datum, label: "Datum", input: :select, options: &Report.datums/0},
-      %{field: :surface_coordinates, label: "Surface Coordinates", wide: true},
-      %{field: :surface_location, label: "Surface Location"},
-      %{field: :bottom_location, label: "Bottom Location"},
-      %{field: :field_region, label: "Field / Region"}
-    ]
-  end
-
-  defp configuration_specs do
-    [
-      %{
-        field: :classification,
-        label: "Classification",
-        input: :select,
-        options: &Report.classifications/0
-      },
-      %{field: :license, label: "License"},
-      %{field: :purpose, label: "Purpose"},
-      %{field: :substance, label: "Substance"},
-      %{field: :terminating_zone, label: "Terminating Zone"}
-    ]
   end
 
   defp profile_columns do
@@ -389,7 +357,7 @@ defmodule ChinookReportsWeb.ReportComponents do
       %{key: :section, label: "Section", placeholder: "Lateral"},
       %{key: :start_depth, label: "Start", unit: "m"},
       %{key: :end_depth, label: "End", unit: "m"},
-      %{key: :start_date, label: "Start Date", placeholder: "YYYY-MM-DD"}
+      %{key: :start_date, label: "Start Date", type: :datetime}
     ]
   end
 
@@ -489,25 +457,6 @@ defmodule ChinookReportsWeb.ReportComponents do
         </.table_panel>
       <% end %>
     </div>
-    """
-  end
-
-  attr :legs, :list, required: true
-
-  defp surveys_import_section(assigns) do
-    ~H"""
-    <%= for leg <- @legs, points = get_in(leg, ["survey", "survey_points"]) || [], points != [] do %>
-      <.table_panel title={"Directional Survey — #{leg["leg_name"] || "Leg"}"}>
-        <.table id={"survey_points_#{leg["leg_name"]}"} rows={points}>
-          <:col :let={p} label="MD (m)">{fmt_num(p["md"])}</:col>
-          <:col :let={p} label="Inc (°)">{fmt_num(p["inclination_deg"])}</:col>
-          <:col :let={p} label="Azi (°)">{fmt_num(p["azimuth_deg"])}</:col>
-          <:col :let={p} label="TVD (m)">{fmt_num(p["tvd"])}</:col>
-          <:col :let={p} label="VS (m)">{fmt_num(p["vertical_section"])}</:col>
-          <:col :let={p} label="Subsea (m)">{fmt_num(p["subsea"])}</:col>
-        </.table>
-      </.table_panel>
-    <% end %>
     """
   end
 
@@ -627,10 +576,12 @@ defmodule ChinookReportsWeb.ReportComponents do
 
   attr :synopsis, :map, required: true
   attr :legs, :list, default: []
+  slot :action, doc: "trailing content in the panel header (e.g. an edit button)"
 
-  defp synopsis_section(assigns) do
+  def synopsis_section(assigns) do
     ~H"""
     <.section_panel id="synopsis" title="Synopsis">
+      <:action :if={@action != []}>{render_slot(@action)}</:action>
       <%= if summary = @synopsis["well_summary"] do %>
         <.flat_card_panel title="Well Summary">
           <div class="py-4 flex flex-col gap-3">
@@ -1083,8 +1034,11 @@ defmodule ChinookReportsWeb.ReportComponents do
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3 pt-3 border-t border-border-light">
-          <.wfield label="Spud Date" value={@report.spud_date} />
-          <.wfield label="Final T.D. Date" value={@report.final_td_date} />
+          <.wfield label="Spud Date" value={@report.spud_date && fmt_datetime(@report.spud_date)} />
+          <.wfield
+            label="Final T.D. Date"
+            value={@report.final_td_date && fmt_datetime(@report.final_td_date)}
+          />
           <.wfield label="Geometry" value={@report.geometry} />
           <.wfield label="Units" value={@report.units} />
         </div>
@@ -1102,9 +1056,9 @@ defmodule ChinookReportsWeb.ReportComponents do
               <p class="text-xs mb-0.5 text-muted uppercase font-medium">Coordinates</p>
               <p class="text-sm font-mono text-text">
                 <%= if @report.report_data && @report.report_data.datum == "UTM" do %>
-                  {@report.latitude}m, {@report.longitude}m
+                  {fmt_coord(@report.latitude)}m, {fmt_coord(@report.longitude)}m
                 <% else %>
-                  {@report.latitude}° N, {abs(@report.longitude)}° W
+                  {fmt_coord(@report.latitude)}° N, {fmt_coord(abs(@report.longitude))}° W
                 <% end %>
               </p>
             </div>
@@ -1213,7 +1167,7 @@ defmodule ChinookReportsWeb.ReportComponents do
           <:col :let={s} label="Section">{s.section}</:col>
           <:col :let={s} label="Start (m)">{fmt_decimal(s.start_depth)}</:col>
           <:col :let={s} label="End (m)">{fmt_decimal(s.end_depth)}</:col>
-          <:col :let={s} label="Start Date">{s.start_date || "—"}</:col>
+          <:col :let={s} label="Start Date">{fmt_datetime(s.start_date)}</:col>
         </.table>
         <p :if={@rows == []} class="py-4 text-sm text-muted">No well profile sections recorded.</p>
       </.table_panel>
@@ -1252,14 +1206,14 @@ defmodule ChinookReportsWeb.ReportComponents do
   defp surveys_section(assigns) do
     ~H"""
     <%= if @rows != [] or @action != [] do %>
-      <.table_panel title="Directional Surveys">
+      <.table_panel title="Directional Program">
         <:action :if={@action != []}>{render_slot(@action)}</:action>
         <.table :if={@rows != []} id="surveys_table" rows={@rows}>
-          <:col :let={s} label="MD (m)">{fmt_decimal(s.md)}</:col>
-          <:col :let={s} label="Inclination (°)">{fmt_decimal(s.inclination)}</:col>
-          <:col :let={s} label="Azimuth (°)">{fmt_decimal(s.azimuth)}</:col>
+          <:col :let={s} label="MD (m)">{fmt_survey(s.md)}</:col>
+          <:col :let={s} label="Inclination (°)">{fmt_survey(s.inclination)}</:col>
+          <:col :let={s} label="Azimuth (°)">{fmt_survey(s.azimuth)}</:col>
         </.table>
-        <p :if={@rows == []} class="py-4 text-sm text-muted">No directional surveys recorded.</p>
+        <p :if={@rows == []} class="py-4 text-sm text-muted">No directional program recorded.</p>
       </.table_panel>
     <% end %>
     """
@@ -1272,7 +1226,7 @@ defmodule ChinookReportsWeb.ReportComponents do
   slot :inner_block, required: true
   slot :action, doc: "trailing content in the panel header (e.g. an edit button)"
 
-  defp card_panel(assigns) do
+  def card_panel(assigns) do
     ~H"""
     <div class="card overflow-hidden">
       <div class="px-5 py-2.5 flex items-center justify-between gap-3">
@@ -1313,7 +1267,7 @@ defmodule ChinookReportsWeb.ReportComponents do
   slot :inner_block, required: true
   slot :action, doc: "trailing content in the panel header (e.g. an edit button)"
 
-  defp table_panel(assigns) do
+  def table_panel(assigns) do
     ~H"""
     <div class="data-table-container">
       <div class="py-2.5 w-full flex items-center justify-between gap-3">
@@ -1385,8 +1339,25 @@ defmodule ChinookReportsWeb.ReportComponents do
 
   defp has_any?(data, fields), do: Enum.any?(fields, &(Map.get(data, &1) not in [nil, ""]))
 
+  # Directional-survey values keep their precision (see NumberFormat.survey/1).
+  defp fmt_survey(nil), do: "—"
+  defp fmt_survey(v), do: ChinookReportsWeb.NumberFormat.survey(v)
+
   defp fmt_decimal(nil), do: "—"
   defp fmt_decimal(%Decimal{} = d), do: d |> Decimal.round(2) |> Decimal.to_string(:normal)
+
+  # spud_date/final_td_date/start_date are wellsite local wall-clock time
+  # (:naive_datetime, no timezone conversion). Drop the seconds and only show
+  # a time at all when one was actually entered (pre-migration rows and any
+  # date-only entry both land on exact midnight).
+  defp fmt_datetime(nil), do: "—"
+
+  defp fmt_datetime(%NaiveDateTime{} = ndt) do
+    case NaiveDateTime.to_time(ndt) do
+      ~T[00:00:00] -> Calendar.strftime(ndt, "%Y-%m-%d")
+      _ -> Calendar.strftime(ndt, "%Y-%m-%d %H:%M")
+    end
+  end
 
   # Elevation value that may be a typed Decimal (report_data) or a raw number
   # (import_data welldata elevations).
@@ -1394,6 +1365,14 @@ defmodule ChinookReportsWeb.ReportComponents do
   defp elev_m(%Decimal{} = d), do: "#{d |> Decimal.round(2) |> Decimal.to_string(:normal)} m"
   defp elev_m(n) when is_number(n), do: "#{:erlang.float_to_binary(n / 1, decimals: 1)} m"
   defp elev_m(_), do: nil
+
+  # Coordinates/depths in plain positional notation — never "1.2e3". Erlang's
+  # default float formatting flips to exponents past a certain magnitude, which
+  # is unusable for a lat/long/easting readout. Keeps up to 10 decimals but
+  # trims trailing zeros (:compact).
+  defp fmt_coord(n) when is_float(n), do: :erlang.float_to_binary(n, [:compact, {:decimals, 10}])
+  defp fmt_coord(n) when is_integer(n), do: Integer.to_string(n)
+  defp fmt_coord(n), do: n
 
   defp fmt_num(nil), do: nil
   defp fmt_num(n) when is_float(n), do: :erlang.float_to_binary(n, decimals: 2)

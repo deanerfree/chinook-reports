@@ -3,21 +3,28 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   The rich Formation Tops table (`import_data["tops"]`), with per-column-group
   editing while the report is active.
 
-  Prognosis is entered in the draft phase and is read-only here. For Samples and
-  MWD / Gamma the user edits one group at a time (its pencil) and enters only the
-  MD pick; TVD comes from the directional survey (interpolated where it has
-  reached, extrapolated beyond — those rows are flagged), Subsea is `KB − TVD`,
-  Isopach and Diff follow. All of that is derived by `ChinookReports.FormationTops`
-  on save (and on any KB / survey change elsewhere).
+  The user edits one group at a time (its pencil). Prognosis takes an MD and a
+  Subsea (the datum-stable geologic pick); Samples and MWD / Gamma take only the
+  MD read at the wellsite. Everything else is derived by
+  `ChinookReports.FormationTops` on save (and on any KB / survey change
+  elsewhere): for Samples / MWD the TVD comes from the directional survey
+  (interpolated where it has reached, extrapolated beyond — those rows are
+  flagged) and Subsea is `KB − TVD`; for Prognosis the TVD is `KB − Subsea`.
+  Isopach and Diff follow.
+
+  `editable_fields/1` is the single source of truth for which columns a group's
+  pick lives in.
   """
   use ChinookReportsWeb, :live_component
 
   alias ChinookReports.{FormationTops, Reports}
+  alias ChinookReportsWeb.NumberFormat
 
   @groups ~w(prognosis samples mwd_gamma)
-  @editable_groups ~w(samples mwd_gamma)
+  @editable_groups ~w(prognosis samples mwd_gamma)
   @labels %{"prognosis" => "Prognosis", "samples" => "Samples", "mwd_gamma" => "MWD / Gamma"}
   @group_notes %{
+    "prognosis" => "Enter the prognosed MD and Subsea (TVDSS — negative below sea level).",
     "samples" => "Enter the MD picked from cuttings at the wellsite.",
     "mwd_gamma" => "Enter the MD read from the MWD / gamma log."
   }
@@ -59,6 +66,13 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     {:noreply, assign(socket, editing: g, errors: [])}
   end
 
+  # Escape fires "cancel" too; with the delete confirmation open it only
+  # dismisses that, rather than throwing away the whole edit.
+  def handle_event("cancel", _params, %{assigns: %{pending_delete: i}} = socket)
+      when not is_nil(i) do
+    {:noreply, assign(socket, pending_delete: nil)}
+  end
+
   def handle_event("cancel", _params, socket) do
     {:noreply, load(assign(socket, editing: nil))}
   end
@@ -74,7 +88,13 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     {:noreply, assign(socket, rows: socket.assigns.rows ++ [blank_row()])}
   end
 
-  def handle_event("ask_delete", %{"index" => i}, socket) do
+  # The row menu sends the index via `JS.push(value: %{index: i})`, which arrives
+  # as an integer; accept a string too (phx-value-* attributes are strings).
+  def handle_event("ask_delete", %{"index" => i}, socket) when is_integer(i) do
+    {:noreply, assign(socket, pending_delete: i)}
+  end
+
+  def handle_event("ask_delete", %{"index" => i}, socket) when is_binary(i) do
     {:noreply, assign(socket, pending_delete: String.to_integer(i))}
   end
 
@@ -123,20 +143,26 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     |> Enum.map(fn {k, rp} ->
       base = Enum.at(rows, String.to_integer(k)) || blank_row()
 
-      base
-      |> Map.put("formation", Map.get(rp, "formation", base["formation"]))
-      |> put_md("samples", rp)
-      |> put_md("mwd_gamma", rp)
+      base = Map.put(base, "formation", Map.get(rp, "formation", base["formation"]))
+      Enum.reduce(@editable_groups, base, &put_pick(&2, &1, rp))
     end)
   end
 
   defp merge_params(rows, _), do: rows
 
-  defp put_md(row, group, rp) do
-    case get_in(rp, [group, "md"]) do
-      nil -> row
-      md -> put_in(row, [group, "md"], md)
-    end
+  # Pull the group's editable cells (MD, and Subsea for Prognosis) out of the submitted params.
+  # A pick whose text comes back unchanged keeps its stored value, so the
+  # at-most-2-decimals input text never rounds a saved pick.
+  defp put_pick(row, group, rp) do
+    Enum.reduce(editable_fields(group), row, fn field, acc ->
+      put_cell(acc, group, field, get_in(rp, [group, field]))
+    end)
+  end
+
+  defp put_cell(row, _group, _field, nil), do: row
+
+  defp put_cell(row, group, field, raw) do
+    if raw == pick_value(row, group, field), do: row, else: put_in(row, [group, field], raw)
   end
 
   # Recompute derived cells for a live preview (bad numbers just read "—").
@@ -149,15 +175,17 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     end
   end
 
-  # errors: list of {row_index, group} for a bad MD in the group being edited
+  # errors: list of {row_index, group} for a bad pick in the group being edited
   defp validate(rows, group) when group in @editable_groups do
     rows
     |> Enum.with_index()
     |> Enum.flat_map(fn {row, i} ->
-      case parse_md(get_in(row, [group, "md"])) do
-        :error -> [{i, group}]
-        _ -> []
-      end
+      bad? =
+        Enum.any?(editable_fields(group), fn field ->
+          parse_pick(field, get_in(row, [group, field])) == :error
+        end)
+
+      if bad?, do: [{i, group}], else: []
     end)
   end
 
@@ -167,10 +195,12 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     row = Map.put(row, "formation", trim(row["formation"]))
 
     Enum.reduce(@editable_groups, row, fn g, acc ->
-      case parse_md(get_in(acc, [g, "md"])) do
-        {:ok, v} -> put_in(acc, [g, "md"], v)
-        :error -> acc
-      end
+      Enum.reduce(editable_fields(g), acc, fn field, row ->
+        case parse_pick(field, get_in(row, [g, field])) do
+          {:ok, v} -> put_in(row, [g, field], v)
+          :error -> row
+        end
+      end)
     end)
   end
 
@@ -180,26 +210,36 @@ defmodule ChinookReportsWeb.FormationTopsLive do
 
   defp blank?(row) do
     is_nil(row["formation"]) and
-      Enum.all?(@groups, fn g -> get_in(row, [g, "md"]) in [nil, ""] end)
+      Enum.all?(@groups, fn g ->
+        Enum.all?(editable_fields(g), fn f -> get_in(row, [g, f]) in [nil, ""] end)
+      end)
   end
 
-  defp parse_md(nil), do: {:ok, nil}
-  defp parse_md(n) when is_number(n), do: if(n >= 0, do: {:ok, n / 1}, else: :error)
+  # Parse a group's pick. MD must be a non-negative number; Subsea is a signed datum.
+  defp parse_pick(field, raw) do
+    case parse_number(raw) do
+      {:ok, n} when is_number(n) and field == "md" and n < 0 -> :error
+      other -> other
+    end
+  end
 
-  defp parse_md(s) when is_binary(s) do
+  defp parse_number(nil), do: {:ok, nil}
+  defp parse_number(n) when is_number(n), do: {:ok, n / 1}
+
+  defp parse_number(s) when is_binary(s) do
     case String.trim(s) do
       "" ->
         {:ok, nil}
 
       t ->
         case Float.parse(t) do
-          {f, ""} when f >= 0 -> {:ok, f}
+          {f, ""} -> {:ok, f}
           _ -> :error
         end
     end
   end
 
-  defp parse_md(_), do: :error
+  defp parse_number(_), do: :error
 
   defp trim(nil), do: nil
   defp trim(s) when is_binary(s), do: ((t = String.trim(s)) != "" && t) || nil
@@ -211,34 +251,46 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   defp group_note(g), do: Map.get(@group_notes, g, "")
   defp editable_group?(g), do: g in @editable_groups
 
+  # The columns a group's pick is entered and stored in; every other cell is derived.
+  # Prognosis carries an MD and a Subsea (the datum-stable pick TVD is `KB − Subsea`
+  # from); Samples / MWD carry only the MD read at the wellsite.
+  defp editable_fields("prognosis"), do: ~w(md subsea)
+  defp editable_fields(_group), do: ~w(md)
+
   defp provisional_row?(row), do: FormationTops.provisional?(row)
 
   defp cell_editable?(_group, editing) when is_nil(editing), do: false
   defp cell_editable?(group, editing), do: group == editing
 
+  # Is `field` one of `group`'s editable cells while it's being edited?
+  defp cell_editable?(group, field, editing),
+    do: cell_editable?(group, editing) and field in editable_fields(group)
+
+  # Depths show at most two decimals (NumberFormat.up_to_2/1).
   defp fmt(nil), do: "—"
   defp fmt(""), do: "—"
-  defp fmt(n) when is_number(n), do: :erlang.float_to_binary(n / 1, decimals: 1)
+  defp fmt(n) when is_number(n), do: NumberFormat.up_to_2(n)
 
   defp fmt(s) when is_binary(s) do
     case Float.parse(s) do
-      {f, ""} -> :erlang.float_to_binary(f, decimals: 1)
+      {f, ""} -> NumberFormat.up_to_2(f)
       _ -> s
     end
   end
 
-  defp md_value(row, group) do
-    case get_in(row, [group, "md"]) do
+  # Current value of an editable cell, as an input-ready string.
+  defp pick_value(row, group, field) do
+    case get_in(row, [group, field]) do
       nil -> ""
       "" -> ""
-      n when is_number(n) -> :erlang.float_to_binary(n / 1, decimals: 1)
+      n when is_number(n) -> NumberFormat.up_to_2(n)
       s -> s
     end
   end
 
   defp diff_display(row) do
     case row["difference_m"] do
-      d when is_number(d) -> "#{if d > 0, do: "+"}#{:erlang.float_to_binary(d / 1, decimals: 1)}"
+      d when is_number(d) -> "#{if d > 0, do: "+"}#{NumberFormat.up_to_2(d)}"
       _ -> "—"
     end
   end
@@ -258,72 +310,78 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col rounded-xl card-shadow">
-      <div class="relative flex flex-col overflow-hidden rounded-xl">
-        <div class="absolute left-0 top-0 h-full w-1 bg-primary"></div>
+    <div class="flex flex-col">
+      <%!-- The form wraps the clipped card so the Save bar can sit outside its
+           overflow and stick to the bottom of the viewport. --%>
+      <.form
+        :let={_f}
+        for={%{}}
+        as={:tops}
+        id={"tops-form-#{@id}"}
+        phx-change="validate"
+        phx-submit="save"
+        phx-target={@myself}
+      >
+        <div class="relative flex flex-col overflow-hidden rounded-xl card-shadow">
+          <div class="absolute left-0 top-0 h-full w-1 bg-primary"></div>
 
-        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-t-xl bg-linear-to-r from-primary to-secondary px-5 py-3">
-          <h3 class="m-0 text-lg font-semibold text-on-primary">Formation Tops</h3>
-          <div class="flex flex-wrap items-center gap-3 text-on-primary/90">
-            <span :if={@survey_reach} class="text-[11px]">
-              Last survey <span class="font-semibold">{fmt(@survey_reach)} m</span>
-              MD
-              <span
-                :if={Enum.count(@rows, &provisional_row?/1) > 0}
-                class="ml-1.5 rounded-full bg-amber-400/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-100"
-              >
-                {Enum.count(@rows, &provisional_row?/1)} extrapolated
+          <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-t-xl bg-linear-to-r from-primary to-secondary px-5 py-3">
+            <h3 class="m-0 text-lg font-semibold text-on-primary">Formation Tops</h3>
+            <div class="flex flex-wrap items-center gap-3 text-on-primary/90">
+              <span :if={@survey_reach} class="text-[11px]">
+                Last survey
+                <span class="font-semibold">
+                  {@survey_reach && NumberFormat.survey(@survey_reach)} m
+                </span>
+                MD
+                <span
+                  :if={Enum.count(@rows, &provisional_row?/1) > 0}
+                  class="ml-1.5 rounded-full bg-amber-400/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-100"
+                >
+                  {Enum.count(@rows, &provisional_row?/1)} extrapolated
+                </span>
               </span>
-            </span>
-            <button
-              type="button"
-              phx-click={JS.toggle(to: "#tops-info-#{@id}")}
-              class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-on-primary/90 cursor-pointer transition-opacity hover:opacity-100"
-            >
-              <.icon name="hero-information-circle" class="h-4 w-4" />Editing
-            </button>
+              <button
+                type="button"
+                phx-click={JS.toggle(to: "#tops-info-#{@id}")}
+                class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-on-primary/90 cursor-pointer transition-opacity hover:opacity-100"
+              >
+                <.icon name="hero-information-circle" class="h-4 w-4" />Editing
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div
-          id={"tops-info-#{@id}"}
-          class="hidden border-b border-border-light bg-bg px-5 py-3.5 text-[12px] leading-relaxed text-text-secondary"
-          phx-click-away={JS.hide()}
-        >
-          <p class="m-0 mb-1.5">
-            <span class="font-semibold text-text">Prognosis</span>
-            comes from the operator and is filled in during the draft phase — locked here; its Subsea
-            only shifts when the KB elevation changes.
-          </p>
-          <p class="m-0 mb-1.5">
-            <span class="font-semibold text-text">Samples</span>
-            and <span class="font-semibold text-text">MWD / Gamma</span>
-            are edited one group at a time — click the pencil and enter the MD you picked (≥ 0).
-          </p>
-          <p class="m-0 mb-1.5">
-            <span class="font-semibold text-text">TVD</span>
-            comes from the directional survey — interpolated where the survey has reached,
-            extrapolated beyond it; extrapolated rows are highlighted and finalise once the survey
-            passes that depth. <span class="font-semibold text-text">Subsea</span>
-            = KB elevation − TVD; <span class="font-semibold text-text">Isopach</span>
-            and <span class="font-semibold text-text">Diff</span>
-            follow. None are editable.
-          </p>
-          <p class="m-0">
-            <span class="font-semibold text-text">KB elevation</span>
-            ({fmt(@kb)} m) is edited in Well Data · Elevations.
-          </p>
-        </div>
+          <div
+            id={"tops-info-#{@id}"}
+            class="hidden border-b border-border-light bg-bg px-5 py-3.5 text-[12px] leading-relaxed text-text-secondary"
+            phx-click-away={JS.hide()}
+          >
+            <p class="m-0 mb-1.5">
+              Each group is edited one at a time — click its pencil.
+              <span class="font-semibold text-text">Prognosis</span>
+              takes an <span class="font-semibold text-text">MD</span>
+              and a <span class="font-semibold text-text">Subsea</span>
+              (TVDSS, negative below sea level); its TVD is KB elevation − Subsea.
+            </p>
+            <p class="m-0 mb-1.5">
+              <span class="font-semibold text-text">Samples</span>
+              and <span class="font-semibold text-text">MWD / Gamma</span>
+              take the <span class="font-semibold text-text">MD</span>
+              you picked (≥ 0); their TVD comes from the directional survey — interpolated where the
+              survey has reached, extrapolated beyond it (those rows are highlighted and finalise once
+              the survey passes that depth) — and Subsea = KB elevation − TVD.
+            </p>
+            <p class="m-0 mb-1.5">
+              <span class="font-semibold text-text">Isopach</span>
+              and <span class="font-semibold text-text">Diff</span>
+              are always derived.
+            </p>
+            <p class="m-0">
+              <span class="font-semibold text-text">KB elevation</span>
+              ({fmt(@kb)} m) is edited in Well Data · Elevations.
+            </p>
+          </div>
 
-        <.form
-          :let={_f}
-          for={%{}}
-          as={:tops}
-          id={"tops-form-#{@id}"}
-          phx-change="validate"
-          phx-submit="save"
-          phx-target={@myself}
-        >
           <div class="overflow-x-auto px-5 py-4">
             <table class="w-full border-collapse text-sm">
               <thead>
@@ -419,15 +477,15 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                         "px-2 py-1.5 text-right tabular-nums text-text-secondary",
                         f == "md" && "border-l border-border-light"
                       ]}>
-                        <%= if f == "md" and cell_editable?(g, @editing) do %>
+                        <%= if cell_editable?(g, f, @editing) do %>
                           <input
                             type="number"
                             step="any"
-                            min="0"
+                            min={f == "md" && "0"}
                             inputmode="decimal"
                             phx-debounce="blur"
-                            name={"tops[rows][#{i}][#{g}][md]"}
-                            value={md_value(row, g)}
+                            name={"tops[rows][#{i}][#{g}][#{f}]"}
+                            value={pick_value(row, g, f)}
                             placeholder="—"
                             class={[
                               "w-20 rounded border bg-white px-2 py-1 text-right tabular-nums focus:outline-none",
@@ -484,37 +542,32 @@ defmodule ChinookReportsWeb.FormationTopsLive do
               </tbody>
             </table>
           </div>
+        </div>
 
-          <div
-            :if={@editing}
-            class="flex flex-wrap items-center gap-3 border-t border-border-light px-5 py-3"
+        <.edit_actions
+          :if={@editing}
+          target={@myself}
+          disabled={@errors != []}
+          label={"Save #{group_label(@editing)}"}
+        >
+          <span class="rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-on-primary">
+            {group_label(@editing)}
+          </span>
+          <span class="text-xs text-text-secondary">{group_note(@editing)}</span>
+          <button
+            type="button"
+            phx-click="add_row"
+            phx-target={@myself}
+            class="rounded border border-border px-3 py-1.5 text-xs font-medium text-copy-secondary hover:border-primary hover:text-primary"
           >
-            <span class="rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-on-primary">
-              {group_label(@editing)}
-            </span>
-            <span class="text-xs text-text-secondary">{group_note(@editing)}</span>
-            <button
-              type="button"
-              phx-click="add_row"
-              phx-target={@myself}
-              class="rounded border border-border px-3 py-1.5 text-xs font-medium text-copy-secondary hover:border-primary hover:text-primary"
-            >
-              + Add formation
-            </button>
-            <span :if={@errors != []} class="text-xs font-semibold text-danger">
-              {length(@errors)} MD {if length(@errors) == 1, do: "value needs", else: "values need"} a fix (must be a number ≥ 0)
-            </span>
-            <div class="ml-auto flex gap-2">
-              <button type="submit" disabled={@errors != []} class="btn-primary disabled:opacity-50">
-                Save {group_label(@editing)}
-              </button>
-              <button type="button" phx-click="cancel" phx-target={@myself} class="btn-secondary">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </.form>
-      </div>
+            + Add formation
+          </button>
+          <span :if={@errors != []} class="text-xs font-semibold text-danger">
+            {length(@errors)} {if length(@errors) == 1, do: "row needs", else: "rows need"} a fix
+            — every value must be a number, and MD ≥ 0
+          </span>
+        </.edit_actions>
+      </.form>
 
       <div
         :if={@pending_delete != nil}

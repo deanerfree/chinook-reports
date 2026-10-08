@@ -4,7 +4,6 @@ defmodule ChinookReportsWeb.ReportPageLive do
   alias ChinookReports.ReportSummary
   alias ChinookReports.Reports
   alias ChinookReports.Reports.Editing
-  alias ChinookReports.Reports.Report
   alias ChinookReports.ReservoirQuality
   import ChinookReportsWeb.ReportSummaryComponents
 
@@ -107,14 +106,8 @@ defmodule ChinookReportsWeb.ReportPageLive do
   end
 
   def handle_event("save_section", %{"report" => params}, socket) do
-    editing = socket.assigns.editing
-
     case Reports.update_report(base_report(socket.assigns.report), params) do
       {:ok, report} ->
-        # A KB change in the Elevations section ripples into every Subsea in the
-        # Formation Tops table, so re-derive those and persist alongside.
-        report = if editing == "elevations", do: recompute_tops(report), else: report
-
         {:noreply,
          socket
          |> assign(
@@ -174,8 +167,18 @@ defmodule ChinookReportsWeb.ReportPageLive do
      |> put_flash(:info, "Formation Tops saved.")}
   end
 
+  # The import_data editors (WellDataCardLive, ImportTableLive, SynopsisLive)
+  # persist their own slice — plus any Formation Tops it re-derives — and hand
+  # back the updated report.
+  def handle_info({:import_updated, report, title, _section}, socket) do
+    {:noreply,
+     socket
+     |> assign(report: report, summary: ReportSummary.build(report))
+     |> put_flash(:info, "#{title} saved.")}
+  end
+
   defp mutate_rows(socket, op, list) do
-    changeset = edit_changeset(socket.assigns.report, current_params(socket))
+    changeset = current_changeset(socket)
     list_atom = String.to_existing_atom(list)
 
     case op do
@@ -184,10 +187,13 @@ defmodule ChinookReportsWeb.ReportPageLive do
     end
   end
 
-  defp current_params(socket) do
+  # Build on the open form's changeset, not its params: rows added since the
+  # last phx-change exist only in the changeset, so rebuilding from params would
+  # drop them (two "Add row" clicks in a row left you with one row).
+  defp current_changeset(socket) do
     case socket.assigns.form do
-      %Phoenix.HTML.Form{params: params} when is_map(params) -> params
-      _ -> %{}
+      %Phoenix.HTML.Form{source: %Ecto.Changeset{} = changeset} -> changeset
+      _ -> edit_changeset(socket.assigns.report)
     end
   end
 
@@ -205,26 +211,7 @@ defmodule ChinookReportsWeb.ReportPageLive do
   defp tab_path(report, "summary"), do: "/reports/#{report.id}"
   defp tab_path(report, tab), do: "/reports/#{report.id}?tab=#{tab}"
 
-  # Re-derive import_data["tops"] from the report's survey + KB and persist it.
-  # No-op when the report carries no tops.
-  defp recompute_tops(report) do
-    case ChinookReports.FormationTops.recompute_for_report(report) do
-      nil ->
-        report
-
-      tops ->
-        case Reports.update_import_section(report, "tops", tops) do
-          {:ok, updated} -> updated
-          {:error, _} -> report
-        end
-    end
-  end
-
-  # Reports created through the wizard always carry a `report_data` embed; guard
-  # against a legacy row where the JSONB column is null so the nested form and
-  # its changeset still have something to bind to.
-  defp base_report(report),
-    do: %{report | report_data: report.report_data || %Report.ReportData{}}
+  defp base_report(report), do: Reports.ensure_report_data(report)
 
   defp edit_changeset(report, params \\ %{}) do
     Reports.change_report(base_report(report), params)

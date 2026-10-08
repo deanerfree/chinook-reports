@@ -28,20 +28,76 @@ defmodule ChinookReports.Trajectory do
   """
   @spec integrate([station()]) :: [point()]
   def integrate(stations) when is_list(stations) do
-    parsed =
-      stations
-      |> Enum.map(&normalize_station/1)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.sort_by(& &1.md)
-      |> Enum.dedup_by(& &1.md)
-
-    case parsed do
-      [_, _ | _] -> build(parsed)
+    case parse(stations) do
+      [_, _ | _] = parsed -> build(parsed)
       _ -> []
     end
   end
 
   def integrate(_), do: []
+
+  @doc """
+  Position (`md`, `tvd`, `north`, `east`) of the trajectory described by
+  `stations` at measured depth `md`.
+
+  Between stations the integrated positions are interpolated linearly; past the
+  final station the hole is projected straight ahead on the last station's
+  inclination and azimuth (the usual "projection to bit"). Returns `nil` when
+  there are fewer than two usable stations or `md` is above the first one.
+  """
+  @spec position_at([station()], number()) ::
+          %{md: float(), tvd: float(), north: float(), east: float()} | nil
+  def position_at(stations, md) when is_list(stations) and is_number(md) do
+    with [_, _ | _] = parsed <- parse(stations),
+         curve = build(parsed),
+         true <- md >= hd(curve).md do
+      locate(curve, List.last(parsed), md)
+    else
+      _ -> nil
+    end
+  end
+
+  def position_at(_, _), do: nil
+
+  defp locate(curve, last_station, md) do
+    last = List.last(curve)
+
+    if md >= last.md do
+      project(last, last_station, md - last.md)
+    else
+      curve
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.find(fn [a, b] -> md >= a.md and md <= b.md end)
+      |> interpolate(md)
+    end
+  end
+
+  defp parse(stations) do
+    stations
+    |> Enum.map(&normalize_station/1)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.sort_by(& &1.md)
+    |> Enum.dedup_by(& &1.md)
+  end
+
+  defp project(p, station, d_md) do
+    inc = deg2rad(station.inc_deg)
+    azi = deg2rad(station.azi_deg)
+
+    %{
+      md: p.md + d_md,
+      tvd: p.tvd + d_md * :math.cos(inc),
+      north: p.north + d_md * :math.sin(inc) * :math.cos(azi),
+      east: p.east + d_md * :math.sin(inc) * :math.sin(azi)
+    }
+  end
+
+  defp interpolate([a, b], md) do
+    f = if b.md == a.md, do: 0.0, else: (md - a.md) / (b.md - a.md)
+    lerp = fn k -> Map.fetch!(a, k) + f * (Map.fetch!(b, k) - Map.fetch!(a, k)) end
+
+    %{md: md * 1.0, tvd: lerp.(:tvd), north: lerp.(:north), east: lerp.(:east)}
+  end
 
   defp build(stations) do
     positions =
@@ -67,8 +123,24 @@ defmodule ChinookReports.Trajectory do
     end)
   end
 
+  @doc """
+  Minimum-curvature step between two stations (`%{md, inc_deg, azi_deg}`):
+  the change in TVD / north / east over the interval and its dogleg in degrees.
+  """
+  @spec interval(station(), station()) ::
+          %{tvd: float(), north: float(), east: float(), dogleg_deg: float()}
+  def interval(a, b) do
+    {d_tvd, d_n, d_e, beta} = step(a, b)
+    %{tvd: d_tvd, north: d_n, east: d_e, dogleg_deg: beta * 180.0 / :math.pi()}
+  end
+
   # Minimum-curvature contribution of the interval between stations `a` and `b`.
   defp segment(a, b) do
+    {d_tvd, d_n, d_e, _beta} = step(a, b)
+    {d_tvd, d_n, d_e}
+  end
+
+  defp step(a, b) do
     i1 = deg2rad(a.inc_deg)
     i2 = deg2rad(b.inc_deg)
     a1 = deg2rad(a.azi_deg)
@@ -86,7 +158,7 @@ defmodule ChinookReports.Trajectory do
     d_n = half * (:math.sin(i1) * :math.cos(a1) + :math.sin(i2) * :math.cos(a2))
     d_e = half * (:math.sin(i1) * :math.sin(a1) + :math.sin(i2) * :math.sin(a2))
 
-    {d_tvd, d_n, d_e}
+    {d_tvd, d_n, d_e, beta}
   end
 
   defp normalize_station(%{} = s) do

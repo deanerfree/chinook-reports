@@ -2,7 +2,12 @@ defmodule ChinookReports.Reports.Report do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @geometries ["Vertical", "Directional", "Horizontal"]
+  alias ChinookReports.Countries
+  alias ChinookReports.Reports.UWI
+
+  # "Deviated" is a vertical well drilled to a directional plan: it keeps the
+  # vertical summary layout but adds the actual-vs-plan comparison.
+  @geometries ["Vertical", "Deviated", "Directional", "Horizontal"]
   @statuses ~w(draft active complete)
 
   @derive {
@@ -35,8 +40,11 @@ defmodule ChinookReports.Reports.Report do
     field :well_name, :string
     field :unique_well_id, :string
     field :operator, :string
-    field :spud_date, :date
-    field :final_td_date, :date
+    # Wellsite local wall-clock time, stored as entered -- no timezone
+    # conversion. See the ConvertDatesToDatetimes migration for why these
+    # were widened from :date to :naive_datetime.
+    field :spud_date, :naive_datetime
+    field :final_td_date, :naive_datetime
     field :target_formation, :string
     field :secondary_target, :string
     field :country, :string
@@ -79,7 +87,7 @@ defmodule ChinookReports.Reports.Report do
         field :section, :string
         field :start_depth, :decimal
         field :end_depth, :decimal
-        field :start_date, :date
+        field :start_date, :naive_datetime
       end
 
       embeds_many :formation_tops, FormationTop, on_replace: :delete do
@@ -115,11 +123,16 @@ defmodule ChinookReports.Reports.Report do
   Validations:
   - Required: well_name, unique_well_id
   - unique_well_id must be unique in the database
+  - country must be one of `ChinookReports.Countries.all/0`
+  - unique_well_id must match the country's UWI format, where one is defined
+    (`ChinookReports.Reports.UWI`)
   - geometry must be one of the predefined geometries
   - status must be one of the predefined statuses
   - report_data.units must be "metric" or "imperial"
   """
   def changeset(report, attrs) do
+    attrs = merge_split_datetime_fields(attrs)
+
     report
     |> reset_errors()
     |> cast(attrs, [
@@ -144,11 +157,90 @@ defmodule ChinookReports.Reports.Report do
     ])
     |> cast_report_data(attrs)
     |> validate_required(@required_fields)
+    |> validate_inclusion(:country, Countries.all())
+    |> validate_uwi()
     |> validate_inclusion(:geometry, @geometries)
     |> validate_inclusion(:status, @statuses)
     |> validate_inclusion(:units, ~w(metric imperial))
     |> unique_constraint(:unique_well_id)
   end
+
+  # The UWI format depends on the country, so re-check it when either one
+  # changes (switching an existing report to Canada must flag a non-Canadian
+  # UWI). Untouched records with a legacy UWI aren't blocked from other edits.
+  defp validate_uwi(changeset) do
+    uwi = get_field(changeset, :unique_well_id)
+    country = get_field(changeset, :country)
+
+    cond do
+      not (changed?(changeset, :unique_well_id) or changed?(changeset, :country)) ->
+        changeset
+
+      is_nil(uwi) ->
+        changeset
+
+      UWI.valid?(uwi, country) ->
+        changeset
+
+      true ->
+        add_error(
+          changeset,
+          :unique_well_id,
+          "must be a #{country} UWI, e.g. #{UWI.example(country)}"
+        )
+    end
+  end
+
+  # spud_date, final_td_date, and profile_sections[].start_date are entered
+  # as a separate date input and time input (see
+  # ChinookReportsWeb.ReportFormComponents.datetime_field/1) rather than one
+  # combined `datetime-local` control, so the raw web params carry them as
+  # "<field>_date"/"<field>_time" pairs instead of the real field name.
+  # Recombine each pair into one ISO datetime string before casting, walking
+  # the whole (possibly nested, e.g. report_data.profile_sections) attrs tree
+  # so every occurrence is covered in one pass.
+  #
+  # A blank time defaults to midnight, matching the pre-existing date-only
+  # behaviour; a blank date with a time is dropped (there's no date to hang
+  # it on). Attrs coming from internal callers (e.g. HandleData, already
+  # atom-keyed with real NaiveDateTime values) never match these string keys,
+  # so this is a no-op for them.
+  @split_datetime_fields ~w(spud_date final_td_date start_date)
+
+  defp merge_split_datetime_fields(map) when is_map(map) and not is_struct(map) do
+    map
+    |> Map.new(fn {k, v} -> {k, merge_split_datetime_fields(v)} end)
+    |> combine_datetime_parts()
+  end
+
+  defp merge_split_datetime_fields(list) when is_list(list) do
+    Enum.map(list, &merge_split_datetime_fields/1)
+  end
+
+  defp merge_split_datetime_fields(value), do: value
+
+  defp combine_datetime_parts(map) do
+    Enum.reduce(@split_datetime_fields, map, fn field, acc ->
+      date_key = field <> "_date"
+      time_key = field <> "_time"
+
+      if Map.has_key?(acc, date_key) or Map.has_key?(acc, time_key) do
+        date = Map.get(acc, date_key, "")
+        time = Map.get(acc, time_key, "")
+
+        acc
+        |> Map.delete(date_key)
+        |> Map.delete(time_key)
+        |> Map.put(field, combine_datetime(date, time))
+      else
+        acc
+      end
+    end)
+  end
+
+  defp combine_datetime("", _time), do: ""
+  defp combine_datetime(date, ""), do: date <> "T00:00"
+  defp combine_datetime(date, time), do: date <> "T" <> time
 
   defp profile_section_changeset(section, attrs) do
     section

@@ -38,18 +38,30 @@
   >
     <.field
       field={@new_report_form[:well_name]}
-      label="Well Name *"
+      label="Well Name"
+      required
       placeholder="e.g. GEAR SODA LAKE 103 HZ"
+    />
+    <.select_field
+      field={@new_report_form[:country]}
+      label="Country"
+      options={ChinookReports.Countries.all()}
     />
     <.field
       field={@new_report_form[:unique_well_id]}
-      label="UWI *"
-      placeholder="e.g. XXX/XX-XX-XXX-XXWX/XX"
+      label="UWI"
+      required
+      placeholder={
+        if ex = ChinookReports.Reports.UWI.example(@new_report_form[:country].value),
+          do: "e.g. #{ex}",
+          else: "Enter the well's UWI"
+      }
+      pattern={ChinookReports.Reports.UWI.html_pattern(@new_report_form[:country].value)}
     />
     <.field
       field={@new_report_form[:operator]}
       label="Operator"
-      placeholder="e.g. Chinook Petroleum Ltd."
+      placeholder="Enter the name of the client"
     />
 
     <div class="flex justify-end gap-3 pt-4 border-t border-border-light">

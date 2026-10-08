@@ -71,9 +71,11 @@ defmodule ChinookReportsWeb.ReportsLive do
             <:col :let={report} label="Well Name" field={:well_name}>{report.well_name}</:col>
             <:col :let={report} label="Unique Well ID">{report.unique_well_id}</:col>
             <:col :let={report} label="Operator" field={:operator}>{report.operator}</:col>
-            <:col :let={report} label="Spud Date" field={:spud_date}>{report.spud_date}</:col>
+            <:col :let={report} label="Spud Date" field={:spud_date}>
+              {fmt_date(report.spud_date)}
+            </:col>
             <:col :let={report} label="Final TD Date" field={:final_td_date}>
-              {report.final_td_date}
+              {fmt_date(report.final_td_date)}
             </:col>
             <:col :let={report} label="Target Formation">{report.target_formation}</:col>
             <:col :let={report} label="Country">{report.country}</:col>
@@ -95,7 +97,7 @@ defmodule ChinookReportsWeb.ReportsLive do
                   </a>
                 <% "draft" -> %>
                   <div class="flex items-center gap-2">
-                    <a href={~p"/reports/#{report.id}/edit"} title="Edit report">
+                    <a href={~p"/reports/#{report.id}/draft"} title="Edit report">
                       <.pencil_square_icon class="w-5 h-5 text-blue-500 hover:text-blue-700" />
                     </a>
                     <button
@@ -115,6 +117,19 @@ defmodule ChinookReportsWeb.ReportsLive do
           <Flop.Phoenix.pagination meta={@meta} path={~p"/reports"} />
         </div>
         """
+    end
+  end
+
+  # spud_date/final_td_date are wellsite local wall-clock time
+  # (:naive_datetime, no timezone conversion). Only show a time in this list
+  # view when one was actually entered; everything before the time field
+  # existed (and any date-only entry) lands on exact midnight.
+  defp fmt_date(nil), do: nil
+
+  defp fmt_date(%NaiveDateTime{} = ndt) do
+    case NaiveDateTime.to_time(ndt) do
+      ~T[00:00:00] -> Calendar.strftime(ndt, "%Y-%m-%d")
+      _ -> Calendar.strftime(ndt, "%Y-%m-%d %H:%M")
     end
   end
 end

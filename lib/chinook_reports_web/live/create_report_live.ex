@@ -4,6 +4,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
   import ChinookReportsWeb.ReportFormComponents
   import ChinookReportsWeb.Stepper
 
+  alias ChinookReports.Countries
   alias ChinookReports.Reports
   alias ChinookReports.Reports.Editing
   alias ChinookReports.Reports.Report
@@ -23,15 +24,16 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{id: 3, label: "Configuration", optional: false},
     %{id: 4, label: "Well Profile", optional: false},
     %{id: 5, label: "Formation Tops", optional: true},
-    %{id: 6, label: "Directional Program", optional: true}
+    %{id: 6, label: "Directional Program", optional: true},
+    %{id: 7, label: "Review", optional: false}
   ]
 
   @identity_fields [
     %{field: :well_name, label: "Well Name", placeholder: "GEAR SODA LAKE 103 HZ…", wide: true},
-    %{field: :spud_date, label: "Spud Date", placeholder: "YYYY-MM-DD"},
+    %{field: :spud_date, label: "Spud Date", type: :datetime},
     %{field: :unique_well_id, label: "Unique Well I.D.", placeholder: "XXX/XX-XX-XXX-XXWX/XX"},
     %{field: :operator, label: "Operator", placeholder: "Operator name"},
-    %{field: :country, label: "Country", placeholder: "Canada"},
+    %{field: :country, label: "Country", input: :select, options: &Countries.all/0},
     %{field: :province, label: "Province", placeholder: "Alberta"},
     %{field: :geometry, label: "Well Geometry", input: :select, options: &Report.geometries/0},
     %{
@@ -45,8 +47,8 @@ defmodule ChinookReportsWeb.CreateReportLive do
 
   @elevation_fields [
     %{field: :gl_elevation, label: "Ground Level", unit: :depth},
-    %{field: :kb_elevation, label: "Kelly Bushing", unit: :depth},
-    %{field: :kb_to_ground, label: "KB to Ground", unit: :depth}
+    %{field: :kb_elevation, label: "Kelly Bushing", unit: :depth}
+    # %{field: :kb_to_ground, label: "KB to Ground", unit: :depth}
   ]
 
   # latitude/longitude are top-level Report columns; the rest of the
@@ -79,14 +81,13 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{key: :section, label: "Section", placeholder: "Lateral"},
     %{key: :start_depth, label: "Start", unit: :depth},
     %{key: :end_depth, label: "End", unit: :depth},
-    %{key: :start_date, label: "Start Date", placeholder: "YYYY-MM-DD"}
+    %{key: :start_date, label: "Start Date", type: :datetime}
   ]
 
   @formation_top_columns [
     %{key: :formation, label: "Formation", placeholder: "McLaren"},
     %{key: :md, label: "MD", unit: :depth},
     %{key: :tvd, label: "TVD", unit: :depth},
-    %{key: :isopach, label: "Isopach", unit: :depth},
     %{key: :subsea, label: "Subsea", unit: :depth}
   ]
 
@@ -96,10 +97,17 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{key: :azimuth, label: "Azimuth", unit: "°"}
   ]
 
-  # Fields that must be valid before leaving a given step.
-  @step_guards %{
-    1 => [:well_name, :unique_well_id]
+  # Mandatory fields per step: `{top_level_columns, report_data_columns}`.
+  # Every one of these must have a value before Next will leave the step,
+  # and a step with all of them filled is drawn "complete" in the stepper.
+  # Steps not listed here (the table steps) have no mandatory fields.
+  @mandatory %{
+    1 => {[:well_name, :unique_well_id], []},
+    2 => {[:latitude, :longitude], []},
+    3 => {[], [:classification]}
   }
+
+  @list_steps %{4 => :profile_sections, 5 => :formation_tops, 6 => :surveys}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -121,7 +129,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
 
   @impl true
   def handle_params(%{"id" => id}, _uri, socket) do
-    report = Reports.get_report!(id)
+    report = id |> Reports.get_report!() |> Reports.ensure_report_data()
     changeset = Reports.change_report(report)
     {:noreply, socket |> assign(:editing_report, report) |> assign_form(changeset)}
   end
@@ -141,10 +149,15 @@ defmodule ChinookReportsWeb.CreateReportLive do
         </:subtitle>
       </.heading>
 
-      <.stepper steps={@steps} current_step={@current_step} />
+      <.stepper
+        steps={@steps}
+        current_step={@current_step}
+        unlocked={unlocked_step_ids(@steps, @form.source)}
+        completed={completed_step_ids(@steps, @form.source)}
+      />
 
       <div class="border rounded-lg p-4 bg-white shadow">
-        <.form for={@form} phx-change="validate" phx-submit="update">
+        <.form for={@form} phx-change="validate" phx-submit="create_report">
           <div class="min-h-48">
             {step_content(assigns)}
           </div>
@@ -174,6 +187,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
                 type="button"
                 phx-click="next"
                 class="btn-primary"
+                disabled={not can_advance?(@current_step, @form.source)}
               >
                 Next →
               </button>
@@ -182,8 +196,9 @@ defmodule ChinookReportsWeb.CreateReportLive do
                 :if={last_step?(@steps, @current_step)}
                 type="submit"
                 class="btn-primary"
+                disabled={not can_advance?(@current_step, @form.source)}
               >
-                {if @editing_report, do: "Save report", else: "Create report"}
+                {if @editing_report, do: "Approve & save", else: "Approve & activate"}
               </button>
             </div>
           </div>
@@ -301,7 +316,60 @@ defmodule ChinookReportsWeb.CreateReportLive do
           <p class="mt-3 text-xs text-copy-secondary">
             TVD, N/S, E/W and dogleg are computed from MD / Inc / Azi (minimum curvature) — no need to enter them.
           </p>
+          <p
+            :if={Ecto.Changeset.get_field(@form.source, :geometry) == "Deviated"}
+            class="mt-2 text-xs text-copy-secondary"
+          >
+            Deviated well: the report Summary measures the actual surveys against this path.
+            You can skip it for now and add or revise it from the report's Surveys tab while the well is active.
+          </p>
         </.section_card>
+      <% 7 -> %>
+        <%!-- Review --%>
+        <div class="space-y-4">
+          <.section_card title="Identity" subtitle="Confirm the details below before submitting">
+            <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div :for={spec <- @identity_fields ++ @coordinate_fields}>
+                <dt class="text-xs font-semibold uppercase tracking-wide text-copy-secondary">
+                  {spec.label}
+                </dt>
+                <dd class="text-sm text-copy">{review_value(@form, spec.field)}</dd>
+              </div>
+            </dl>
+          </.section_card>
+
+          <.inputs_for :let={data} field={@form[:report_data]}>
+            <.section_card title="Elevations, Location & Configuration">
+              <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div :for={spec <- @elevation_fields ++ @location_fields ++ @configuration_fields}>
+                  <dt class="text-xs font-semibold uppercase tracking-wide text-copy-secondary">
+                    {spec.label}
+                  </dt>
+                  <dd class="text-sm text-copy">{review_value(data, spec.field)}</dd>
+                </div>
+              </dl>
+            </.section_card>
+
+            <.section_card title="Tables">
+              <ul class="space-y-1 text-sm text-copy">
+                <li>
+                  Well Profile sections:
+                  <strong>{length(data[:profile_sections].value || [])}</strong>
+                </li>
+                <li>
+                  Formation tops entered: <strong>{length(data[:formation_tops].value || [])}</strong>
+                </li>
+                <li>
+                  Survey points entered: <strong>{length(data[:surveys].value || [])}</strong>
+                </li>
+              </ul>
+            </.section_card>
+          </.inputs_for>
+
+          <p class="text-xs text-copy-secondary">
+            Submitting from here marks this report <strong>Active</strong>.
+          </p>
+        </div>
       <% _other -> %>
         <p class="text-sm text-copy-secondary">
           Step content for <strong>{step_label(@steps, @current_step)}</strong> coming next.
@@ -323,17 +391,20 @@ defmodule ChinookReportsWeb.CreateReportLive do
   end
 
   def handle_event("next", _params, socket) do
-    required = Map.get(@step_guards, socket.assigns.current_step, [])
+    current_step = socket.assigns.current_step
 
     changeset =
       socket.assigns.form.source
       |> Reports.change_report(socket.assigns.form.params || %{})
       |> Map.put(:action, :validate)
 
-    if Enum.any?(required, &Keyword.has_key?(changeset.errors, &1)) do
-      {:noreply, assign_form(socket, changeset)}
-    else
+    if optional_step?(@steps, current_step) or mandatory_met?(changeset, current_step) do
       {:noreply, assign(socket, :current_step, next_step(socket.assigns))}
+    else
+      {:noreply,
+       socket
+       |> assign_form(changeset)
+       |> put_flash(:error, "Fill in the required fields before continuing.")}
     end
   end
 
@@ -348,11 +419,12 @@ defmodule ChinookReportsWeb.CreateReportLive do
   end
 
   def handle_event("navigate_to_step", %{"step" => step}, socket) do
-    {:noreply, assign(socket, :current_step, step)}
+    {:noreply, assign(socket, :current_step, String.to_integer(step))}
   end
 
-  def handle_event("update", %{"report" => params}, socket) do
+  def handle_event("create_report", %{"report" => params}, socket) do
     changeset = Map.put(socket.assigns.form.source, :action, nil)
+    params = Map.put(params, "status", "active")
 
     result =
       case socket.assigns.editing_report do
@@ -426,6 +498,85 @@ defmodule ChinookReportsWeb.CreateReportLive do
   defp optional_step?(steps, current), do: Enum.find(steps, &(&1.id == current)).optional
 
   defp step_label(steps, current), do: Enum.find(steps, &(&1.id == current)).label
+
+  # Whether Next/Save may leave the current step: an optional step always
+  # can, otherwise its mandatory fields must all be filled.
+  defp can_advance?(step, changeset) do
+    optional_step?(@steps, step) or mandatory_met?(changeset, step)
+  end
+
+  # Steps you can click straight to: everything up to and including the first
+  # step that still has a mandatory field missing. Steps with no mandatory
+  # fields (the table steps) never block the chain, so a draft with the key
+  # fields filled ends up entirely navigable.
+  defp unlocked_step_ids(steps, changeset) do
+    steps
+    |> Enum.reduce({[], true}, fn step, {ids, prefix_ok?} ->
+      ids = if prefix_ok?, do: [step.id | ids], else: ids
+      {ids, prefix_ok? and mandatory_met?(changeset, step.id)}
+    end)
+    |> elem(0)
+  end
+
+  # Steps drawn "complete" in the stepper — solid circle, solid connector
+  # leaving them.
+  defp completed_step_ids(steps, changeset) do
+    for step <- steps, step_complete?(changeset, step.id), do: step.id
+  end
+
+  # A table step counts as complete once it has one row with real content in
+  # it; every other step, once all its mandatory fields are filled.
+  defp step_complete?(changeset, step) when step in [4, 5, 6] do
+    report_data_list_present?(changeset, Map.fetch!(@list_steps, step))
+  end
+
+  defp step_complete?(changeset, step), do: mandatory_met?(changeset, step)
+
+  # The Next-button gate. Table steps have no mandatory fields, so Next
+  # always lets you leave them (Skip covers the optional ones).
+  defp mandatory_met?(_changeset, step) when step in [4, 5, 6], do: true
+
+  defp mandatory_met?(changeset, step) do
+    {top_fields, data_fields} = Map.get(@mandatory, step, {[], []})
+    data = get_field(changeset, :report_data)
+
+    # Present *and* valid: a filled-in field that fails validation (e.g. a
+    # UWI in the wrong format for the country) still holds the step.
+    Enum.all?(top_fields, &(present?(get_field(changeset, &1)) and not has_error?(changeset, &1))) and
+      Enum.all?(data_fields, &present?(data && Map.get(data, &1)))
+  end
+
+  defp has_error?(changeset, field), do: Keyword.has_key?(changeset.errors, field)
+
+  defp report_data_list_present?(changeset, key) do
+    case get_field(changeset, :report_data) do
+      nil -> false
+      data -> Enum.any?(Map.get(data, key, []), &row_has_content?/1)
+    end
+  end
+
+  defp row_has_content?(row) do
+    row
+    |> Map.from_struct()
+    |> Map.drop([:id])
+    |> Map.values()
+    |> Enum.any?(&present?/1)
+  end
+
+  defp get_field(changeset, field), do: Ecto.Changeset.get_field(changeset, field)
+
+  # Read-only display value for the Review step; blank/nil reads as an em dash
+  # rather than an empty cell.
+  defp review_value(form, field) do
+    case form[field].value do
+      value when value in [nil, ""] -> "—"
+      value -> value
+    end
+  end
+
+  defp present?(nil), do: false
+  defp present?(""), do: false
+  defp present?(_), do: true
 
   defp assign_form(socket, changeset) do
     assign(socket, :form, to_form(changeset, as: :report))

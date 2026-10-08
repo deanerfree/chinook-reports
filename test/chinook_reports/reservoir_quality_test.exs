@@ -88,6 +88,28 @@ defmodule ChinookReports.ReservoirQualityTest do
     end
   end
 
+  describe "lithology_summary/1" do
+    test "sums interval width per lithology in the extractor's order, plus a Total" do
+      intervals = [
+        interval(0.0, 30.0, "Good", lithology: "Sandstone"),
+        interval(30.0, 40.0, "Nil", lithology: "Shale"),
+        interval(40.0, 50.0, "Fair", lithology: "Coal")
+      ]
+
+      summary = ReservoirQuality.lithology_summary(intervals)
+      by_lith = Map.new(summary, &{&1["lithology"], &1})
+
+      assert Enum.take(Enum.map(summary, & &1["lithology"]), 3) ==
+               ~w(Sandstone Siltstone Shale)
+
+      assert by_lith["Sandstone"]["metres"] == 30.0
+      assert by_lith["Sandstone"]["percent"] == 60.0
+      # a lithology the extractor doesn't list is appended, not dropped
+      assert by_lith["Coal"]["metres"] == 10.0
+      assert List.last(summary) == %{"lithology" => "Total", "metres" => 50.0, "percent" => 100.0}
+    end
+  end
+
   describe "recompute_for_report/2" do
     test "replaces the leg's intervals and rebuilds quality_summary" do
       report = %{
@@ -112,6 +134,8 @@ defmodule ChinookReports.ReservoirQualityTest do
 
       total = Enum.find(leg["log_data"]["quality_summary"], &(&1["quality"] == "Total"))
       assert total["metres"] == 40.0
+      # the lithology chart follows the edit too
+      assert List.last(leg["log_data"]["lithology_summary"])["metres"] == 40.0
     end
 
     test "is nil when the report carries no legs" do

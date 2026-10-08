@@ -1,6 +1,6 @@
 <script lang="ts">
   import Chart from './Chart.svelte'
-  import { buildChartOption, CHART_TYPES, type ChartData, type ChartType } from '../js/charts/charts'
+  import { buildChartOption, CHART_TYPES, fmt2, type ChartData, type ChartType } from '../js/charts/charts'
 
   type CurvePoint = { md: number; rop: number; gas: number; gamma: number; interval_flag: number }
   type Interval   = { from_depth: number; to_depth: number; interval: number; quality: string; gas: number; lithology: string }
@@ -58,7 +58,7 @@
 
       case 'intervals-gas':
         return {
-          categories: ld.intervals.map(iv => `${iv.from_depth}–${iv.to_depth}`),
+          categories: ld.intervals.map(iv => `${fmt2(iv.from_depth)}–${fmt2(iv.to_depth)}`),
           series: [
             { name: 'Gas (units)',  data: ld.intervals.map(iv => iv.gas)      },
             { name: 'Length (m)',   data: ld.intervals.map(iv => iv.interval) },
@@ -77,7 +77,7 @@
             : Math.round(((v - min) / (max - min)) * 100)
 
         return {
-          categories: pts.map(p => String(p.md)),
+          categories: pts.map(p => fmt2(p.md)),
           series: [
             { name: 'GR %',  data: pts.map(p => norm(p.gamma, meta.gamma.min, meta.gamma.max)) },
             { name: 'Gas %', data: pts.map(p => norm(p.gas,   meta.gas.min,   meta.gas.max))   },

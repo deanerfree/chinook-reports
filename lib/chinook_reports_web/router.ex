@@ -23,7 +23,7 @@ defmodule ChinookReportsWeb.Router do
       live "/upload", UploadLive, :upload
       live "/reports", ReportsLive, :reports
       live "/reports/:id", ReportPageLive, :report_detail
-      live "/reports/:id/edit", CreateReportLive, :edit
+      live "/reports/:id/draft", CreateReportLive, :edit
     end
   end
 

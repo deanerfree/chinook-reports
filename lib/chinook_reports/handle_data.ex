@@ -27,8 +27,8 @@ defmodule ChinookReports.HandleData do
       well_name: meta["well_name"],
       unique_well_id: meta["unique_well_id"],
       operator: meta["operator"],
-      spud_date: parse_date(meta["spud_date"]),
-      final_td_date: parse_date(meta["final_td_date"]),
+      spud_date: parse_datetime(meta["spud_date"]),
+      final_td_date: parse_datetime(meta["final_td_date"]),
       target_formation: meta["target_formation"],
       secondary_target: meta["secondary_target"],
       country: meta["country"],
@@ -72,11 +72,22 @@ defmodule ChinookReports.HandleData do
     end
   end
 
-  defp parse_date(nil), do: nil
+  # spud_date/final_td_date are :naive_datetime now (wellsite local time, no
+  # timezone conversion). Import metadata has always carried a bare
+  # "YYYY-MM-DD" date, so accept that (defaulting to midnight) as well as a
+  # full ISO datetime for whenever the source data starts including a time.
+  defp parse_datetime(nil), do: nil
 
-  defp parse_date(str) do
+  defp parse_datetime(str) do
+    case NaiveDateTime.from_iso8601(str) do
+      {:ok, naive_datetime} -> naive_datetime
+      _ -> parse_bare_date(str)
+    end
+  end
+
+  defp parse_bare_date(str) do
     case Date.from_iso8601(str) do
-      {:ok, date} -> date
+      {:ok, date} -> NaiveDateTime.new!(date, ~T[00:00:00])
       _ -> nil
     end
   end

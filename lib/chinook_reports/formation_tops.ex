@@ -91,6 +91,22 @@ defmodule ChinookReports.FormationTops do
   end
 
   @doc """
+  `sections` (top-level `import_data` keys about to be saved, e.g. an edited
+  `"welldata"` or `"reservoir_data"`) plus the `"tops"` they imply, so a KB or
+  survey edit and the tops it re-derives are persisted in one update. Returns
+  `sections` unchanged when the report carries no tops.
+  """
+  @spec with_tops(struct(), map()) :: map()
+  def with_tops(report, sections) do
+    pending = %{report | import_data: Map.merge(report.import_data || %{}, sections)}
+
+    case recompute_for_report(pending) do
+      nil -> sections
+      tops -> Map.put(sections, "tops", tops)
+    end
+  end
+
+  @doc """
   The KB elevation a tops recompute should use.
 
   For an imported report the authoritative value is the Kelly Bushing in

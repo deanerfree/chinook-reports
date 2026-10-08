@@ -12,23 +12,33 @@ defmodule ChinookReportsWeb.ReportFormComponents do
   attr :placeholder, :string, default: nil
   attr :unit, :string, default: nil
   attr :wide, :boolean, default: false
+  attr :required, :boolean, default: false, doc: "appends a * to the label"
+
+  attr :type, :string,
+    default: "text",
+    doc: ~s(input type; use "date" for a native calendar picker)
+
+  attr :rest, :global,
+    include: ~w(pattern title inputmode autocomplete),
+    doc: "extra input attributes, e.g. `pattern` for a browser-side format check"
 
   def field(assigns) do
     ~H"""
     <label class={["flex flex-col gap-1", @wide && "sm:col-span-2"]}>
       <span class="text-xs font-semibold uppercase tracking-wide text-copy-secondary">
-        {@label}
+        {@label}{if @required, do: " *"}
       </span>
       <div class="flex items-stretch">
         <input
-          type="text"
+          type={@type}
           name={@field.name}
           id={@field.id}
-          value={Phoenix.HTML.Form.normalize_value("text", @field.value)}
+          value={format_value(@field.value)}
           placeholder={@placeholder}
+          {@rest}
           class={[
             "w-full border bg-surface-card px-3 py-2 text-sm text-copy outline-none",
-            "focus:ring-1",
+            "focus:ring-1 scheme-light dark:scheme-dark",
             @unit && "rounded-l",
             !@unit && "rounded",
             @field.errors == [] && "border-border focus:border-primary focus:ring-primary",
@@ -52,12 +62,13 @@ defmodule ChinookReportsWeb.ReportFormComponents do
   attr :field, Phoenix.HTML.FormField, required: true
   attr :label, :string, required: true
   attr :options, :list, required: true
+  attr :required, :boolean, default: false, doc: "appends a * to the label"
 
   def select_field(assigns) do
     ~H"""
     <label class="flex flex-col gap-1">
       <span class="text-xs font-semibold uppercase tracking-wide text-copy-secondary">
-        {@label}
+        {@label}{if @required, do: " *"}
       </span>
       <select
         name={@field.name}
@@ -68,6 +79,10 @@ defmodule ChinookReportsWeb.ReportFormComponents do
           @field.errors != [] && "border-danger focus:border-danger focus:ring-danger"
         ]}
       >
+        <%!-- Without this, when @field.value matches none of @options (nothing
+        chosen yet), the browser silently displays — and later submits — the
+        first real option as if it had been picked. --%>
+        <option value="" selected={@field.value in [nil, ""]}></option>
         <option
           :for={opt <- @options}
           value={opt}
@@ -80,6 +95,46 @@ defmodule ChinookReportsWeb.ReportFormComponents do
         {msg}
       </span>
     </label>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, required: true
+  attr :wide, :boolean, default: false
+
+  @doc """
+  A date input and a time input side by side for a single :naive_datetime
+  field, instead of one combined `datetime-local` control. Each writes to its
+  own param — "<field>_date" / "<field>_time" — since there's no native input
+  that splits a value across two fields; `Report.changeset/2` stitches the
+  pair back into one ISO datetime string before casting.
+  """
+  def datetime_field(assigns) do
+    ~H"""
+    <div class={["flex flex-col gap-1", @wide && "sm:col-span-2"]}>
+      <span class="text-xs font-semibold uppercase tracking-wide text-copy-secondary">
+        {@label}
+      </span>
+      <div class="flex gap-2">
+        <input
+          type="date"
+          name={compound_name(@field.name, "date")}
+          id={"#{@field.id}_date"}
+          value={date_part(@field.value)}
+          class={datetime_input_class(@field)}
+        />
+        <input
+          type="time"
+          name={compound_name(@field.name, "time")}
+          id={"#{@field.id}_time"}
+          value={time_part(@field.value)}
+          class={datetime_input_class(@field)}
+        />
+      </div>
+      <span :for={msg <- field_errors(@field)} class="text-xs text-danger">
+        {msg}
+      </span>
+    </div>
     """
   end
 
@@ -105,17 +160,24 @@ defmodule ChinookReportsWeb.ReportFormComponents do
 
   def report_field(assigns) do
     ~H"""
-    <%= case @spec[:input] do %>
-      <% :select -> %>
+    <%= cond do %>
+      <% @spec[:input] == :select -> %>
         <.select_field
           field={@form[@spec.field]}
           label={display_label(@spec)}
           options={resolve_options(@spec[:options])}
         />
-      <% _text -> %>
+      <% @spec[:type] == :datetime -> %>
+        <.datetime_field
+          field={@form[@spec.field]}
+          label={display_label(@spec)}
+          wide={@spec[:wide] || false}
+        />
+      <% true -> %>
         <.field
           field={@form[@spec.field]}
           label={display_label(@spec)}
+          type={input_type(@spec[:type])}
           placeholder={@spec[:placeholder]}
           unit={resolve_unit(@spec[:unit], @form)}
           wide={@spec[:wide] || false}
@@ -162,12 +224,27 @@ defmodule ChinookReportsWeb.ReportFormComponents do
           <.inputs_for :let={row} field={@form[@list]}>
             <tr class="hover:bg-surface">
               <td :for={col <- @columns} class="border-b border-light px-1 py-1">
+                <div :if={col[:type] == :datetime} class="flex gap-1">
+                  <input
+                    type="date"
+                    name={compound_name(row[col.key].name, "date")}
+                    value={date_part(row[col.key].value)}
+                    class={table_cell_input_class()}
+                  />
+                  <input
+                    type="time"
+                    name={compound_name(row[col.key].name, "time")}
+                    value={time_part(row[col.key].value)}
+                    class={table_cell_input_class()}
+                  />
+                </div>
                 <input
-                  type="text"
+                  :if={col[:type] != :datetime}
+                  type={input_type(col[:type])}
                   name={row[col.key].name}
-                  value={Phoenix.HTML.Form.normalize_value("text", row[col.key].value)}
+                  value={format_value(row[col.key].value)}
                   placeholder={col[:placeholder]}
-                  class="w-full rounded border border-transparent bg-transparent px-2 py-1 outline-none hover:border-border focus:border-primary focus:bg-surface-card"
+                  class={table_cell_input_class()}
                 />
               </td>
               <td class="border-b border-light px-1 py-1 text-center">
@@ -201,6 +278,70 @@ defmodule ChinookReportsWeb.ReportFormComponents do
 
   defp display_label(%{field: field, label: label}) do
     if Report.required?(field), do: label <> " *", else: label
+  end
+
+  # Render a form field's value for a text input.
+  #
+  # Floats are formatted in plain positional notation so stored values like
+  # 1200.0 show as "1200.0" and never "1.2e3" — Erlang's default float
+  # formatting (and Float.to_string/1) switches to exponents past a certain
+  # magnitude, which is useless for coordinates and depths. Strings (the raw
+  # text a user is mid-edit on) and nil pass straight through unchanged.
+  defp format_value(value) when is_float(value) do
+    :erlang.float_to_binary(value, [:compact, {:decimals, 10}])
+  end
+
+  # A stored Date must reach a `type="date"` input as an ISO `yyyy-mm-dd`
+  # string or the browser drops it and shows an empty picker.
+  defp format_value(%Date{} = date), do: Date.to_iso8601(date)
+
+  defp format_value(value), do: Phoenix.HTML.Form.normalize_value("text", value)
+
+  # Field/column specs carry an optional `:type`; `:date` swaps in a native
+  # calendar picker with a guaranteed ISO value instead of the default
+  # free-text box. `:datetime` fields don't reach this — see report_field/1
+  # and editable_table/1, which route them to .datetime_field's split
+  # date/time inputs instead.
+  defp input_type(:date), do: "date"
+  defp input_type(_), do: "text"
+
+  # spud_date/final_td_date/profile_sections.start_date render as a date
+  # input and a time input rather than one combined `datetime-local` control
+  # (no native input splits a value across two fields). Turn
+  # "report[spud_date]" into "report[spud_date_date]" / "report[spud_date_time]"
+  # so each half gets its own param; Report.changeset/2 stitches the pair
+  # back into one ISO datetime string before casting.
+  defp compound_name(field_name, suffix),
+    do: String.replace_trailing(field_name, "]", "_#{suffix}]")
+
+  defp date_part(%NaiveDateTime{} = ndt), do: ndt |> NaiveDateTime.to_date() |> Date.to_iso8601()
+  defp date_part(%Date{} = date), do: Date.to_iso8601(date)
+  defp date_part(_), do: nil
+
+  # A stored midnight is indistinguishable from "no time was ever entered"
+  # (see Report.changeset/2's default when the time input is left blank), so
+  # leave the time input empty rather than show a misleading 00:00 on every
+  # date-only record.
+  defp time_part(%NaiveDateTime{} = ndt) do
+    case NaiveDateTime.to_time(ndt) do
+      ~T[00:00:00] -> nil
+      time -> Calendar.strftime(time, "%H:%M")
+    end
+  end
+
+  defp time_part(_), do: nil
+
+  defp datetime_input_class(%Phoenix.HTML.FormField{errors: errors}) do
+    [
+      "w-full rounded border bg-surface-card px-3 py-2 text-sm text-copy outline-none",
+      "focus:ring-1 [color-scheme:light] dark:[color-scheme:dark]",
+      errors == [] && "border-border focus:border-primary focus:ring-primary",
+      errors != [] && "border-danger focus:border-danger focus:ring-danger"
+    ]
+  end
+
+  defp table_cell_input_class do
+    "w-full rounded border border-transparent bg-transparent px-2 py-1 outline-none hover:border-border focus:border-primary focus:bg-surface-card [color-scheme:light] dark:[color-scheme:dark]"
   end
 
   defp field_errors(%Phoenix.HTML.FormField{errors: errors}) do

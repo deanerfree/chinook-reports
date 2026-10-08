@@ -109,7 +109,14 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
       </.blueprint_card>
 
       <div class="flex flex-col gap-5.5">
-        <.key_facts facts={@summary.facts} />
+        <.key_facts facts={@summary.facts}>
+          <:lead><.well_status vertical={@summary.vertical} /></:lead>
+        </.key_facts>
+        <.plan_deviation
+          :if={@summary.vertical.deviated}
+          rows={@summary.vertical.vs_plan}
+          has_plan={@summary.vertical.has_plan}
+        />
         <.formation_tops_preview summary={@summary} />
         <.synopsis_block synopsis={@summary.synopsis} />
       </div>
@@ -142,6 +149,7 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
   # ── Key facts ─────────────────────────────────────────────────────────────
 
   attr :facts, :list, required: true
+  slot :lead, doc: "headline facts shown above the grid (vertical wells: where the well finished)"
 
   defp key_facts(assigns) do
     ~H"""
@@ -150,6 +158,7 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
         <.card_head bare>Key facts</.card_head>
         <span class="text-[10px] text-muted">Times local to rig</span>
       </div>
+      {render_slot(@lead)}
       <div class="grid grid-cols-2 sm:grid-cols-3">
         <div
           :for={fact <- @facts}
@@ -341,6 +350,164 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
     """
   end
 
+  # ── Well status at TD (vertical layout, leads the Key facts card) ─────────
+
+  attr :vertical, :map, required: true
+
+  defp well_status(assigns) do
+    ~H"""
+    <div class="bg-accent-subtle/40 border-b border-border">
+      <p class="m-0 px-4 pt-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-secondary">
+        Where the well finished
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2">
+        <.status_cell label="Last formation">
+          <%= if f = @vertical.last_formation do %>
+            <.top_status top={f} />
+          <% else %>
+            <p class="m-0 text-xs text-muted">No formation tops on file.</p>
+          <% end %>
+        </.status_cell>
+
+        <.status_cell label="Primary target">
+          <%= case @vertical.target do %>
+            <% nil -> %>
+              <p class="m-0 text-xs text-muted">No primary target on file.</p>
+            <% %{call: :not_reached} = t -> %>
+              <p class="m-0 text-[13px] font-bold text-text">{t.formation}</p>
+              <p class="m-0 mt-0.5 text-xs text-muted">No top picked for the target.</p>
+            <% t -> %>
+              <.top_status top={t} />
+          <% end %>
+        </.status_cell>
+
+        <.status_cell label="Max gas">
+          <%= if g = @vertical.max_gas do %>
+            <p class="m-0 text-[13px] font-bold tabular-nums text-text">
+              {g.value} <span class="text-[11px] font-medium text-muted">{g.units}</span>
+            </p>
+            <p class="m-0 mt-0.5 text-xs text-text-secondary tabular-nums">
+              @ {g.md} m MD<span :if={g.formation}> · {g.formation}</span>
+            </p>
+          <% else %>
+            <p class="m-0 text-xs text-muted">No gas data on file.</p>
+          <% end %>
+        </.status_cell>
+
+        <.status_cell label="Current depth">
+          <p class="m-0 text-[13px] font-bold tabular-nums text-text">
+            {@vertical.depth.md} m MD
+            <span class="text-[11px] font-medium text-muted">
+              · {@vertical.depth.tvd} TVD · {@vertical.depth.subsea} SS
+            </span>
+          </p>
+          <p
+            :if={s = @vertical.depth.last_survey}
+            class="m-0 mt-0.5 text-xs text-text-secondary tabular-nums"
+          >
+            Last survey {s.md} m · {s.inc}° / {s.azi}°
+          </p>
+          <p
+            :if={@vertical.depth.extrapolated}
+            class="m-0 mt-0.5 text-[11px] text-muted tabular-nums"
+          >
+            Survey extrapolated {@vertical.depth.projected_from} m to TD
+          </p>
+        </.status_cell>
+      </div>
+    </div>
+    """
+  end
+
+  attr :label, :string, required: true
+  slot :inner_block, required: true
+
+  defp status_cell(assigns) do
+    ~H"""
+    <div class="px-4 py-3 border-t border-r border-border-light">
+      <p class="m-0 mb-1 text-[9px] font-bold uppercase tracking-[0.11em] text-muted">{@label}</p>
+      {render_slot(@inner_block)}
+    </div>
+    """
+  end
+
+  attr :top, :map, required: true
+
+  defp top_status(assigns) do
+    ~H"""
+    <p class="m-0 text-[13px] font-bold text-text">
+      {@top.formation}
+      <span :if={@top.provisional} class="text-[10px] font-medium text-muted">(provisional)</span>
+    </p>
+    <p class="m-0 mt-0.5 text-xs text-text-secondary tabular-nums">
+      {@top.md} m MD · {@top.subsea} SS
+    </p>
+    <p class="m-0 mt-0.5 text-[11px] font-bold tabular-nums text-secondary">
+      {call_text(@top.call, @top.diff)}
+    </p>
+    """
+  end
+
+  # ── Actual vs plan (deviated vertical wells) ──────────────────────────────
+
+  attr :rows, :list, default: nil
+  attr :has_plan, :boolean, default: false
+
+  defp plan_deviation(assigns) do
+    ~H"""
+    <.blueprint_card>
+      <div class="flex items-baseline justify-between px-4 py-2.5 border-b border-border-light">
+        <.card_head bare>Position vs plan</.card_head>
+        <span class="text-[10px] text-muted">actual − planned, same MD</span>
+      </div>
+      <%= if @rows do %>
+        <div class="grid grid-cols-[minmax(0,1.3fr)_repeat(4,minmax(0,1fr))]">
+          <div
+            :for={h <- ["", "ΔTVD", "ΔN / ΔE", "Off plan", "3D"]}
+            class="px-3 py-2 border-b border-border-light text-right first:text-left text-[9px] font-bold uppercase tracking-[0.11em] text-muted"
+          >
+            {h}
+          </div>
+          <%= for r <- @rows do %>
+            <div class="px-3 py-2.5 border-b border-border-light">
+              <p class="m-0 text-[10px] font-bold uppercase tracking-[0.09em] text-text-secondary">
+                {r.label}
+              </p>
+              <p class="m-0 text-[11px] text-muted tabular-nums">{r.md} m MD</p>
+            </div>
+            <div class="px-3 py-2.5 border-b border-border-light text-right tabular-nums">
+              <p class="m-0 text-[13px] font-bold text-text">{r.d_tvd}</p>
+              <p class="m-0 text-[10px] text-muted">{r.vertical_call}</p>
+            </div>
+            <div class="px-3 py-2.5 border-b border-border-light text-right text-xs tabular-nums text-text-secondary">
+              {r.d_north} / {r.d_east}
+            </div>
+            <div class="px-3 py-2.5 border-b border-border-light text-right tabular-nums">
+              <p class="m-0 text-[13px] font-bold text-text">{r.horizontal} m</p>
+              <p class="m-0 text-[10px] text-muted">{r.compass} · {r.bearing}°</p>
+            </div>
+            <div class="px-3 py-2.5 border-b border-border-light text-right text-[13px] font-bold tabular-nums text-secondary">
+              {r.distance} m
+            </div>
+          <% end %>
+        </div>
+        <p
+          :if={Enum.any?(@rows, & &1.beyond_plan)}
+          class="m-0 px-4 py-2.5 text-[11px] text-muted"
+        >
+          Hole is deeper than the plan; the plan is projected on its final inclination and azimuth.
+        </p>
+      <% else %>
+        <p class="m-0 px-4 py-3 text-xs text-muted">
+          {if @has_plan,
+            do: "No actual surveys on file yet to compare against the plan.",
+            else: "No directional program on file. Add the planned path on the Surveys tab."}
+        </p>
+      <% end %>
+    </.blueprint_card>
+    """
+  end
+
   # ── Formation tops preview (vertical layout) ──────────────────────────────
 
   attr :summary, :map, required: true
@@ -470,6 +637,11 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
   defp timeline_anchor(i, n) when i == n - 1, do: "end"
   defp timeline_anchor(_, _), do: "middle"
 
+  defp call_text(:high, diff), do: "#{diff} m · high to prognosis"
+  defp call_text(:low, diff), do: "#{diff} m · low to prognosis"
+  defp call_text(:on_prognosis, _), do: "On prognosis"
+  defp call_text(_, _), do: "No prognosis"
+
   defp formation_tops_rows(%{chart_props: %{tops: tops}}) when is_list(tops) do
     tops
     |> Enum.take(9)
@@ -483,7 +655,7 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
         subsea: fmt_top(samples["subsea"]),
         diff:
           if(is_number(diff),
-            do: "#{if(diff > 0, do: "+")}#{:erlang.float_to_binary(diff / 1, decimals: 1)}",
+            do: "#{if(diff > 0, do: "+")}#{ChinookReportsWeb.NumberFormat.up_to_2(diff)}",
             else: "—"
           ),
         diff_colour: if(is_number(diff) and diff > 0, do: "#e67e22", else: "#176935")
@@ -493,6 +665,6 @@ defmodule ChinookReportsWeb.ReportSummaryComponents do
 
   defp formation_tops_rows(_), do: []
 
-  defp fmt_top(v) when is_number(v), do: :erlang.float_to_binary(v / 1, decimals: 1)
+  defp fmt_top(v) when is_number(v), do: ChinookReportsWeb.NumberFormat.up_to_2(v)
   defp fmt_top(_), do: "—"
 end

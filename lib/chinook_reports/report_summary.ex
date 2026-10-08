@@ -12,7 +12,7 @@ defmodule ChinookReports.ReportSummary do
   yields empty sections.
   """
 
-  alias ChinookReports.Trajectory
+  alias ChinookReports.{FormationTops, Trajectory}
 
   # Reservoir quality colours — kept in step with `assets/svelte/ProfileChart.svelte`.
   @quality_colours %{
@@ -26,6 +26,15 @@ defmodule ChinookReports.ReportSummary do
 
   @diff_good "#176935"
   @diff_over "#e67e22"
+
+  # Tops rows that mark a drilling event or marker rather than a formation:
+  # TD, coring, fluid contacts, kick-off / casing points, heel, toe, landing.
+  @non_formation ~r/^\s*(total\s*dep|td\s*$|start core|end core|kop\b|kick.?off|icp\b|scp\b|heel\b|toe\b|landing)|contact|casing pt|casing point|\/heel/i
+
+  # Survey remarks that mark a projected (not measured) station.
+  @extrapolated_remark ~r/extrapolat|^\s*td\s*$/i
+
+  @compass ~w(N NE E SE S SW W NW)
 
   @timeline_keys [
     {"Spud", "spud_date"},
@@ -45,6 +54,7 @@ defmodule ChinookReports.ReportSummary do
           facts: [map()],
           reservoir_quality: map() | nil,
           depths: map() | nil,
+          vertical: map() | nil,
           timeline: [map()],
           synopsis: map(),
           chart_props: map()
@@ -59,10 +69,14 @@ defmodule ChinookReports.ReportSummary do
     survey = leg["survey"] || %{}
     log = leg["log_data"] || %{}
 
-    geometry = well["well_geometry"] || report.geometry || ""
-    layout = if String.downcase(to_string(geometry)) == "vertical", do: :vertical, else: :lateral
+    # The report column wins over the imported value: it's what the wizard and
+    # the Well Data editor set (e.g. switching an imported well to "Deviated").
+    geometry = present(report.geometry) || well["well_geometry"] || ""
+    kind = geometry |> to_string() |> String.downcase()
+    layout = if kind in ["vertical", "deviated"], do: :vertical, else: :lateral
 
-    plan = plan_curve(survey)
+    stations = plan_stations(report, survey)
+    plan = Trajectory.integrate(stations)
 
     %{
       geometry: geometry,
@@ -72,6 +86,7 @@ defmodule ChinookReports.ReportSummary do
       facts: facts(well, layout),
       reservoir_quality: reservoir_quality(log),
       depths: depths(well, survey, plan),
+      vertical: vertical(layout, import_data, well, legs, survey, {kind == "deviated", stations}),
       timeline: timeline(well),
       synopsis: synopsis(import_data, well),
       chart_props: %{
@@ -87,6 +102,63 @@ defmodule ChinookReports.ReportSummary do
         overlay_curves: layout == :lateral and is_list(log["curve_data_cleaned"])
       }
     }
+  end
+
+  @doc """
+  A one-card digest of a report for the Home dashboard: where the hole is now,
+  the last formation it penetrated, time on well and — for a Deviated well —
+  how far it sits off plan. Built on `build/1`, so it reads the same data the
+  Summary tab does. `today` is injectable for tests.
+  """
+  @spec glance(struct(), Date.t()) :: map()
+  def glance(report, today \\ Date.utc_today()) do
+    summary = build(report)
+    import_data = report.import_data || %{}
+    td_md = num(get_in(import_data, ["welldata", "total_depth_actual", "md"]))
+    tops = get_in(import_data, ["tops", "formations"]) || []
+    spud = spud_date(report, import_data)
+    td_date = final_td_date(report, import_data)
+
+    off_plan =
+      case summary.vertical do
+        %{deviated: true, vs_plan: [_ | _] = rows} ->
+          last = List.last(rows)
+          "#{last.horizontal} m #{last.compass}"
+
+        _ ->
+          nil
+      end
+
+    %{
+      id: report.id,
+      well_name: summary.header.well_name,
+      uwi: summary.header.uwi,
+      operator: summary.header.operator,
+      geometry: geometry_label(summary.geometry),
+      depth: summary.header.td.md,
+      last_formation: last_formation(tops, td_md),
+      spud: spud && Date.to_iso8601(spud),
+      td_date: td_date && Date.to_iso8601(td_date),
+      # Stops counting once the well reached final TD.
+      days_on_well: spud && max(Date.diff(td_date || today, spud), 0),
+      off_plan: off_plan
+    }
+  end
+
+  defp spud_date(%{spud_date: %NaiveDateTime{} = dt}, _), do: NaiveDateTime.to_date(dt)
+  defp spud_date(_report, import_data), do: timing_date(import_data, "spud_date")
+
+  defp final_td_date(%{final_td_date: %NaiveDateTime{} = dt}, _), do: NaiveDateTime.to_date(dt)
+  defp final_td_date(_report, import_data), do: timing_date(import_data, "final_td")
+
+  defp timing_date(import_data, key) do
+    with date when is_binary(date) <-
+           get_in(import_data, ["welldata", "well_timing", key, "date"]),
+         {:ok, d} <- Date.from_iso8601(date) do
+      d
+    else
+      _ -> nil
+    end
   end
 
   @doc "Reservoir quality colour for a quality label (or grey)."
@@ -109,9 +181,9 @@ defmodule ChinookReports.ReportSummary do
       field: field,
       badges: ["Final report", geometry_label(geometry)] |> Enum.reject(&(&1 == "")),
       td: %{
-        md: fmt(td["md"], 0),
-        tvd: fmt(td["tvd"], 1),
-        subsea: fmt(td["subsea"], 1)
+        md: dist(td["md"]),
+        tvd: dist(td["tvd"]),
+        subsea: dist(td["subsea"])
       }
     }
   end
@@ -306,10 +378,10 @@ defmodule ChinookReports.ReportSummary do
 
   defp fmt_row(row) do
     %{
-      md: fmt(row[:md], 1),
-      tvd: fmt(row[:tvd], 1),
-      vs: fmt(row[:vs], 1),
-      subsea: fmt(row[:subsea], 1)
+      md: dist(row[:md]),
+      tvd: dist(row[:tvd]),
+      vs: dist(row[:vs]),
+      subsea: dist(row[:subsea])
     }
   end
 
@@ -317,21 +389,220 @@ defmodule ChinookReports.ReportSummary do
   defp delta(_, _), do: nil
 
   defp signed(nil), do: "—"
-  defp signed(v) when v > 0, do: "+" <> fmt(v, 1)
-  defp signed(v), do: fmt(v, 1)
+  defp signed(v) when v > 0, do: "+" <> dist(v)
+  defp signed(v), do: dist(v)
 
   defp depth_note(nil, _), do: "No planned survey on file."
 
   defp depth_note(d_tvd, d_md) do
     md_part =
       if is_number(d_md) do
-        " and #{fmt(abs(d_md), 1)} m #{if d_md < 0, do: "short", else: "long"} in measured depth"
+        " and #{dist(abs(d_md))} m #{if d_md < 0, do: "short", else: "long"} in measured depth"
       else
         ""
       end
 
-    "TD landed #{fmt(abs(d_tvd), 1)} m #{if d_tvd < 0, do: "high", else: "low"} to plan" <>
+    "TD landed #{dist(abs(d_tvd))} m #{if d_tvd < 0, do: "high", else: "low"} to plan" <>
       md_part <> "."
+  end
+
+  # ── Vertical wells: where the hole ended up ─────────────────────────────
+
+  defp vertical(:lateral, _import_data, _well, _legs, _survey, _plan), do: nil
+
+  defp vertical(:vertical, import_data, well, legs, survey, {deviated, stations}) do
+    tops = get_in(import_data, ["tops", "formations"]) || []
+    td = well["total_depth_actual"] || %{}
+    td_md = num(td["md"])
+
+    %{
+      last_formation: last_formation(tops, td_md),
+      target: target_top(tops, well["primary_target"]),
+      max_gas: max_gas(legs, tops, get_in(well, ["units", "gas"])),
+      depth: depth_status(td, survey),
+      deviated: deviated,
+      has_plan: stations != [],
+      vs_plan: if(deviated, do: vs_plan(survey, stations))
+    }
+  end
+
+  defp last_formation(tops, td_md), do: tops |> deepest_top(td_md) |> top_call()
+
+  # Deepest real formation top at or above `max_md` (any depth when nil).
+  defp deepest_top(tops, max_md) do
+    tops
+    |> Enum.filter(fn t ->
+      md = top_md(t)
+      formation_row?(t) and is_number(md) and (is_nil(max_md) or md <= max_md)
+    end)
+    |> Enum.max_by(&top_md/1, fn -> nil end)
+  end
+
+  defp target_top(_tops, target) when target in [nil, "", "-"], do: nil
+
+  defp target_top(tops, target) do
+    key = target |> to_string() |> String.trim() |> String.downcase()
+
+    tops
+    |> Enum.find(&(&1["formation"] |> to_string() |> String.trim() |> String.downcase() == key))
+    |> case do
+      nil -> %{formation: to_string(target), md: "—", subsea: "—", diff: "—", call: :not_reached}
+      row -> top_call(row)
+    end
+  end
+
+  defp formation_row?(t), do: not Regex.match?(@non_formation, to_string(t["formation"]))
+
+  defp top_md(t), do: num(get_in(t, ["samples", "md"])) || num(get_in(t, ["mwd_gamma", "md"]))
+
+  defp top_subsea(t),
+    do: num(get_in(t, ["samples", "subsea"])) || num(get_in(t, ["mwd_gamma", "subsea"]))
+
+  defp top_call(nil), do: nil
+
+  defp top_call(row) do
+    diff = num(row["difference_m"])
+
+    %{
+      formation: row["formation"],
+      md: dist(top_md(row)),
+      subsea: dist(top_subsea(row)),
+      diff: signed(diff),
+      # difference_m = samples.subsea - prognosis.subsea: positive came in high.
+      call:
+        cond do
+          not is_number(diff) -> :no_prognosis
+          abs(diff) < 0.05 -> :on_prognosis
+          diff > 0 -> :high
+          true -> :low
+        end,
+      provisional: FormationTops.provisional?(row)
+    }
+  end
+
+  defp max_gas(legs, tops, units) do
+    legs
+    |> Enum.flat_map(fn leg ->
+      log = leg["log_data"] || %{}
+      null = get_in(log, ["curve_metadata", "null_value"])
+      curve = log["curve_data_cleaned"] || log["curve_data_actual"] || []
+
+      curve
+      |> Enum.map(&{num(&1["md"]), num(&1["gas"])})
+      |> Enum.filter(fn {md, gas} -> is_number(md) and is_number(gas) and gas != null end)
+    end)
+    |> Enum.max_by(&elem(&1, 1), fn -> nil end)
+    |> case do
+      nil ->
+        nil
+
+      {md, gas} ->
+        %{
+          value: fmt(gas, 0),
+          units: present(units) || "units",
+          md: dist(md),
+          formation: formation_at(tops, md)
+        }
+    end
+  end
+
+  defp formation_at(tops, md) do
+    case deepest_top(tops, md) do
+      nil -> nil
+      top -> top["formation"]
+    end
+  end
+
+  defp depth_status(td, survey) do
+    points = survey_points(survey)
+    last = List.last(points)
+    measured = Enum.reject(points, &extrapolated?/1)
+    last_measured = List.last(measured)
+
+    projected =
+      if last && extrapolated?(last) && last_measured, do: last, else: nil
+
+    %{
+      md: dist(num(td["md"])),
+      tvd: dist(num(td["tvd"])),
+      subsea: dist(num(td["subsea"])),
+      extrapolated: projected != nil,
+      projected_from:
+        projected &&
+          dist(delta(num(projected["md"]), num(last_measured["md"]))),
+      last_survey: last_measured && station_row(last_measured)
+    }
+  end
+
+  # A survey station keeps the survey's own precision (up to 5 decimals) —
+  # rounding a station misstates the wellpath.
+  defp station_row(p) do
+    %{
+      md: survey(num(p["md"])),
+      tvd: survey(num(p["tvd"])),
+      inc: survey(num(p["inclination_deg"])),
+      azi: survey(num(p["azimuth_deg"]))
+    }
+  end
+
+  defp survey_points(%{"survey_points" => pts}) when is_list(pts),
+    do: Enum.filter(pts, &is_number(num(&1["md"])))
+
+  defp survey_points(_), do: []
+
+  defp extrapolated?(p), do: Regex.match?(@extrapolated_remark, to_string(p["remarks"]))
+
+  # Actual against plan at the same measured depth, at the last measured
+  # station and at the (extrapolated) bottom of the survey.
+  defp vs_plan(_survey, []), do: nil
+
+  defp vs_plan(survey, stations) do
+    points = survey_points(survey)
+    measured = points |> Enum.reject(&extrapolated?/1) |> List.last()
+    bottom = List.last(points)
+
+    [{"Last survey", measured}, {"Projected to TD", bottom}]
+    |> Enum.uniq_by(fn {_, p} -> p end)
+    |> Enum.reject(fn {label, p} ->
+      is_nil(p) or (label != "Last survey" and not extrapolated?(p))
+    end)
+    |> Enum.map(fn {label, p} -> plan_offset(label, p, stations) end)
+    |> Enum.reject(&is_nil/1)
+    |> case do
+      [] -> nil
+      rows -> rows
+    end
+  end
+
+  defp plan_offset(label, p, stations) do
+    md = num(p["md"])
+    actual = %{tvd: num(p["tvd"]), north: num(p["north_south"]), east: num(p["east_west"])}
+
+    with true <- Enum.all?(Map.values(actual), &is_number/1),
+         %{} = planned <- Trajectory.position_at(stations, md) do
+      d_tvd = actual.tvd - planned.tvd
+      d_n = actual.north - planned.north
+      d_e = actual.east - planned.east
+      horizontal = :math.sqrt(d_n * d_n + d_e * d_e)
+      bearing = :math.atan2(d_e, d_n) * 180 / :math.pi()
+      bearing = if bearing < 0, do: bearing + 360, else: bearing
+
+      %{
+        label: label,
+        md: dist(md),
+        beyond_plan: md > List.last(stations).md,
+        d_tvd: signed(d_tvd),
+        vertical_call: if(d_tvd > 0, do: :low, else: :high),
+        d_north: signed(d_n),
+        d_east: signed(d_e),
+        horizontal: dist(horizontal),
+        bearing: fmt(bearing, 0),
+        compass: Enum.at(@compass, rem(round(bearing / 45), 8)),
+        distance: dist(:math.sqrt(horizontal * horizontal + d_tvd * d_tvd))
+      }
+    else
+      _ -> nil
+    end
   end
 
   # ── Drilling timeline (Fig 03) ────────────────────────────────────────────
@@ -362,11 +633,44 @@ defmodule ChinookReports.ReportSummary do
 
   # ── Plan trajectory ───────────────────────────────────────────────────────
 
-  defp plan_curve(%{"prognosed_survey" => stations}) when is_list(stations) do
-    Trajectory.integrate(stations)
+  # The planned path: the Directional Program entered in the wizard or edited
+  # on the report page while drilling (report_data.surveys) wins; otherwise the
+  # prognosed survey that came in with an Excel import. Normalised to the
+  # station shape `Trajectory` takes, sorted by MD, unusable rows dropped.
+  defp plan_stations(report, survey) do
+    entered =
+      case report.report_data do
+        %{surveys: [_ | _] = rows} ->
+          Enum.map(
+            rows,
+            &%{md: num(&1.md), inc_deg: num(&1.inclination), azi_deg: num(&1.azimuth)}
+          )
+
+        _ ->
+          []
+      end
+
+    imported =
+      Enum.map(survey["prognosed_survey"] || [], fn s ->
+        %{md: num(s["md"]), inc_deg: num(s["inclination_deg"]), azi_deg: num(s["azimuth_deg"])}
+      end)
+
+    [entered, imported]
+    |> Enum.map(fn rows ->
+      rows
+      |> Enum.filter(&(is_number(&1.md) and is_number(&1.inc_deg) and is_number(&1.azi_deg)))
+      |> Enum.sort_by(& &1.md)
+    end)
+    |> Enum.find([], &(&1 != []))
+    |> tie_in_at_surface()
   end
 
-  defp plan_curve(_), do: []
+  # A program typed in from the kick-off point down still starts vertical at
+  # the wellhead.
+  defp tie_in_at_surface([%{md: md} | _] = rows) when md > 0,
+    do: [%{md: 0.0, inc_deg: 0.0, azi_deg: 0.0} | rows]
+
+  defp tie_in_at_surface(rows), do: rows
 
   # ── Formatting helpers ────────────────────────────────────────────────────
 
@@ -376,6 +680,7 @@ defmodule ChinookReports.ReportSummary do
   defp present(v), do: to_string(v)
 
   defp num(v) when is_number(v), do: v
+  defp num(%Decimal{} = v), do: Decimal.to_float(v)
 
   defp num(v) when is_binary(v) do
     case Float.parse(v) do
@@ -388,6 +693,30 @@ defmodule ChinookReports.ReportSummary do
 
   defp round_num(v) when is_number(v), do: round(v)
   defp round_num(_), do: 0
+
+  # Depths, lengths and distances: at most two decimals, without padding
+  # (1128.734 → "1128.73", 1979.0 → "1979") — the same rule as the report
+  # page's ChinookReportsWeb.NumberFormat.up_to_2/1.
+  defp dist(v), do: up_to(v, 2)
+
+  # Directional-survey values: up to 5 decimals (NumberFormat.survey/1).
+  defp survey(v), do: up_to(v, 5)
+
+  defp up_to(nil, _), do: "—"
+  defp up_to(v, _places) when is_integer(v), do: Integer.to_string(v)
+
+  defp up_to(v, places) when is_float(v) do
+    (Float.round(v, places) + 0.0)
+    |> :erlang.float_to_binary([:compact, decimals: places])
+    |> String.trim_trailing(".0")
+  end
+
+  defp up_to(v, places) when is_binary(v) do
+    case Float.parse(v) do
+      {f, _} -> up_to(f, places)
+      :error -> v
+    end
+  end
 
   defp fmt(nil, _), do: "—"
 

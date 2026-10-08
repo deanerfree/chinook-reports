@@ -29,11 +29,31 @@ export const CHART_TYPES: { type: ChartType; label: string }[] = [
   { type: 'scatter-horizontal', label: 'Scatter H'  },
 ]
 
+/** At most two decimals, without padding: 124.93684 → 124.94, 3.5 → 3.5. */
+export function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+/** `round2` as display text (for labels / categories built from raw numbers). */
+export function fmt2(n: number | null | undefined): string {
+  return n == null || Number.isNaN(n) ? '—' : String(round2(n))
+}
+
 export function buildChartOption(
   type: ChartType,
-  data: ChartData,
+  rawData: ChartData,
   title?: string
 ): EChartsOption {
+  // Round once on the way in so every tooltip, label and axis shows at most
+  // two decimals (the extractor's floats run to 5+); nulls stay gaps.
+  const data: ChartData = {
+    ...rawData,
+    series: rawData.series.map(s => ({
+      ...s,
+      data: s.data.map(v => (typeof v === 'number' ? round2(v) : v)),
+    })),
+  }
+
   switch (type) {
     case 'bar-vertical':       return barVertical(data, title)
     case 'bar-horizontal':     return barHorizontal(data, title)

@@ -29,7 +29,7 @@ defmodule ChinookReportsWeb.NavAssigns do
               {:halt,
                socket
                |> assign(:new_report_form, blank_new_report_form())
-               |> push_navigate(to: "/reports/#{report.id}/edit")}
+               |> push_navigate(to: "/reports/#{report.id}/draft")}
 
             {:error, changeset} ->
               {:halt,
@@ -47,7 +47,8 @@ defmodule ChinookReportsWeb.NavAssigns do
     {:cont, socket}
   end
 
+  # Most wells are Canadian, so preselect it (and with it the UWI format check).
   defp blank_new_report_form do
-    to_form(Reports.new_report_changeset(), as: :new_report)
+    to_form(Reports.new_report_changeset(%{"country" => "Canada"}), as: :new_report)
   end
 end

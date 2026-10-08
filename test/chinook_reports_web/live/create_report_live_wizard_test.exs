@@ -20,7 +20,7 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
   alias ChinookReports.Repo
   alias ChinookReports.Reports.Report
 
-  @form_sel ~s(form[phx-submit="update"])
+  @form_sel ~s(form[phx-submit="create_report"])
 
   # Values for every field across every step, keyed the same way the wizard's
   # own `phx-change`/submit params are shaped. Reused by both the create and
@@ -43,7 +43,6 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
     "report_data" => %{
       "gl_elevation" => "884.5",
       "kb_elevation" => "891.2",
-      "kb_to_ground" => "6.7",
       "datum" => "NTS",
       "surface_coordinates" => "15-31-46-23W3M"
     }
@@ -60,7 +59,12 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
   }
 
   @profile_row %{"section" => "Lateral", "start_depth" => "1200", "end_depth" => "2400"}
-  @formation_top_row %{"formation" => "McLaren", "md" => "1500", "tvd" => "1490", "subsea" => "-800"}
+  @formation_top_row %{
+    "formation" => "McLaren",
+    "md" => "1500",
+    "tvd" => "1490",
+    "subsea" => "-800"
+  }
   @survey_row %{"md" => "1000", "inclination" => "45", "azimuth" => "180"}
 
   describe "creating a report" do
@@ -83,6 +87,7 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       next(view)
 
       add_row_and_fill(view, "surveys", @survey_row)
+      next(view)
 
       {:error, {:live_redirect, %{to: to}}} = submit(view)
 
@@ -95,17 +100,23 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       assert_row(hd(created.report_data.profile_sections), @profile_row)
       assert_row(hd(created.report_data.formation_tops), @formation_top_row)
       assert_row(hd(created.report_data.surveys), @survey_row)
+      assert created.status == "active"
     end
   end
 
   describe "editing a report" do
     setup do
+      # A complete draft: every step's mandatory fields are already filled, so
+      # the wizard lets you Next straight through without re-entering them.
       {:ok, report} =
         %Report{report_data: %Report.ReportData{}}
         |> Report.changeset(%{
           "well_name" => "Original Well",
           "unique_well_id" => "ORIG-001",
-          "operator" => "Original Operator"
+          "operator" => "Original Operator",
+          "latitude" => "50.1",
+          "longitude" => "-113.2",
+          "report_data" => %{"classification" => "EXP"}
         })
         |> Repo.insert()
 
@@ -116,7 +127,7 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       conn: conn,
       report: report
     } do
-      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}/edit")
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}/draft")
 
       fill_step1(view, @step1)
       next(view)
@@ -134,6 +145,7 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       next(view)
 
       add_row_and_fill(view, "surveys", @survey_row)
+      next(view)
 
       {:error, {:live_redirect, %{to: to}}} = submit(view)
 
@@ -146,13 +158,14 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       assert_row(hd(updated.report_data.profile_sections), @profile_row)
       assert_row(hd(updated.report_data.formation_tops), @formation_top_row)
       assert_row(hd(updated.report_data.surveys), @survey_row)
+      assert updated.status == "active"
     end
 
     test "fields left untouched on earlier steps survive edits made on later steps", %{
       conn: conn,
       report: report
     } do
-      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}/edit")
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}/draft")
 
       # Only step 1 is touched; every later step is just "Next" through
       # without changing anything, including report_data-owning steps 2/3/4.
@@ -160,14 +173,16 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
       |> form(@form_sel, report: %{"well_name" => "Renamed Well"})
       |> render_change()
 
-      for _ <- 1..5, do: next(view)
+      for _ <- 1..6, do: next(view)
 
       {:error, {:live_redirect, _}} = submit(view)
 
       updated = Repo.get!(Report, report.id)
       assert updated.well_name == "Renamed Well"
-      # untouched field from the original record must survive
+      # untouched fields from the original record must survive
       assert updated.operator == "Original Operator"
+      assert updated.latitude == 50.1
+      assert updated.report_data.classification == "EXP"
     end
   end
 
@@ -223,7 +238,6 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
     data = expected["report_data"]
     assert Decimal.equal?(report.report_data.gl_elevation, Decimal.new(data["gl_elevation"]))
     assert Decimal.equal?(report.report_data.kb_elevation, Decimal.new(data["kb_elevation"]))
-    assert Decimal.equal?(report.report_data.kb_to_ground, Decimal.new(data["kb_to_ground"]))
     assert report.report_data.datum == data["datum"]
     assert report.report_data.surface_coordinates == data["surface_coordinates"]
   end

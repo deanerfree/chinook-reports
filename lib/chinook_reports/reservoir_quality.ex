@@ -6,11 +6,16 @@ defmodule ChinookReports.ReservoirQuality do
   Each leg under `import_data["reservoir_data"]` carries `log_data.intervals`
   — the From / To footage picks with a lithology, porosity, gas and quality
   call — and `log_data.quality_summary`, the metres/percent-per-band totals
-  the Summary tab's quality chart reads. `recompute_for_report/2` rebuilds
-  `quality_summary` from an edited interval list so the two never drift.
+  the Summary tab's quality chart reads, plus `log_data.lithology_summary`
+  (metres/percent per lithology, the Reservoir tab's lithology chart).
+  `recompute_for_report/2` rebuilds both summaries from an edited interval
+  list so they never drift.
   """
 
   @quality_order ["Very Good", "Good", "Fair", "Poor", "Nil"]
+  # The extractor's lithology rows, in its order; any other lithology an
+  # interval names is appended after these.
+  @lithology_order ~w(Sandstone Siltstone Shale Limestone Dolomite Chert Other)
 
   @doc "The five reservoir-quality labels an interval row may be tagged with."
   @spec quality_options() :: [String.t()]
@@ -144,8 +149,8 @@ defmodule ChinookReports.ReservoirQuality do
 
   @doc """
   Rebuild `import_data["reservoir_data"]` with the edited leg's
-  `log_data.intervals` replaced by `intervals` and `log_data.quality_summary`
-  recomputed to match. Returns `nil` when the report carries no legs.
+  `log_data.intervals` replaced by `intervals` and `log_data.quality_summary` /
+  `lithology_summary` recomputed to match. Returns `nil` when the report carries no legs.
   """
   @spec recompute_for_report(struct() | map(), [map()]) :: [map()] | nil
   def recompute_for_report(report, intervals) do
@@ -161,6 +166,7 @@ defmodule ChinookReports.ReservoirQuality do
             (leg["log_data"] || %{})
             |> Map.put("intervals", intervals)
             |> Map.put("quality_summary", quality_summary(intervals))
+            |> Map.put("lithology_summary", lithology_summary(intervals))
 
           Map.put(leg, "log_data", log_data)
         end)
@@ -256,6 +262,27 @@ defmodule ChinookReports.ReservoirQuality do
       end)
 
     bands ++ [%{"quality" => "Total", "metres" => round1(total), "percent" => 100.0}]
+  end
+
+  @doc "Metres / percent per lithology, aggregated from `intervals`, plus a Total row."
+  @spec lithology_summary([map()]) :: [map()]
+  def lithology_summary(intervals) do
+    totals =
+      Enum.reduce(intervals, %{}, fn iv, acc ->
+        w = numeric(iv["interval"]) || 0
+        Map.update(acc, iv["lithology"] || "Other", w, &(&1 + w))
+      end)
+
+    total = totals |> Map.values() |> Enum.sum()
+    extra = totals |> Map.keys() |> Enum.reject(&(&1 in @lithology_order)) |> Enum.sort()
+
+    rows =
+      Enum.map(@lithology_order ++ extra, fn l ->
+        m = Map.get(totals, l, 0)
+        %{"lithology" => l, "metres" => round1(m), "percent" => percent(m, total)}
+      end)
+
+    rows ++ [%{"lithology" => "Total", "metres" => round1(total), "percent" => 100.0}]
   end
 
   defp percent(_m, total) when total in [0, 0.0], do: 0.0
