@@ -114,7 +114,7 @@ defmodule ChinookReportsWeb.HomeLive do
         </div>
         <span
           :if={@well.geometry != ""}
-          class="shrink-0 text-[9px] font-bold uppercase tracking-[0.14em] px-1.5 py-[3px] text-secondary border border-muted"
+          class="shrink-0 text-[9px] font-bold uppercase tracking-[0.14em] px-1.5 py-0.75 text-secondary border border-muted"
         >
           {@well.geometry}
         </span>
