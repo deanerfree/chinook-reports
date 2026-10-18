@@ -71,6 +71,30 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{field: :surface_coordinates, label: "Surface Coordinates", wide: true}
   ]
 
+  # Example values shown in the Location inputs, keyed by the selected Datum
+  # so each hints at that system's own format: ATS/DLS legal land
+  # descriptions (Alberta / Saskatchewan-Manitoba), NTS grid references
+  # (BC), and metric UTM Northing/Easting in place of latitude/longitude.
+  @datum_placeholders %{
+    "ATS" => %{latitude: "54.1234", longitude: "115.5678", surface_coordinates: "06-12-045-05W5"},
+    "DLS" => %{latitude: "49.8765", longitude: "103.4321", surface_coordinates: "16-24-012-09W2"},
+    "NTS" => %{
+      latitude: "56.9123",
+      longitude: "121.4567",
+      surface_coordinates: "A-034-L/094-B-16"
+    },
+    "UTM" => %{
+      latitude: "5967432",
+      longitude: "412345",
+      surface_coordinates: "Zone 11U, 412345 E, 5967432 N"
+    },
+    "Other" => %{
+      latitude: "52.5000",
+      longitude: "113.5000",
+      surface_coordinates: "Describe the surface location"
+    }
+  }
+
   @configuration_fields [
     %{
       field: :classification,
@@ -290,7 +314,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
                   spec={spec}
                 />
                 <.report_field
-                  :for={spec <- @location_fields}
+                  :for={spec <- location_fields(data)}
                   form={data}
                   spec={spec}
                 />
@@ -562,11 +586,29 @@ defmodule ChinookReportsWeb.CreateReportLive do
   # UTM coordinates are metric Easting/Northing; every other supported datum
   # (ATS/NTS/DLS/Other) is a lat/long-based description, so the unit suffix
   # on the Latitude/Longitude fields follows whichever Datum is selected.
+  # Placeholders follow the Datum too (see @datum_placeholders).
   defp coordinate_fields(data_form) do
-    case data_form[:datum].value do
-      "UTM" -> Enum.map(@coordinate_fields, &Map.put(&1, :unit, "m"))
-      _other -> @coordinate_fields
+    datum = data_form[:datum].value
+    fields = with_datum_placeholders(@coordinate_fields, datum)
+
+    case datum do
+      "UTM" -> Enum.map(fields, &Map.put(&1, :unit, "m"))
+      _other -> fields
     end
+  end
+
+  defp location_fields(data_form),
+    do: with_datum_placeholders(@location_fields, data_form[:datum].value)
+
+  defp with_datum_placeholders(fields, datum) do
+    examples = Map.get(@datum_placeholders, datum, @datum_placeholders["Other"])
+
+    Enum.map(fields, fn spec ->
+      case examples[spec.field] do
+        nil -> spec
+        example -> Map.put(spec, :placeholder, example)
+      end
+    end)
   end
 
   defp resolve_columns(columns) do
