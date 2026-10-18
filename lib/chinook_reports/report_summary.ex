@@ -97,7 +97,7 @@ defmodule ChinookReports.ReportSummary do
         tops: get_in(import_data, ["tops", "formations"]) || [],
         elevations: well["elevations"] || %{},
         td: well["total_depth_actual"] || %{},
-        plan: Enum.map(plan, &Map.take(&1, [:tvd, :vertical_section])),
+        plan: Enum.map(plan, &Map.take(&1, [:md, :tvd, :vertical_section])),
         show_curves: layout == :lateral and is_list(log["curve_data_cleaned"]),
         overlay_curves: layout == :lateral and is_list(log["curve_data_cleaned"])
       }

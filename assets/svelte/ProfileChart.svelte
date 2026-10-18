@@ -55,7 +55,7 @@
     formation: string
     samples?: { md?: number | null; tvd?: number | null; subsea?: number | null }
   }
-  type PlanPoint = { tvd: number; vertical_section: number }
+  type PlanPoint = { md: number; tvd: number; vertical_section: number }
 
   // ── Props ────────────────────────────────────────────────────────────────────
 
@@ -161,12 +161,14 @@
   )
   const hasTops = $derived(topList.length > 0)
 
-  const hasSettings = $derived(
-    layout === 'vertical'
-      ? hasTops
-      // Lateral layout always has at least the Plan/Actual legend to toggle.
-      : true,
-  )
+
+  type AxisKey = 'xMin' | 'xMax' | 'yMin' | 'yMax'
+
+  // An emptied box clears the bound back to fit-to-data.
+  function setAxisBound(key: AxisKey, raw: string) {
+    const v = raw.trim() === '' ? null : Number(raw)
+    design.axes[key] = v != null && Number.isFinite(v) ? v : null
+  }
 
   // Formation tops the user has kept visible (master switch + per-top state).
   const activeTops = $derived(
@@ -223,11 +225,21 @@
     return { entry, exit }
   }
 
+  // ── Axis bounds ───────────────────────────────────────────────────────────────
+
+  // The user's fixed bounds from Chart Settings; an unset end is left out so
+  // the chart's own fitting (or the caller's default) applies.
+  function axisBounds(min: number | null, max: number | null): { min?: number; max?: number } {
+    return { ...(min != null ? { min } : {}), ...(max != null ? { max } : {}) }
+  }
+
   // ── VS trajectory chart ───────────────────────────────────────────────────────
 
   function buildVSOption() {
+    // A new well has its plan before any survey is shot: draw the plan alone,
+    // and the actual path fills in as stations arrive.
     const activeLegs = legs.filter(l => l.survey?.survey_points?.length)
-    if (!activeLegs.length) return {}
+    if (!activeLegs.length && plan.length < 2) return {}
 
     const textColor = dark ? '#a3b5a8' : '#555'
     const gridColor = dark ? '#1e2e24' : '#f0ede8'
@@ -418,7 +430,7 @@
           yAxis: t.samples!.tvd as number,
           lineStyle: { color: dark ? '#7d8a80' : '#9aa39c', width: 1, type: 'dashed' as const },
           label: {
-            show: true, position: 'insideEndTop' as const, fontSize: 8.5,
+            show: design.tops.labels, position: 'insideEndTop' as const, fontSize: 8.5,
             color: textColor, formatter: t.formation,
           },
         }))
@@ -626,6 +638,7 @@
         axisLine: { lineStyle: { color: axisColor } },
         splitLine: { lineStyle: { color: gridColor, type: 'dashed' as const } },
         boundaryGap: ['5%', '5%'],
+        ...axisBounds(design.axes.xMin, design.axes.xMax),
       },
       yAxis: {
         type: 'value',
@@ -638,6 +651,7 @@
         axisLine: { lineStyle: { color: axisColor } },
         splitLine: { lineStyle: { color: gridColor, type: 'dashed' as const } },
         boundaryGap: ['1%', '1%'],
+        ...axisBounds(design.axes.yMin, design.axes.yMax),
       },
       series,
     }
@@ -793,17 +807,20 @@
     const pts = (leg?.survey?.survey_points ?? []).filter(
       p => p.tvd != null && p.vertical_section != null
     )
-    if (!pts.length) return {}
+    if (!pts.length && plan.length < 2) return {}
 
     const textColor  = dark ? '#a3b5a8' : '#555'
     const mutedColor = dark ? '#6b8f74' : '#8d998f'
     const gridColor  = dark ? '#1e2e24' : '#f4f4f2'
     const axisColor  = dark ? '#2a3d30' : '#1b1b1b'
 
-    const maxTvd = Math.max(...pts.map(p => p.tvd), td?.tvd ?? 0) * 1.03
+    const maxTvd = Math.max(...pts.map(p => p.tvd), ...plan.map(p => p.tvd), td?.tvd ?? 0) * 1.03
 
+    // Casing depths are MD; place them on the actual path, or on the plan
+    // until there's a survey.
+    const mdPath = pts.length ? pts : plan
     const mdToTvd = (md: number): number => {
-      const hit = interpolateSurvey(pts, md)
+      const hit = interpolateSurvey(mdPath, md)
       return hit ? hit[1] : md
     }
 
@@ -826,10 +843,17 @@
         yAxis: t.samples!.tvd as number,
         lineStyle: { color: mutedColor, width: 1, type: 'dashed' as const },
         label: {
-          show: true, position: 'insideEndTop' as const, fontSize: 8.5,
+          show: design.tops.labels, position: 'insideEndTop' as const, fontSize: 8.5,
           color: textColor, formatter: t.formation,
         },
       }))
+
+    const markLine = {
+      silent: true,
+      symbol: 'none',
+      animation: false,
+      data: [...casingLines, ...topLines],
+    }
 
     return {
       backgroundColor: 'transparent',
@@ -852,12 +876,13 @@
         axisLabel: { color: mutedColor, fontSize: 9 },
         axisLine: { lineStyle: { color: axisColor } },
         splitLine: { lineStyle: { color: gridColor } },
+        ...axisBounds(design.axes.xMin, design.axes.xMax),
       },
       yAxis: {
         type: 'value',
         inverse: true,
-        min: 0,
-        max: Math.ceil(maxTvd),
+        min: design.axes.yMin ?? 0,
+        max: design.axes.yMax ?? Math.ceil(maxTvd),
         name: 'TVD (m)',
         nameLocation: 'middle' as const,
         nameGap: 40,
@@ -867,21 +892,31 @@
         splitLine: { lineStyle: { color: gridColor } },
       },
       series: [
-        {
-          name: leg?.leg_name ?? 'Profile',
-          type: 'line',
-          smooth: false,
-          symbol: 'none',
-          data: pts.map(p => [p.vertical_section, p.tvd]),
-          lineStyle: { width: 1.6, color: dark ? '#4ade80' : '#114a26' },
-          itemStyle: { color: dark ? '#4ade80' : '#114a26' },
-          markLine: {
-            silent: true,
-            symbol: 'none',
-            animation: false,
-            data: [...casingLines, ...topLines],
-          },
-        },
+        ...(plan.length > 1
+          ? [{
+              name: 'Plan',
+              type: 'line',
+              smooth: false,
+              symbol: 'none',
+              data: plan.map(p => [p.vertical_section, p.tvd]),
+              lineStyle: { width: 1.3, color: dark ? '#7d8a80' : '#93a995', type: 'dashed' as const },
+              itemStyle: { color: '#93a995' },
+              tooltip: { show: false },
+              ...(pts.length ? {} : { markLine }),
+            }]
+          : []),
+        ...(pts.length
+          ? [{
+              name: leg?.leg_name ?? 'Profile',
+              type: 'line',
+              smooth: false,
+              symbol: 'none',
+              data: pts.map(p => [p.vertical_section, p.tvd]),
+              lineStyle: { width: 1.6, color: dark ? '#4ade80' : '#114a26' },
+              itemStyle: { color: dark ? '#4ade80' : '#114a26' },
+              markLine,
+            }]
+          : []),
       ],
     }
   }
@@ -982,6 +1017,27 @@
   </div>
 {/if}
 
+{#snippet axisInput(key: AxisKey, placeholder: string)}
+  <input
+    type="number"
+    step="any"
+    value={design.axes[key] ?? ''}
+    onchange={(e) => setAxisBound(key, e.currentTarget.value)}
+    {placeholder}
+    aria-label={key}
+    class="w-20 rounded border border-gray-300 bg-white px-1.5 py-0.5 text-[11px] tabular-nums text-gray-700"
+  />
+{/snippet}
+
+{#snippet axisRow(label: string, min: AxisKey, max: AxisKey)}
+  <div class="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+    <span class="w-14">{label}</span>
+    {@render axisInput(min, 'Min')}
+    <span>to</span>
+    {@render axisInput(max, 'Max')}
+  </div>
+{/snippet}
+
 {#snippet settingsButton()}
   <button
     type="button"
@@ -1003,7 +1059,7 @@
     <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0 pt-1">
       Depth Column · Profile · Casing · Formation Tops
     </p>
-    {#if hasSettings}{@render settingsButton()}{/if}
+    {@render settingsButton()}
   </div>
   <div bind:this={dcContainer} style="width: 100%; height: 640px;"></div>
 {:else}
@@ -1011,7 +1067,7 @@
     <p class="text-xs font-semibold uppercase tracking-wider text-muted m-0 pt-1">
       Vertical Section · Wellbore Profile
     </p>
-    {#if hasSettings}{@render settingsButton()}{/if}
+    {@render settingsButton()}
   </div>
 
   {#if design.legend.show}
@@ -1025,10 +1081,12 @@
           Plan
         </span>
       {/if}
-      <span class="flex items-center gap-1.5">
-        <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
-        Actual
-      </span>
+      {#if legs.some(l => l.survey?.survey_points?.length)}
+        <span class="flex items-center gap-1.5">
+          <svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#114a26" stroke-width="1.6" /></svg>
+          Actual
+        </span>
+      {/if}
       {#if hasQualityOnPath}
         <span class="mx-0.5 h-3 w-px self-center bg-gray-200"></span>
         {#each QUALITY_ORDER as q}
@@ -1060,82 +1118,89 @@
   {/if} -->
 {/if}
 
-{#if hasSettings}
-  <Drawer bind:open={settingsOpen} title="Chart Settings">
-    {#if !isVertical}
-      <DrawerSection title="Legend" description="Key for the plan, actual and reservoir-quality traces, shown in a box above the plot.">
-        <Toggle bind:checked={design.legend.show} label="Show legend" />
-      </DrawerSection>
-    {/if}
+<Drawer bind:open={settingsOpen} title="Chart Settings">
+  <DrawerSection
+    title="Axes"
+    description="Fixed axis bounds in metres. Leave a box empty to fit that end to the data."
+  >
+    {@render axisRow('VS (X)', 'xMin', 'xMax')}
+    {@render axisRow('TVD (Y)', 'yMin', 'yMax')}
+  </DrawerSection>
 
-    {#if hasQualityOnPath}
-      <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
-        <Toggle bind:checked={design.style.showBackdrop} label="Quality Backdrop" />
-        {#if design.style.showBackdrop}
-          <div class="indent-2">
-            <RangeSlider
-              bind:value={design.style.backdropOpacity}
-              min={0}
-              max={1}
-              step={0.02}
-              label="Opacity"
-              format={(v) => `${Math.round(v * 100)}`}
+  {#if !isVertical}
+    <DrawerSection title="Legend" description="Key for the plan, actual and reservoir-quality traces, shown in a box above the plot.">
+      <Toggle bind:checked={design.legend.show} label="Show legend" />
+    </DrawerSection>
+  {/if}
+
+  {#if hasQualityOnPath}
+    <DrawerSection title="Chart Style" description="Reservoir-quality styling on the wellbore plot.">
+      <Toggle bind:checked={design.style.showBackdrop} label="Quality Backdrop" />
+      {#if design.style.showBackdrop}
+        <div class="indent-2">
+          <RangeSlider
+            bind:value={design.style.backdropOpacity}
+            min={0}
+            max={1}
+            step={0.02}
+            label="Opacity"
+            format={(v) => `${Math.round(v * 100)}`}
+          />
+        </div>
+      {/if}
+      <Toggle bind:checked={design.style.showColors} label="Path colours" />
+      {#if design.style.showColors}
+        <div class="indent-2">
+          <RangeSlider
+            bind:value={design.style.pathOpacity}
+            min={0}
+            max={1}
+            step={0.02}
+            label="Opacity"
+            format={(v) => `${Math.round(v * 100)}`}
+          />
+        </div>
+      {/if}
+    </DrawerSection>
+  {/if}
+
+  {#if hasTops}
+    <DrawerSection
+      title="Formation Tops"
+      description="Formation tops picked from samples, drawn across the profile at their TVD."
+      collapsible
+    >
+      <Toggle bind:checked={design.tops.show} label="Show tops" />
+      {#if design.tops.show}
+        <Toggle bind:checked={design.tops.labels} label="Show names" />
+        <div class="flex flex-wrap gap-1.5">
+          {#each topList as formation}
+            <ToggleChip
+              pressed={!design.tops.hidden.includes(formation)}
+              label={formation}
+              onchange={(v) => setTopHidden(formation, !v)}
             />
-          </div>
-        {/if}
-        <Toggle bind:checked={design.style.showColors} label="Path colours" />
-        {#if design.style.showColors}
-          <div class="indent-2">
-            <RangeSlider
-              bind:value={design.style.pathOpacity}
-              min={0}
-              max={1}
-              step={0.02}
-              label="Opacity"
-              format={(v) => `${Math.round(v * 100)}`}
-            />
-          </div>
-        {/if}
-      </DrawerSection>
-    {/if}
+          {/each}
+        </div>
+      {/if}
+    </DrawerSection>
+  {/if}
 
-    {#if hasTops}
-      <DrawerSection
-        title="Formation Tops"
-        description="Formation tops picked from samples, drawn across the profile at their TVD."
-        collapsible
-      >
-        <Toggle bind:checked={design.tops.show} label="Show tops" />
-        {#if design.tops.show}
-          <div class="flex flex-wrap gap-1.5">
-            {#each topList as formation}
-              <ToggleChip
-                pressed={!design.tops.hidden.includes(formation)}
-                label={formation}
-                onchange={(v) => setTopHidden(formation, !v)}
-              />
-            {/each}
-          </div>
-        {/if}
-      </DrawerSection>
-    {/if}
-
-    {#if overlay_curves}
-      <DrawerSection title="Fig. 01 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
-        <Toggle bind:checked={design.curves.overlayOn} label="Overlay" />
-        {#if design.curves.overlayOn}
-          <div class="flex flex-col gap-2">
-            {#each OVERLAY_BANDS as band}
-              <div class="flex flex-wrap items-center gap-1.5 indent-1">
-                <ToggleChip bind:pressed={design.curves.show[band.key]} label={band.label} dotColor={band.color} />
-                {#if design.curves.show[band.key] && hasQualityOnPath}
-                  <ToggleChip bind:pressed={design.curves.quality[band.key]} label="Quality" />
-                {/if}
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </DrawerSection>
-    {/if}
-  </Drawer>
-{/if}
+  {#if overlay_curves}
+    <DrawerSection title="Fig. 01 Overlay" description="Drilling curves superimposed on the VS plot. Toggle reservoir-quality shading per curve.">
+      <Toggle bind:checked={design.curves.overlayOn} label="Overlay" />
+      {#if design.curves.overlayOn}
+        <div class="flex flex-col gap-2">
+          {#each OVERLAY_BANDS as band}
+            <div class="flex flex-wrap items-center gap-1.5 indent-1">
+              <ToggleChip bind:pressed={design.curves.show[band.key]} label={band.label} dotColor={band.color} />
+              {#if design.curves.show[band.key] && hasQualityOnPath}
+                <ToggleChip bind:pressed={design.curves.quality[band.key]} label="Quality" />
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </DrawerSection>
+  {/if}
+</Drawer>

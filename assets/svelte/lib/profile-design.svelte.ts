@@ -25,7 +25,15 @@ export type ProfileDesign = {
   }
   tops: {
     show: boolean
+    labels: boolean  // formation name printed on each top line
     hidden: string[] // formation names the user has switched off
+  }
+  axes: {
+    // Fixed axis bounds in metres; null fits that end to the data.
+    xMin: number | null
+    xMax: number | null
+    yMin: number | null
+    yMax: number | null
   }
 }
 
@@ -43,7 +51,8 @@ function defaults(): ProfileDesign {
       show: { rop: true, gas: true, gamma: true },
       quality: { rop: true, gas: true, gamma: true },
     },
-    tops: { show: true, hidden: [] },
+    tops: { show: true, labels: true, hidden: [] },
+    axes: { xMin: -10, xMax: null, yMin: null, yMax: null },
   }
 }
 
@@ -64,9 +73,24 @@ function hydrate(saved: any): ProfileDesign {
     },
     tops: {
       show: saved.tops?.show ?? d.tops.show,
+      labels: saved.tops?.labels ?? d.tops.labels,
       hidden: Array.isArray(saved.tops?.hidden) ? saved.tops.hidden.filter((f: unknown) => typeof f === 'string') : [],
     },
+    axes: {
+      xMin: bound(saved.axes, 'xMin', d.axes.xMin),
+      xMax: bound(saved.axes, 'xMax', d.axes.xMax),
+      yMin: bound(saved.axes, 'yMin', d.axes.yMin),
+      yMax: bound(saved.axes, 'yMax', d.axes.yMax),
+    },
   }
+}
+
+// A saved axis bound: a finite number, an explicit null (cleared by the user),
+// or — when the key is missing from an older blob — the default.
+function bound(saved: any, key: string, fallback: number | null): number | null {
+  if (!saved || typeof saved !== 'object' || !(key in saved)) return fallback
+  const v = saved[key]
+  return typeof v === 'number' && Number.isFinite(v) ? v : null
 }
 
 function load(): ProfileDesign {

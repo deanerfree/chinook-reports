@@ -241,4 +241,15 @@ defmodule ChinookReports.ReportSummaryTest do
     assert s.reservoir_quality == nil
     assert s.timeline == []
   end
+
+  test "a new well with only a directional program charts the plan before any survey" do
+    s =
+      %Report{well_name: "New", import_data: %{}}
+      |> with_program([{"0", "0", "0"}, {"200", "0", "0"}, {"500", "30", "90"}])
+      |> ReportSummary.build()
+
+    assert s.chart_props.legs == []
+    assert [%{md: +0.0, tvd: +0.0, vertical_section: +0.0} | _] = s.chart_props.plan
+    assert %{md: 500.0} = List.last(s.chart_props.plan)
+  end
 end
