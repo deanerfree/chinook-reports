@@ -32,6 +32,8 @@ defmodule ChinookReports.FormationTops do
   (`provisional?/1`).
   """
 
+  alias ChinookReports.Trajectory
+
   @groups ~w(prognosis samples mwd_gamma)
   @derived_groups ~w(samples mwd_gamma)
 
@@ -59,7 +61,7 @@ defmodule ChinookReports.FormationTops do
 
     formations
     |> Enum.map(&recompute_row(&1, survey, kb))
-    |> fill_isopachs()
+    |> fill_isopachs(survey)
     |> Enum.map(&put_difference/1)
   end
 
@@ -68,13 +70,18 @@ defmodule ChinookReports.FormationTops do
   KB elevation from the report. `overrides` can pass a not-yet-persisted
   `:kb_elevation` or `:formations` list (e.g. mid-edit).
 
-  Returns the rebuilt tops map, or `nil` when the report carries no tops.
+  A report with no `import_data["tops"]` yet starts one from its typed tops
+  (`seeded_formations/1`), so a report set up in the wizard gets the same
+  table; it's persisted with the next save that carries tops.
+
+  Returns the rebuilt tops map, or `nil` when the report has no tops of
+  either kind (and no `:formations` override).
   """
   @spec recompute_for_report(struct(), keyword()) :: map() | nil
   def recompute_for_report(report, overrides \\ []) do
     import_data = report.import_data || %{}
 
-    case import_data["tops"] do
+    case base_tops(report, overrides) do
       %{"formations" => formations} = tops ->
         formations = Keyword.get(overrides, :formations, formations)
 
@@ -105,6 +112,38 @@ defmodule ChinookReports.FormationTops do
       tops -> Map.put(sections, "tops", tops)
     end
   end
+
+  defp base_tops(report, overrides) do
+    case {(report.import_data || %{})["tops"], seeded_formations(report)} do
+      {%{"formations" => _} = tops, _} -> tops
+      {_, [_ | _] = seeded} -> %{"formations" => seeded}
+      _ -> if Keyword.has_key?(overrides, :formations), do: %{"formations" => []}
+    end
+  end
+
+  @doc """
+  The tops table a report set up in the wizard starts from: one row per typed
+  formation top (`report_data.formation_tops`), named as typed, with its MD
+  and subsea (or, lacking a subsea, its TVD) as the Prognosis pick and every
+  compared group empty, ready to fill in while drilling.
+  """
+  @spec seeded_formations(struct()) :: [map()]
+  def seeded_formations(%{report_data: %{formation_tops: [_ | _] = typed}}) do
+    Enum.map(typed, fn top ->
+      subsea = numeric(top.subsea)
+
+      prognosis =
+        if is_number(subsea),
+          do: %{"md" => numeric(top.md), "subsea" => subsea},
+          else: %{"md" => numeric(top.md), "tvd" => numeric(top.tvd)}
+
+      @derived_groups
+      |> Map.new(&{&1, %{}})
+      |> Map.merge(%{"formation" => top.formation, "prognosis" => prognosis})
+    end)
+  end
+
+  def seeded_formations(_report), do: []
 
   @doc """
   The KB elevation a tops recompute should use.
@@ -169,8 +208,10 @@ defmodule ChinookReports.FormationTops do
   end
 
   # Prognosis is anchored on the geologic pick — datum-stable in *subsea* — and
-  # its TVD is `kb - subsea`. Older / manually-entered prognoses that carry only
-  # a TVD are honoured the other way round (subsea = `kb - tvd`).
+  # its TVD is `kb - subsea` — always our KB, so a TVD a plan gave (measured
+  # from its own KB) is replaced; with no KB it's left blank and the isopach
+  # comes from the subsea difference. Older / manually-entered prognoses that
+  # carry only a TVD are honoured the other way round (subsea = `kb - tvd`).
   defp recompute_group("prognosis", grp, _survey, kb) do
     {tvd, ss} =
       case {numeric(grp["subsea"]), numeric(grp["tvd"])} do
@@ -246,45 +287,224 @@ defmodule ChinookReports.FormationTops do
 
   # ── isopach (needs the neighbouring rows) ─────────────────────────────────
 
-  defp fill_isopachs(rows) do
-    Enum.reduce(@groups, rows, &fill_isopach_group(&2, &1))
+  @doc """
+  The isopach — vertical thickness — of each of `tops`, in the order given:
+  the distance down to the next top in depth order. The deepest top, and any
+  top without a depth, has none (`nil`).
+
+  Each top is a map of numbers or `nil`:
+
+    * `:md`, `:tvd`, `:subsea` — the top's depths (`:subsea` is an elevation,
+      KB − TVD, so it decreases going down);
+    * `:est_tvd` — a TVD estimated from the MD (off a survey or planned path,
+      or the MD itself in a hole with no survey, taken as vertical), used only
+      when neither of the others gives a thickness.
+
+  A pair's thickness is the first of: the TVD difference; the subsea
+  difference (needs no KB elevation); the estimated-TVD difference.
+  """
+  @spec isopachs([map()]) :: [float() | nil]
+  def isopachs(tops) do
+    by_index =
+      tops
+      |> Enum.with_index()
+      |> Enum.filter(fn {top, _} -> depth_key(top) end)
+      |> Enum.sort_by(fn {top, _} -> depth_key(top) end)
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Map.new(fn [{top, i}, {next, _}] -> {i, round1(thickness(top, next))} end)
+
+    for i <- 0..(length(tops) - 1)//1, do: Map.get(by_index, i)
   end
 
-  defp fill_isopach_group(rows, group) do
-    # rows carrying a tvd for this group, in depth order, keyed by original index
-    ordered =
-      rows
-      |> Enum.with_index()
-      |> Enum.filter(fn {row, _} -> is_number(get_in(row, [group, "tvd"])) end)
-      |> Enum.sort_by(fn {row, _} -> get_in(row, [group, "tvd"]) end)
+  # Where a top sits in the hole: by MD (tops follow the hole down), else TVD,
+  # else depth below the subsea datum.
+  defp depth_key(top) do
+    cond do
+      is_number(top[:md]) -> top[:md]
+      is_number(top[:tvd]) -> top[:tvd]
+      is_number(top[:est_tvd]) -> top[:est_tvd]
+      is_number(top[:subsea]) -> -top[:subsea]
+      true -> nil
+    end
+  end
 
-    isopachs =
-      ordered
-      |> Enum.chunk_every(2, 1, :discard)
-      |> Enum.map(fn [{row, idx}, {next, _}] ->
-        {idx, round1(get_in(next, [group, "tvd"]) - get_in(row, [group, "tvd"]))}
+  defp thickness(a, b) do
+    cond do
+      is_number(a[:tvd]) and is_number(b[:tvd]) -> b[:tvd] - a[:tvd]
+      is_number(a[:subsea]) and is_number(b[:subsea]) -> a[:subsea] - b[:subsea]
+      is_number(a[:est_tvd]) and is_number(b[:est_tvd]) -> b[:est_tvd] - a[:est_tvd]
+      true -> nil
+    end
+  end
+
+  @doc """
+  A TVD for measured depth `md` estimated off `tvd_at` (a function of MD
+  returning a TVD or `nil`, e.g. a survey or planned path), or the MD itself
+  when there is no path to read (`tvd_at` is `nil`) — a hole with no survey
+  is taken as vertical.
+  """
+  @spec estimate_tvd(number() | nil, (number() -> number() | nil) | nil) :: number() | nil
+  def estimate_tvd(md, _tvd_at) when not is_number(md), do: nil
+  def estimate_tvd(md, nil), do: md
+  def estimate_tvd(md, tvd_at), do: tvd_at.(md)
+
+  @doc """
+  Derive the typed formation tops (`report_data.formation_tops`) on a report
+  changeset — the typed counterpart of `recompute/2`:
+
+    * `tvd` — `kb − subsea` where the top has a subsea (the geologic pick, so
+      it moves with any KB correction), `kb` being *our* KB elevation
+      (`kb_elevation/1`'s choice: Well Data's Kelly Bushing, else the typed
+      one) — never a plan's, which is measured from another KB. A top with no
+      subsea, or no KB to hand, keeps the TVD typed in.
+    * `isopach` — always derived (`isopachs/1`); a top's estimated TVD is read
+      off the directional program (`report_data.surveys`, by minimum
+      curvature), or is its MD when there is no program.
+
+  Runs when the report data or import data (Well Data's KB) changes; a report
+  whose `report_data` was never saved (`id: nil`, see
+  `Reports.ensure_report_data/1`) has no typed tops to derive. Leaves the
+  changeset alone when nothing changes.
+  """
+  @spec put_typed_tops(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  def put_typed_tops(%Ecto.Changeset{} = report) do
+    case typed_report_data(report) do
+      nil ->
+        report
+
+      report_data ->
+        derived = derive_typed_tops(report_data, typed_kb(report, report_data))
+
+        if derived == report_data,
+          do: report,
+          else: Ecto.Changeset.put_embed(report, :report_data, derived)
+    end
+  end
+
+  defp typed_report_data(report) do
+    case Ecto.Changeset.fetch_change(report, :report_data) do
+      {:ok, %Ecto.Changeset{} = report_data} ->
+        report_data
+
+      _ ->
+        with true <- Ecto.Changeset.changed?(report, :import_data),
+             %{id: id} = data when not is_nil(id) <- report.data.report_data do
+          Ecto.Changeset.change(data)
+        else
+          _ -> nil
+        end
+    end
+  end
+
+  defp typed_kb(report, report_data) do
+    import_data = Ecto.Changeset.get_field(report, :import_data) || %{}
+
+    numeric(get_in(import_data, ["welldata", "elevations", "kelly_bushing"])) ||
+      numeric(Ecto.Changeset.get_field(report_data, :kb_elevation))
+  end
+
+  defp derive_typed_tops(report_data, kb) do
+    tops = Ecto.Changeset.get_field(report_data, :formation_tops) || []
+    mds = Enum.map(tops, &numeric(&1.md))
+    planned = planned_tvds(Ecto.Changeset.get_field(report_data, :surveys) || [], mds)
+
+    entries =
+      tops
+      |> Enum.zip(Enum.zip(mds, planned))
+      |> Enum.map(fn {top, {md, planned_tvd}} ->
+        subsea = numeric(top.subsea)
+
+        %{
+          md: md,
+          tvd: round1(kb_minus(kb, subsea)) || numeric(top.tvd),
+          subsea: subsea,
+          est_tvd: planned_tvd
+        }
       end)
-      |> Map.new()
+
+    derived =
+      Enum.zip_with(entries, isopachs(entries), fn e, isopach -> {e.tvd, isopach} end)
+
+    if Enum.map(tops, &{numeric(&1.tvd), numeric(&1.isopach)}) == derived do
+      report_data
+    else
+      rows =
+        Enum.zip_with(tops, derived, fn top, {tvd, isopach} ->
+          Ecto.Changeset.change(top, tvd: decimal(tvd), isopach: decimal(isopach))
+        end)
+
+      Ecto.Changeset.put_embed(report_data, :formation_tops, rows)
+    end
+  end
+
+  defp decimal(nil), do: nil
+  defp decimal(n), do: Decimal.from_float(n / 1)
+
+  # TVD at each of `mds` along the directional program `surveys` (tied in
+  # vertically at the wellhead); each MD itself when there's no usable program.
+  defp planned_tvds(surveys, mds) do
+    stations =
+      surveys
+      |> Enum.map(
+        &%{md: numeric(&1.md), inc_deg: numeric(&1.inclination), azi_deg: numeric(&1.azimuth)}
+      )
+      |> Enum.filter(fn s -> Enum.all?(Map.values(s), &is_number/1) end)
+      |> Enum.sort_by(& &1.md)
+      |> Trajectory.tie_in_at_surface()
+
+    if length(stations) >= 2 do
+      stations
+      |> Trajectory.positions_at(Enum.map(mds, &(&1 || -1.0)))
+      |> Enum.map(&(&1 && &1.tvd))
+    else
+      Enum.map(mds, &estimate_tvd(&1, nil))
+    end
+  end
+
+  defp fill_isopachs(rows, survey) do
+    tvd_at = if length(survey) >= 2, do: &(survey |> tvd_at(&1) |> elem(0))
+
+    Enum.reduce(@groups, rows, &fill_isopach_group(&2, &1, tvd_at))
+  end
+
+  defp fill_isopach_group(rows, group, tvd_at) do
+    isopachs =
+      rows
+      |> Enum.map(fn row ->
+        grp = Map.get(row, group) || %{}
+        md = numeric(grp["md"])
+
+        %{
+          md: md,
+          tvd: numeric(grp["tvd"]),
+          subsea: numeric(grp["subsea"]),
+          est_tvd: estimate_tvd(md, tvd_at)
+        }
+      end)
+      |> isopachs()
 
     rows
-    |> Enum.with_index()
-    |> Enum.map(fn {row, idx} ->
-      put_in(row, [group, "isopach"], Map.get(isopachs, idx))
-    end)
+    |> Enum.zip(isopachs)
+    |> Enum.map(fn {row, isopach} -> put_in(row, [group, "isopach"], isopach) end)
   end
 
-  # ── difference_m ─────────────────────────────────────────────────────────
+  # ── difference vs prognosis ──────────────────────────────────────────────
 
   defp put_difference(row) do
-    diff =
-      with s when is_number(s) <- get_in(row, ["samples", "subsea"]),
-           p when is_number(p) <- get_in(row, ["prognosis", "subsea"]) do
-        round1(s - p)
-      else
-        _ -> nil
-      end
+    prognosis = get_in(row, ["prognosis", "subsea"])
 
-    Map.put(row, "difference_m", diff)
+    row =
+      Enum.reduce(@derived_groups, row, fn g, acc ->
+        diff =
+          with s when is_number(s) <- get_in(acc, [g, "subsea"]),
+               p when is_number(p) <- prognosis do
+            round1(s - p)
+          end
+
+        put_in(acc, [g, "difference"], diff)
+      end)
+
+    Map.put(row, "difference_m", get_in(row, ["samples", "difference"]))
   end
 
   # ── helpers ──────────────────────────────────────────────────────────────

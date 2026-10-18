@@ -46,7 +46,9 @@ defmodule ChinookReports.Reports.Editing do
       |> Changeset.change()
       |> Changeset.put_embed(list, new_list)
 
-    Changeset.put_embed(changeset, :report_data, report_data_changeset)
+    changeset
+    |> Changeset.put_embed(:report_data, report_data_changeset)
+    |> ChinookReports.FormationTops.put_typed_tops()
   end
 
   defp blank_row(:profile_sections), do: %ProfileSection{}

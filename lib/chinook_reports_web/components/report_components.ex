@@ -67,27 +67,14 @@ defmodule ChinookReportsWeb.ReportComponents do
             editable={@editable}
           />
         <% "formation_tops" -> %>
-          <%= if @import["tops"] do %>
-            <.live_component
-              module={ChinookReportsWeb.FormationTopsLive}
-              id="formation-tops"
-              report={@report}
-              editable={@editable}
-            />
-          <% else %>
-            <%= if @data do %>
-              <.editable_section key="formation_tops" editing={@editing} form={@form}>
-                <:view>
-                  <.formation_tops_section rows={@data.formation_tops}>
-                    <:action :if={@editable}>
-                      <.edit_button section="formation_tops" />
-                    </:action>
-                  </.formation_tops_section>
-                </:view>
-                <:edit :let={form}><.formation_tops_form form={form} /></:edit>
-              </.editable_section>
-            <% end %>
-          <% end %>
+          <%!-- Every report gets the full tops table; one set up in the wizard
+               starts it from its typed tops (FormationTops.recompute_for_report/2). --%>
+          <.live_component
+            module={ChinookReportsWeb.FormationTopsLive}
+            id="formation-tops"
+            report={@report}
+            editable={@editable}
+          />
         <% "reservoir" -> %>
           <%= if reservoir = @import["reservoir_data"] do %>
             <.reservoir_section reservoir={reservoir} />

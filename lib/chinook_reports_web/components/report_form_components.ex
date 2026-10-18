@@ -198,7 +198,8 @@ defmodule ChinookReportsWeb.ReportFormComponents do
 
   attr :columns, :list,
     required: true,
-    doc: "list of column specs: %{key, label, placeholder?, unit?}"
+    doc:
+      "list of column specs: %{key, label, placeholder?, unit?, computed?} — a `computed` column is read-only"
 
   attr :hint, :string,
     default: nil,
@@ -246,7 +247,10 @@ defmodule ChinookReportsWeb.ReportFormComponents do
                   name={row[col.key].name}
                   value={format_value(row[col.key].value)}
                   placeholder={col[:placeholder]}
-                  class={table_cell_input_class()}
+                  readonly={col[:computed]}
+                  tabindex={col[:computed] && "-1"}
+                  title={col[:computed] && "Calculated"}
+                  class={[table_cell_input_class(), col[:computed] && "text-muted"]}
                 />
               </td>
               <td class="border-b border-light px-1 py-1 text-center">

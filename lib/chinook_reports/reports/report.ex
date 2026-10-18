@@ -67,6 +67,8 @@ defmodule ChinookReports.Reports.Report do
 
     # --- Everything else: structured JSONB ---
     embeds_one :report_data, ReportData, on_replace: :update do
+      @type t :: %__MODULE__{}
+
       field :surface_location, :string
       field :bottom_location, :string
       field :field_region, :string
@@ -84,6 +86,8 @@ defmodule ChinookReports.Reports.Report do
       field :terminating_zone, :string
 
       embeds_many :profile_sections, ProfileSection, on_replace: :delete do
+        @type t :: %__MODULE__{}
+
         field :section, :string
         field :start_depth, :decimal
         field :end_depth, :decimal
@@ -91,6 +95,8 @@ defmodule ChinookReports.Reports.Report do
       end
 
       embeds_many :formation_tops, FormationTop, on_replace: :delete do
+        @type t :: %__MODULE__{}
+
         field :formation, :string
         field :md, :decimal
         field :tvd, :decimal
@@ -99,6 +105,8 @@ defmodule ChinookReports.Reports.Report do
       end
 
       embeds_many :surveys, SurveyPoint, on_replace: :delete do
+        @type t :: %__MODULE__{}
+
         field :md, :decimal
         field :inclination, :decimal
         field :azimuth, :decimal
@@ -156,6 +164,7 @@ defmodule ChinookReports.Reports.Report do
       :import_data
     ])
     |> cast_report_data(attrs)
+    |> ChinookReports.FormationTops.put_typed_tops()
     |> validate_required(@required_fields)
     |> validate_inclusion(:country, Countries.all())
     |> validate_uwi()

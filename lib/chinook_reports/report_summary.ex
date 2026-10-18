@@ -62,7 +62,7 @@ defmodule ChinookReports.ReportSummary do
 
   @spec build(struct()) :: t()
   def build(report) do
-    import_data = report.import_data || %{}
+    import_data = with_tops(report)
     well = import_data["welldata"] || %{}
     legs = import_data["reservoir_data"] || []
     leg = List.first(legs) || %{}
@@ -191,6 +191,17 @@ defmodule ChinookReports.ReportSummary do
   defp geometry_label(nil), do: ""
   defp geometry_label(""), do: ""
   defp geometry_label(g), do: g |> to_string() |> String.capitalize()
+
+  # A wizard-made report's tops table starts from its typed tops until the
+  # Formation Tops tab first saves one (FormationTops.recompute_for_report/2).
+  defp with_tops(report) do
+    import_data = report.import_data || %{}
+
+    case import_data["tops"] || ChinookReports.FormationTops.recompute_for_report(report) do
+      nil -> import_data
+      tops -> Map.put(import_data, "tops", tops)
+    end
+  end
 
   # ── Tabs ──────────────────────────────────────────────────────────────────
 

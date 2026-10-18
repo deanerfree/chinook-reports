@@ -63,7 +63,8 @@ defmodule ChinookReportsWeb.CreateReportLiveWizardTest do
     "formation" => "McLaren",
     "md" => "1500",
     "tvd" => "1490",
-    "subsea" => "-800"
+    # consistent with the KB above (891.2 − 1490): TVD is derived from it
+    "subsea" => "-598.8"
   }
   @survey_row %{"md" => "1000", "inclination" => "45", "azimuth" => "180"}
 

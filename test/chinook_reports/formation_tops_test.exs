@@ -1,5 +1,5 @@
 defmodule ChinookReports.FormationTopsTest do
-  use ExUnit.Case, async: true
+  use ChinookReports.DataCase, async: true
 
   alias ChinookReports.FormationTops
 
@@ -91,6 +91,177 @@ defmodule ChinookReports.FormationTopsTest do
 
       assert shallow["prognosis"]["isopach"] == 300.0
       assert deep["prognosis"]["isopach"] == nil
+    end
+  end
+
+  describe "isopach fallbacks" do
+    test "a prognosis with no KB drops a TVD from another KB; isopach comes from subsea" do
+      [a, b] =
+        FormationTops.recompute(
+          [
+            row("A", %{"md" => 100.0, "tvd" => 98.0, "subsea" => 502.0}),
+            row("B", %{"md" => 200.0, "tvd" => 190.0, "subsea" => 410.0})
+          ],
+          survey_points: [],
+          kb_elevation: nil
+        )
+
+      assert a["prognosis"]["tvd"] == nil
+      assert a["prognosis"]["isopach"] == 92.0
+      assert b["prognosis"]["isopach"] == nil
+    end
+
+    test "with no TVD and no KB, the subsea difference is the thickness" do
+      [a, _] =
+        FormationTops.recompute(
+          [row("A", %{"subsea" => 502.0}), row("B", %{"subsea" => 410.0})],
+          survey_points: [],
+          kb_elevation: nil
+        )
+
+      assert a["prognosis"]["isopach"] == 92.0
+    end
+
+    test "an MD-only prognosis reads its TVD off the survey" do
+      deviated = [
+        %{"md" => 0.0, "tvd" => 0.0},
+        %{"md" => 100.0, "tvd" => 100.0},
+        %{"md" => 300.0, "tvd" => 200.0}
+      ]
+
+      [a, _] =
+        FormationTops.recompute([row("A", %{"md" => 100.0}), row("B", %{"md" => 300.0})],
+          survey_points: deviated,
+          kb_elevation: nil
+        )
+
+      assert a["prognosis"]["isopach"] == 100.0
+    end
+
+    test "with no survey, an MD-only top is taken as vertical" do
+      [a, _] =
+        FormationTops.recompute(
+          [row("A", %{}, %{"md" => 120.0}), row("B", %{}, %{"md" => 175.5})],
+          survey_points: [],
+          kb_elevation: @kb
+        )
+
+      assert a["samples"]["isopach"] == 55.5
+    end
+
+    test "a row with no depth is skipped over" do
+      [a, blank, c] =
+        recompute([
+          row("A", %{"md" => 100.0, "tvd" => 100.0}),
+          row("New"),
+          row("C", %{"md" => 250.0, "tvd" => 250.0})
+        ])
+
+      assert a["prognosis"]["isopach"] == 150.0
+      assert blank["prognosis"]["isopach"] == nil
+      assert c["prognosis"]["isopach"] == nil
+    end
+  end
+
+  describe "typed formation tops (report_data)" do
+    alias ChinookReports.Reports.Report
+
+    defp typed(tops, extra \\ %{}) do
+      %Report{report_data: %Report.ReportData{}}
+      |> Report.changeset(%{
+        "well_name" => "W",
+        "unique_well_id" => "100/01-01-001-01W1/00",
+        "report_data" => Map.merge(%{"formation_tops" => tops}, extra)
+      })
+      |> Ecto.Changeset.get_field(:report_data)
+      |> Map.fetch!(:formation_tops)
+      |> Enum.map(&(&1.isopach && Decimal.to_float(&1.isopach)))
+    end
+
+    test "isopach is derived from TVD as tops are added" do
+      assert typed(%{"0" => %{"formation" => "A", "md" => "100", "tvd" => "100"}}) == [nil]
+
+      assert typed(%{
+               "0" => %{"formation" => "A", "md" => "100", "tvd" => "100"},
+               "1" => %{"formation" => "B", "md" => "260", "tvd" => "240"}
+             }) == [140.0, nil]
+    end
+
+    test "a typed isopach is overwritten by the calculation" do
+      assert typed(%{
+               "0" => %{"formation" => "A", "md" => "100", "tvd" => "100", "isopach" => "7"},
+               "1" => %{"formation" => "B", "md" => "260", "tvd" => "240"}
+             }) == [140.0, nil]
+    end
+
+    test "TVD is our KB − subsea, replacing a TVD typed against another KB" do
+      %{formation_tops: [top]} =
+        %Report{report_data: %Report.ReportData{}}
+        |> Report.changeset(%{
+          "well_name" => "W",
+          "unique_well_id" => "100/01-01-001-01W1/00",
+          "report_data" => %{
+            "kb_elevation" => "600",
+            "formation_tops" => %{"0" => %{"formation" => "A", "tvd" => "97", "subsea" => "500"}}
+          }
+        })
+        |> Ecto.Changeset.apply_changes()
+        |> Map.fetch!(:report_data)
+
+      assert Decimal.equal?(top.tvd, "100")
+    end
+
+    test "Well Data's KB wins over the typed one, and a change to it moves TVD" do
+      {:ok, report} =
+        ChinookReports.Reports.create_report(%{
+          "well_name" => "W",
+          "unique_well_id" => "100/01-01-001-01W1/00",
+          "import_data" => %{"welldata" => %{"elevations" => %{"kelly_bushing" => 610.0}}},
+          "report_data" => %{
+            "kb_elevation" => "600",
+            "formation_tops" => %{"0" => %{"formation" => "A", "subsea" => "500"}}
+          }
+        })
+
+      assert Decimal.equal?(hd(report.report_data.formation_tops).tvd, "110")
+
+      {:ok, report} =
+        ChinookReports.Reports.update_import_section(report, "welldata", %{
+          "elevations" => %{"kelly_bushing" => 615.0}
+        })
+
+      assert Decimal.equal?(hd(report.report_data.formation_tops).tvd, "115")
+    end
+
+    test "uses KB − subsea when there's no TVD" do
+      assert typed(
+               %{
+                 "0" => %{"formation" => "A", "subsea" => "500"},
+                 "1" => %{"formation" => "B", "subsea" => "450"}
+               },
+               %{"kb_elevation" => "600"}
+             ) == [50.0, nil]
+    end
+
+    test "an MD-only top reads its TVD off the directional program" do
+      # vertical to 100 m, then 60° inclination: 100 m of hole drops 50 m TVD
+      program = %{
+        "0" => %{"md" => "0", "inclination" => "0", "azimuth" => "0"},
+        "1" => %{"md" => "100", "inclination" => "0", "azimuth" => "0"},
+        "2" => %{"md" => "101", "inclination" => "60", "azimuth" => "0"},
+        "3" => %{"md" => "400", "inclination" => "60", "azimuth" => "0"}
+      }
+
+      [a, nil] =
+        typed(
+          %{
+            "0" => %{"formation" => "A", "md" => "101"},
+            "1" => %{"formation" => "B", "md" => "201"}
+          },
+          %{"surveys" => program}
+        )
+
+      assert_in_delta a, 50.0, 0.1
     end
   end
 

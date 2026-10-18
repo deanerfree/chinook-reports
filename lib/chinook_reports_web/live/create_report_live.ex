@@ -93,6 +93,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
     %{key: :formation, label: "Formation", placeholder: "McLaren"},
     %{key: :md, label: "MD", unit: :depth},
     %{key: :tvd, label: "TVD", unit: :depth},
+    %{key: :isopach, label: "Isopach", unit: :depth, computed: true},
     %{key: :subsea, label: "Subsea", unit: :depth}
   ]
 
