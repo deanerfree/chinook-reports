@@ -1,0 +1,2337 @@
+{
+ "source": "CNRL Hz Wapiti 4-31-64-8W6M, driller's final actual survey",
+ "method": "WINSERVE minimum curvature",
+ "vertical_section_azimuth_deg": 187.4,
+ "stations": [
+  {
+   "md": 0.0,
+   "inclination_deg": 0.0,
+   "azimuth_deg": 0.0,
+   "tvd": 0.0,
+   "north_south": 0.0,
+   "east_west": 0.0,
+   "vertical_section": 0.0,
+   "dogleg_severity": 0.0
+  },
+  {
+   "md": 8.1,
+   "inclination_deg": 0.0,
+   "azimuth_deg": 0.0,
+   "tvd": 8.1,
+   "north_south": 0.0,
+   "east_west": 0.0,
+   "vertical_section": 0.0,
+   "dogleg_severity": 0.0
+  },
+  {
+   "md": 60.75,
+   "inclination_deg": 1.1,
+   "azimuth_deg": 39.08,
+   "tvd": 60.75,
+   "north_south": 0.39,
+   "east_west": 0.32,
+   "vertical_section": -0.43,
+   "dogleg_severity": 0.63
+  },
+  {
+   "md": 88.59,
+   "inclination_deg": 0.51,
+   "azimuth_deg": 11.06,
+   "tvd": 88.58,
+   "north_south": 0.72,
+   "east_west": 0.51,
+   "vertical_section": -0.78,
+   "dogleg_severity": 0.75
+  },
+  {
+   "md": 116.44,
+   "inclination_deg": 0.52,
+   "azimuth_deg": 341.19,
+   "tvd": 116.43,
+   "north_south": 0.96,
+   "east_west": 0.49,
+   "vertical_section": -1.02,
+   "dogleg_severity": 0.29
+  },
+  {
+   "md": 144.29,
+   "inclination_deg": 0.49,
+   "azimuth_deg": 325.05,
+   "tvd": 144.28,
+   "north_south": 1.18,
+   "east_west": 0.38,
+   "vertical_section": -1.22,
+   "dogleg_severity": 0.16
+  },
+  {
+   "md": 172.15,
+   "inclination_deg": 0.66,
+   "azimuth_deg": 318.46,
+   "tvd": 172.14,
+   "north_south": 1.4,
+   "east_west": 0.21,
+   "vertical_section": -1.41,
+   "dogleg_severity": 0.2
+  },
+  {
+   "md": 199.99,
+   "inclination_deg": 0.78,
+   "azimuth_deg": 310.75,
+   "tvd": 199.98,
+   "north_south": 1.64,
+   "east_west": -0.04,
+   "vertical_section": -1.62,
+   "dogleg_severity": 0.17
+  },
+  {
+   "md": 227.85,
+   "inclination_deg": 0.78,
+   "azimuth_deg": 303.23,
+   "tvd": 227.84,
+   "north_south": 1.87,
+   "east_west": -0.34,
+   "vertical_section": -1.81,
+   "dogleg_severity": 0.11
+  },
+  {
+   "md": 255.72,
+   "inclination_deg": 1.18,
+   "azimuth_deg": 306.92,
+   "tvd": 255.7,
+   "north_south": 2.15,
+   "east_west": -0.73,
+   "vertical_section": -2.03,
+   "dogleg_severity": 0.44
+  },
+  {
+   "md": 283.51,
+   "inclination_deg": 0.57,
+   "azimuth_deg": 283.37,
+   "tvd": 283.49,
+   "north_south": 2.35,
+   "east_west": -1.09,
+   "vertical_section": -2.19,
+   "dogleg_severity": 0.75
+  },
+  {
+   "md": 311.37,
+   "inclination_deg": 0.57,
+   "azimuth_deg": 262.62,
+   "tvd": 311.35,
+   "north_south": 2.36,
+   "east_west": -1.37,
+   "vertical_section": -2.17,
+   "dogleg_severity": 0.22
+  },
+  {
+   "md": 339.3,
+   "inclination_deg": 0.74,
+   "azimuth_deg": 256.42,
+   "tvd": 339.28,
+   "north_south": 2.3,
+   "east_west": -1.68,
+   "vertical_section": -2.07,
+   "dogleg_severity": 0.2
+  },
+  {
+   "md": 367.14,
+   "inclination_deg": 0.93,
+   "azimuth_deg": 255.13,
+   "tvd": 367.11,
+   "north_south": 2.2,
+   "east_west": -2.07,
+   "vertical_section": -1.92,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 394.98,
+   "inclination_deg": 1.17,
+   "azimuth_deg": 250.54,
+   "tvd": 394.95,
+   "north_south": 2.05,
+   "east_west": -2.56,
+   "vertical_section": -1.7,
+   "dogleg_severity": 0.27
+  },
+  {
+   "md": 422.81,
+   "inclination_deg": 1.39,
+   "azimuth_deg": 242.83,
+   "tvd": 422.77,
+   "north_south": 1.8,
+   "east_west": -3.13,
+   "vertical_section": -1.38,
+   "dogleg_severity": 0.3
+  },
+  {
+   "md": 450.65,
+   "inclination_deg": 1.29,
+   "azimuth_deg": 231.43,
+   "tvd": 450.6,
+   "north_south": 1.45,
+   "east_west": -3.67,
+   "vertical_section": -0.97,
+   "dogleg_severity": 0.31
+  },
+  {
+   "md": 478.61,
+   "inclination_deg": 1.37,
+   "azimuth_deg": 215.37,
+   "tvd": 478.56,
+   "north_south": 0.98,
+   "east_west": -4.11,
+   "vertical_section": -0.45,
+   "dogleg_severity": 0.41
+  },
+  {
+   "md": 506.46,
+   "inclination_deg": 0.83,
+   "azimuth_deg": 211.8,
+   "tvd": 506.4,
+   "north_south": 0.54,
+   "east_west": -4.41,
+   "vertical_section": 0.03,
+   "dogleg_severity": 0.59
+  },
+  {
+   "md": 534.3,
+   "inclination_deg": 0.57,
+   "azimuth_deg": 219.3,
+   "tvd": 534.24,
+   "north_south": 0.26,
+   "east_west": -4.6,
+   "vertical_section": 0.33,
+   "dogleg_severity": 0.3
+  },
+  {
+   "md": 562.16,
+   "inclination_deg": 0.19,
+   "azimuth_deg": 178.72,
+   "tvd": 562.1,
+   "north_south": 0.11,
+   "east_west": -4.69,
+   "vertical_section": 0.5,
+   "dogleg_severity": 0.48
+  },
+  {
+   "md": 595.0,
+   "inclination_deg": 0.46,
+   "azimuth_deg": 167.5,
+   "tvd": 594.94,
+   "north_south": -0.07,
+   "east_west": -4.66,
+   "vertical_section": 0.67,
+   "dogleg_severity": 0.25
+  },
+  {
+   "md": 611.0,
+   "inclination_deg": 0.4,
+   "azimuth_deg": 175.71,
+   "tvd": 610.94,
+   "north_south": -0.19,
+   "east_west": -4.64,
+   "vertical_section": 0.79,
+   "dogleg_severity": 0.16
+  },
+  {
+   "md": 621.19,
+   "inclination_deg": 0.37,
+   "azimuth_deg": 182.2,
+   "tvd": 621.13,
+   "north_south": -0.26,
+   "east_west": -4.64,
+   "vertical_section": 0.86,
+   "dogleg_severity": 0.16
+  },
+  {
+   "md": 649.97,
+   "inclination_deg": 0.41,
+   "azimuth_deg": 163.23,
+   "tvd": 649.91,
+   "north_south": -0.45,
+   "east_west": -4.62,
+   "vertical_section": 1.04,
+   "dogleg_severity": 0.14
+  },
+  {
+   "md": 660.0,
+   "inclination_deg": 0.56,
+   "azimuth_deg": 283.62,
+   "tvd": 659.94,
+   "north_south": -0.48,
+   "east_west": -4.65,
+   "vertical_section": 1.07,
+   "dogleg_severity": 2.52
+  },
+  {
+   "md": 678.76,
+   "inclination_deg": 2.09,
+   "azimuth_deg": 302.07,
+   "tvd": 678.69,
+   "north_south": -0.27,
+   "east_west": -5.03,
+   "vertical_section": 0.92,
+   "dogleg_severity": 2.52
+  },
+  {
+   "md": 707.56,
+   "inclination_deg": 4.14,
+   "azimuth_deg": 302.12,
+   "tvd": 707.45,
+   "north_south": 0.56,
+   "east_west": -6.36,
+   "vertical_section": 0.26,
+   "dogleg_severity": 2.14
+  },
+  {
+   "md": 736.33,
+   "inclination_deg": 5.83,
+   "azimuth_deg": 309.8,
+   "tvd": 736.11,
+   "north_south": 2.05,
+   "east_west": -8.36,
+   "vertical_section": -0.95,
+   "dogleg_severity": 1.89
+  },
+  {
+   "md": 765.1,
+   "inclination_deg": 5.39,
+   "azimuth_deg": 309.65,
+   "tvd": 764.74,
+   "north_south": 3.84,
+   "east_west": -10.52,
+   "vertical_section": -2.46,
+   "dogleg_severity": 0.46
+  },
+  {
+   "md": 793.86,
+   "inclination_deg": 5.09,
+   "azimuth_deg": 305.71,
+   "tvd": 793.38,
+   "north_south": 5.45,
+   "east_west": -12.6,
+   "vertical_section": -3.78,
+   "dogleg_severity": 0.49
+  },
+  {
+   "md": 822.62,
+   "inclination_deg": 4.69,
+   "azimuth_deg": 302.0,
+   "tvd": 822.03,
+   "north_south": 6.82,
+   "east_west": -14.63,
+   "vertical_section": -4.88,
+   "dogleg_severity": 0.53
+  },
+  {
+   "md": 851.39,
+   "inclination_deg": 4.15,
+   "azimuth_deg": 302.06,
+   "tvd": 850.72,
+   "north_south": 7.99,
+   "east_west": -16.51,
+   "vertical_section": -5.8,
+   "dogleg_severity": 0.56
+  },
+  {
+   "md": 880.14,
+   "inclination_deg": 3.8,
+   "azimuth_deg": 300.75,
+   "tvd": 879.4,
+   "north_south": 9.03,
+   "east_west": -18.21,
+   "vertical_section": -6.61,
+   "dogleg_severity": 0.38
+  },
+  {
+   "md": 908.85,
+   "inclination_deg": 3.39,
+   "azimuth_deg": 294.55,
+   "tvd": 908.05,
+   "north_south": 9.87,
+   "east_west": -19.8,
+   "vertical_section": -7.24,
+   "dogleg_severity": 0.59
+  },
+  {
+   "md": 937.61,
+   "inclination_deg": 3.1,
+   "azimuth_deg": 290.42,
+   "tvd": 936.77,
+   "north_south": 10.5,
+   "east_west": -21.3,
+   "vertical_section": -7.67,
+   "dogleg_severity": 0.39
+  },
+  {
+   "md": 966.37,
+   "inclination_deg": 2.88,
+   "azimuth_deg": 286.33,
+   "tvd": 965.49,
+   "north_south": 10.97,
+   "east_west": -22.73,
+   "vertical_section": -7.95,
+   "dogleg_severity": 0.32
+  },
+  {
+   "md": 995.15,
+   "inclination_deg": 2.86,
+   "azimuth_deg": 276.09,
+   "tvd": 994.23,
+   "north_south": 11.25,
+   "east_west": -24.13,
+   "vertical_section": -8.05,
+   "dogleg_severity": 0.53
+  },
+  {
+   "md": 1023.92,
+   "inclination_deg": 1.98,
+   "azimuth_deg": 304.75,
+   "tvd": 1022.98,
+   "north_south": 11.61,
+   "east_west": -25.25,
+   "vertical_section": -8.26,
+   "dogleg_severity": 1.53
+  },
+  {
+   "md": 1052.7,
+   "inclination_deg": 1.63,
+   "azimuth_deg": 292.34,
+   "tvd": 1051.74,
+   "north_south": 12.05,
+   "east_west": -26.04,
+   "vertical_section": -8.59,
+   "dogleg_severity": 0.54
+  },
+  {
+   "md": 1081.45,
+   "inclination_deg": 0.97,
+   "azimuth_deg": 286.35,
+   "tvd": 1080.48,
+   "north_south": 12.27,
+   "east_west": -26.65,
+   "vertical_section": -8.74,
+   "dogleg_severity": 0.7
+  },
+  {
+   "md": 1110.25,
+   "inclination_deg": 0.95,
+   "azimuth_deg": 288.29,
+   "tvd": 1109.28,
+   "north_south": 12.42,
+   "east_west": -27.11,
+   "vertical_section": -8.82,
+   "dogleg_severity": 0.04
+  },
+  {
+   "md": 1138.99,
+   "inclination_deg": 0.75,
+   "azimuth_deg": 287.27,
+   "tvd": 1138.02,
+   "north_south": 12.55,
+   "east_west": -27.52,
+   "vertical_section": -8.9,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 1167.75,
+   "inclination_deg": 0.87,
+   "azimuth_deg": 288.17,
+   "tvd": 1166.77,
+   "north_south": 12.67,
+   "east_west": -27.91,
+   "vertical_section": -8.97,
+   "dogleg_severity": 0.13
+  },
+  {
+   "md": 1196.54,
+   "inclination_deg": 0.84,
+   "azimuth_deg": 64.28,
+   "tvd": 1195.56,
+   "north_south": 12.83,
+   "east_west": -27.92,
+   "vertical_section": -9.13,
+   "dogleg_severity": 1.65
+  },
+  {
+   "md": 1225.38,
+   "inclination_deg": 1.01,
+   "azimuth_deg": 58.15,
+   "tvd": 1224.4,
+   "north_south": 13.06,
+   "east_west": -27.52,
+   "vertical_section": -9.4,
+   "dogleg_severity": 0.2
+  },
+  {
+   "md": 1254.2,
+   "inclination_deg": 0.59,
+   "azimuth_deg": 38.0,
+   "tvd": 1253.22,
+   "north_south": 13.31,
+   "east_west": -27.21,
+   "vertical_section": -9.69,
+   "dogleg_severity": 0.52
+  },
+  {
+   "md": 1283.05,
+   "inclination_deg": 0.53,
+   "azimuth_deg": 37.74,
+   "tvd": 1282.07,
+   "north_south": 13.53,
+   "east_west": -27.04,
+   "vertical_section": -9.94,
+   "dogleg_severity": 0.06
+  },
+  {
+   "md": 1311.87,
+   "inclination_deg": 0.4,
+   "azimuth_deg": 22.4,
+   "tvd": 1310.88,
+   "north_south": 13.73,
+   "east_west": -26.92,
+   "vertical_section": -10.15,
+   "dogleg_severity": 0.19
+  },
+  {
+   "md": 1340.7,
+   "inclination_deg": 0.2,
+   "azimuth_deg": 19.94,
+   "tvd": 1339.71,
+   "north_south": 13.87,
+   "east_west": -26.86,
+   "vertical_section": -10.29,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 1369.53,
+   "inclination_deg": 0.21,
+   "azimuth_deg": 307.78,
+   "tvd": 1368.54,
+   "north_south": 13.95,
+   "east_west": -26.89,
+   "vertical_section": -10.37,
+   "dogleg_severity": 0.25
+  },
+  {
+   "md": 1398.34,
+   "inclination_deg": 0.22,
+   "azimuth_deg": 273.2,
+   "tvd": 1397.35,
+   "north_south": 13.98,
+   "east_west": -26.98,
+   "vertical_section": -10.39,
+   "dogleg_severity": 0.13
+  },
+  {
+   "md": 1427.14,
+   "inclination_deg": 0.23,
+   "azimuth_deg": 262.73,
+   "tvd": 1426.15,
+   "north_south": 13.98,
+   "east_west": -27.1,
+   "vertical_section": -10.37,
+   "dogleg_severity": 0.04
+  },
+  {
+   "md": 1455.91,
+   "inclination_deg": 0.14,
+   "azimuth_deg": 218.58,
+   "tvd": 1454.92,
+   "north_south": 13.95,
+   "east_west": -27.18,
+   "vertical_section": -10.33,
+   "dogleg_severity": 0.17
+  },
+  {
+   "md": 1484.76,
+   "inclination_deg": 0.04,
+   "azimuth_deg": 310.1,
+   "tvd": 1483.77,
+   "north_south": 13.92,
+   "east_west": -27.21,
+   "vertical_section": -10.3,
+   "dogleg_severity": 0.15
+  },
+  {
+   "md": 1513.55,
+   "inclination_deg": 0.23,
+   "azimuth_deg": 96.16,
+   "tvd": 1512.56,
+   "north_south": 13.92,
+   "east_west": -27.16,
+   "vertical_section": -10.31,
+   "dogleg_severity": 0.28
+  },
+  {
+   "md": 1542.33,
+   "inclination_deg": 0.39,
+   "azimuth_deg": 71.82,
+   "tvd": 1541.34,
+   "north_south": 13.95,
+   "east_west": -27.01,
+   "vertical_section": -10.35,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 1571.15,
+   "inclination_deg": 0.59,
+   "azimuth_deg": 61.14,
+   "tvd": 1570.16,
+   "north_south": 14.05,
+   "east_west": -26.78,
+   "vertical_section": -10.48,
+   "dogleg_severity": 0.23
+  },
+  {
+   "md": 1599.94,
+   "inclination_deg": 0.91,
+   "azimuth_deg": 49.41,
+   "tvd": 1598.95,
+   "north_south": 14.27,
+   "east_west": -26.48,
+   "vertical_section": -10.74,
+   "dogleg_severity": 0.37
+  },
+  {
+   "md": 1628.72,
+   "inclination_deg": 0.97,
+   "azimuth_deg": 41.87,
+   "tvd": 1627.73,
+   "north_south": 14.6,
+   "east_west": -26.14,
+   "vertical_section": -11.11,
+   "dogleg_severity": 0.14
+  },
+  {
+   "md": 1657.54,
+   "inclination_deg": 1.03,
+   "azimuth_deg": 43.9,
+   "tvd": 1656.54,
+   "north_south": 14.97,
+   "east_west": -25.8,
+   "vertical_section": -11.52,
+   "dogleg_severity": 0.07
+  },
+  {
+   "md": 1686.33,
+   "inclination_deg": 0.53,
+   "azimuth_deg": 179.77,
+   "tvd": 1685.33,
+   "north_south": 15.02,
+   "east_west": -25.62,
+   "vertical_section": -11.6,
+   "dogleg_severity": 1.52
+  },
+  {
+   "md": 1715.09,
+   "inclination_deg": 0.28,
+   "azimuth_deg": 146.4,
+   "tvd": 1714.09,
+   "north_south": 14.83,
+   "east_west": -25.58,
+   "vertical_section": -11.41,
+   "dogleg_severity": 0.35
+  },
+  {
+   "md": 1743.86,
+   "inclination_deg": 0.06,
+   "azimuth_deg": 125.3,
+   "tvd": 1742.86,
+   "north_south": 14.76,
+   "east_west": -25.53,
+   "vertical_section": -11.35,
+   "dogleg_severity": 0.23
+  },
+  {
+   "md": 1772.62,
+   "inclination_deg": 0.06,
+   "azimuth_deg": 342.95,
+   "tvd": 1771.62,
+   "north_south": 14.77,
+   "east_west": -25.52,
+   "vertical_section": -11.36,
+   "dogleg_severity": 0.12
+  },
+  {
+   "md": 1801.43,
+   "inclination_deg": 0.25,
+   "azimuth_deg": 27.56,
+   "tvd": 1800.43,
+   "north_south": 14.84,
+   "east_west": -25.5,
+   "vertical_section": -11.43,
+   "dogleg_severity": 0.22
+  },
+  {
+   "md": 1830.2,
+   "inclination_deg": 0.53,
+   "azimuth_deg": 25.54,
+   "tvd": 1829.2,
+   "north_south": 15.02,
+   "east_west": -25.41,
+   "vertical_section": -11.62,
+   "dogleg_severity": 0.29
+  },
+  {
+   "md": 1858.96,
+   "inclination_deg": 0.56,
+   "azimuth_deg": 32.7,
+   "tvd": 1857.96,
+   "north_south": 15.25,
+   "east_west": -25.28,
+   "vertical_section": -11.87,
+   "dogleg_severity": 0.08
+  },
+  {
+   "md": 1887.73,
+   "inclination_deg": 0.57,
+   "azimuth_deg": 27.38,
+   "tvd": 1886.72,
+   "north_south": 15.5,
+   "east_west": -25.14,
+   "vertical_section": -12.13,
+   "dogleg_severity": 0.06
+  },
+  {
+   "md": 1916.51,
+   "inclination_deg": 0.73,
+   "azimuth_deg": 26.52,
+   "tvd": 1915.5,
+   "north_south": 15.79,
+   "east_west": -24.99,
+   "vertical_section": -12.44,
+   "dogleg_severity": 0.17
+  },
+  {
+   "md": 1945.31,
+   "inclination_deg": 1.01,
+   "azimuth_deg": 33.45,
+   "tvd": 1944.3,
+   "north_south": 16.17,
+   "east_west": -24.77,
+   "vertical_section": -12.84,
+   "dogleg_severity": 0.31
+  },
+  {
+   "md": 1974.1,
+   "inclination_deg": 1.27,
+   "azimuth_deg": 36.05,
+   "tvd": 1973.08,
+   "north_south": 16.64,
+   "east_west": -24.44,
+   "vertical_section": -13.35,
+   "dogleg_severity": 0.28
+  },
+  {
+   "md": 2002.89,
+   "inclination_deg": 0.51,
+   "azimuth_deg": 145.43,
+   "tvd": 2001.87,
+   "north_south": 16.79,
+   "east_west": -24.18,
+   "vertical_section": -13.53,
+   "dogleg_severity": 1.58
+  },
+  {
+   "md": 2031.74,
+   "inclination_deg": 0.16,
+   "azimuth_deg": 69.39,
+   "tvd": 2030.72,
+   "north_south": 16.7,
+   "east_west": -24.07,
+   "vertical_section": -13.46,
+   "dogleg_severity": 0.52
+  },
+  {
+   "md": 2060.52,
+   "inclination_deg": 0.33,
+   "azimuth_deg": 35.58,
+   "tvd": 2059.5,
+   "north_south": 16.78,
+   "east_west": -23.98,
+   "vertical_section": -13.55,
+   "dogleg_severity": 0.23
+  },
+  {
+   "md": 2079.12,
+   "inclination_deg": 0.58,
+   "azimuth_deg": 44.99,
+   "tvd": 2078.1,
+   "north_south": 16.89,
+   "east_west": -23.88,
+   "vertical_section": -13.67,
+   "dogleg_severity": 0.42
+  },
+  {
+   "md": 2107.93,
+   "inclination_deg": 1.05,
+   "azimuth_deg": 30.7,
+   "tvd": 2106.91,
+   "north_south": 17.22,
+   "east_west": -23.65,
+   "vertical_section": -14.03,
+   "dogleg_severity": 0.53
+  },
+  {
+   "md": 2136.71,
+   "inclination_deg": 2.97,
+   "azimuth_deg": 36.68,
+   "tvd": 2135.67,
+   "north_south": 18.04,
+   "east_west": -23.07,
+   "vertical_section": -14.92,
+   "dogleg_severity": 2.01
+  },
+  {
+   "md": 2165.58,
+   "inclination_deg": 3.41,
+   "azimuth_deg": 30.38,
+   "tvd": 2164.49,
+   "north_south": 19.38,
+   "east_west": -22.19,
+   "vertical_section": -16.37,
+   "dogleg_severity": 0.58
+  },
+  {
+   "md": 2194.39,
+   "inclination_deg": 2.16,
+   "azimuth_deg": 26.35,
+   "tvd": 2193.27,
+   "north_south": 20.61,
+   "east_west": -21.51,
+   "vertical_section": -17.67,
+   "dogleg_severity": 1.32
+  },
+  {
+   "md": 2223.21,
+   "inclination_deg": 0.71,
+   "azimuth_deg": 130.89,
+   "tvd": 2222.08,
+   "north_south": 20.98,
+   "east_west": -21.13,
+   "vertical_section": -18.08,
+   "dogleg_severity": 2.54
+  },
+  {
+   "md": 2252.08,
+   "inclination_deg": 0.41,
+   "azimuth_deg": 258.84,
+   "tvd": 2250.95,
+   "north_south": 20.84,
+   "east_west": -21.1,
+   "vertical_section": -17.95,
+   "dogleg_severity": 1.05
+  },
+  {
+   "md": 2280.91,
+   "inclination_deg": 0.51,
+   "azimuth_deg": 285.47,
+   "tvd": 2279.78,
+   "north_south": 20.86,
+   "east_west": -21.33,
+   "vertical_section": -17.94,
+   "dogleg_severity": 0.24
+  },
+  {
+   "md": 2309.73,
+   "inclination_deg": 0.62,
+   "azimuth_deg": 326.53,
+   "tvd": 2308.6,
+   "north_south": 21.02,
+   "east_west": -21.54,
+   "vertical_section": -18.07,
+   "dogleg_severity": 0.43
+  },
+  {
+   "md": 2338.55,
+   "inclination_deg": 0.5,
+   "azimuth_deg": 347.19,
+   "tvd": 2337.42,
+   "north_south": 21.27,
+   "east_west": -21.65,
+   "vertical_section": -18.31,
+   "dogleg_severity": 0.24
+  },
+  {
+   "md": 2367.35,
+   "inclination_deg": 0.59,
+   "azimuth_deg": 349.02,
+   "tvd": 2366.22,
+   "north_south": 21.54,
+   "east_west": -21.71,
+   "vertical_section": -18.57,
+   "dogleg_severity": 0.1
+  },
+  {
+   "md": 2396.12,
+   "inclination_deg": 0.83,
+   "azimuth_deg": 354.57,
+   "tvd": 2394.98,
+   "north_south": 21.9,
+   "east_west": -21.75,
+   "vertical_section": -18.91,
+   "dogleg_severity": 0.26
+  },
+  {
+   "md": 2424.9,
+   "inclination_deg": 0.46,
+   "azimuth_deg": 187.64,
+   "tvd": 2423.76,
+   "north_south": 21.99,
+   "east_west": -21.79,
+   "vertical_section": -19.0,
+   "dogleg_severity": 1.34
+  },
+  {
+   "md": 2457.0,
+   "inclination_deg": 0.24,
+   "azimuth_deg": 100.38,
+   "tvd": 2455.86,
+   "north_south": 21.85,
+   "east_west": -21.74,
+   "vertical_section": -18.87,
+   "dogleg_severity": 0.48
+  },
+  {
+   "md": 2469.0,
+   "inclination_deg": 0.19,
+   "azimuth_deg": 83.65,
+   "tvd": 2467.86,
+   "north_south": 21.85,
+   "east_west": -21.7,
+   "vertical_section": -18.87,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 2506.37,
+   "inclination_deg": 0.22,
+   "azimuth_deg": 5.67,
+   "tvd": 2505.23,
+   "north_south": 21.92,
+   "east_west": -21.63,
+   "vertical_section": -18.96,
+   "dogleg_severity": 0.21
+  },
+  {
+   "md": 2535.14,
+   "inclination_deg": 0.14,
+   "azimuth_deg": 196.04,
+   "tvd": 2534.0,
+   "north_south": 21.95,
+   "east_west": -21.63,
+   "vertical_section": -18.98,
+   "dogleg_severity": 0.37
+  },
+  {
+   "md": 2563.89,
+   "inclination_deg": 0.14,
+   "azimuth_deg": 124.23,
+   "tvd": 2562.75,
+   "north_south": 21.89,
+   "east_west": -21.61,
+   "vertical_section": -18.93,
+   "dogleg_severity": 0.17
+  },
+  {
+   "md": 2592.69,
+   "inclination_deg": 0.0,
+   "azimuth_deg": 312.86,
+   "tvd": 2591.55,
+   "north_south": 21.87,
+   "east_west": -21.58,
+   "vertical_section": -18.91,
+   "dogleg_severity": 0.15
+  },
+  {
+   "md": 2621.56,
+   "inclination_deg": 0.12,
+   "azimuth_deg": 341.15,
+   "tvd": 2620.42,
+   "north_south": 21.9,
+   "east_west": -21.59,
+   "vertical_section": -18.94,
+   "dogleg_severity": 0.12
+  },
+  {
+   "md": 2650.31,
+   "inclination_deg": 0.6,
+   "azimuth_deg": 238.97,
+   "tvd": 2649.17,
+   "north_south": 21.85,
+   "east_west": -21.73,
+   "vertical_section": -18.87,
+   "dogleg_severity": 0.66
+  },
+  {
+   "md": 2679.1,
+   "inclination_deg": 6.85,
+   "azimuth_deg": 245.95,
+   "tvd": 2677.89,
+   "north_south": 21.07,
+   "east_west": -23.43,
+   "vertical_section": -17.88,
+   "dogleg_severity": 6.52
+  },
+  {
+   "md": 2707.94,
+   "inclination_deg": 11.47,
+   "azimuth_deg": 246.08,
+   "tvd": 2706.35,
+   "north_south": 19.21,
+   "east_west": -27.63,
+   "vertical_section": -15.49,
+   "dogleg_severity": 4.81
+  },
+  {
+   "md": 2736.73,
+   "inclination_deg": 16.11,
+   "azimuth_deg": 244.16,
+   "tvd": 2734.3,
+   "north_south": 16.31,
+   "east_west": -33.84,
+   "vertical_section": -11.81,
+   "dogleg_severity": 4.86
+  },
+  {
+   "md": 2765.49,
+   "inclination_deg": 21.8,
+   "azimuth_deg": 236.76,
+   "tvd": 2761.5,
+   "north_south": 11.63,
+   "east_west": -41.91,
+   "vertical_section": -6.14,
+   "dogleg_severity": 6.43
+  },
+  {
+   "md": 2794.26,
+   "inclination_deg": 27.13,
+   "azimuth_deg": 229.81,
+   "tvd": 2787.68,
+   "north_south": 4.47,
+   "east_west": -51.39,
+   "vertical_section": 2.19,
+   "dogleg_severity": 6.31
+  },
+  {
+   "md": 2823.08,
+   "inclination_deg": 32.62,
+   "azimuth_deg": 234.75,
+   "tvd": 2812.66,
+   "north_south": -4.27,
+   "east_west": -62.77,
+   "vertical_section": 12.31,
+   "dogleg_severity": 6.26
+  },
+  {
+   "md": 2851.87,
+   "inclination_deg": 40.19,
+   "azimuth_deg": 234.95,
+   "tvd": 2835.82,
+   "north_south": -14.09,
+   "east_west": -76.73,
+   "vertical_section": 23.86,
+   "dogleg_severity": 7.89
+  },
+  {
+   "md": 2880.69,
+   "inclination_deg": 45.6,
+   "azimuth_deg": 231.81,
+   "tvd": 2856.93,
+   "north_south": -25.81,
+   "east_west": -92.45,
+   "vertical_section": 37.5,
+   "dogleg_severity": 6.05
+  },
+  {
+   "md": 2909.49,
+   "inclination_deg": 50.83,
+   "azimuth_deg": 232.72,
+   "tvd": 2876.11,
+   "north_south": -38.94,
+   "east_west": -109.43,
+   "vertical_section": 52.71,
+   "dogleg_severity": 5.49
+  },
+  {
+   "md": 2938.24,
+   "inclination_deg": 56.91,
+   "azimuth_deg": 236.02,
+   "tvd": 2893.06,
+   "north_south": -52.44,
+   "east_west": -128.3,
+   "vertical_section": 68.53,
+   "dogleg_severity": 6.93
+  },
+  {
+   "md": 2967.06,
+   "inclination_deg": 63.03,
+   "azimuth_deg": 235.87,
+   "tvd": 2907.47,
+   "north_south": -66.4,
+   "east_west": -148.97,
+   "vertical_section": 85.04,
+   "dogleg_severity": 6.37
+  },
+  {
+   "md": 2995.85,
+   "inclination_deg": 68.82,
+   "azimuth_deg": 235.26,
+   "tvd": 2919.21,
+   "north_south": -81.26,
+   "east_west": -170.64,
+   "vertical_section": 102.56,
+   "dogleg_severity": 6.06
+  },
+  {
+   "md": 3024.68,
+   "inclination_deg": 73.93,
+   "azimuth_deg": 234.96,
+   "tvd": 2928.42,
+   "north_south": -96.89,
+   "east_west": -193.04,
+   "vertical_section": 120.94,
+   "dogleg_severity": 5.33
+  },
+  {
+   "md": 3053.49,
+   "inclination_deg": 81.0,
+   "azimuth_deg": 234.58,
+   "tvd": 2934.67,
+   "north_south": -113.1,
+   "east_west": -215.99,
+   "vertical_section": 139.98,
+   "dogleg_severity": 7.37
+  },
+  {
+   "md": 3082.26,
+   "inclination_deg": 84.48,
+   "azimuth_deg": 235.98,
+   "tvd": 2938.3,
+   "north_south": -129.35,
+   "east_west": -239.45,
+   "vertical_section": 159.12,
+   "dogleg_severity": 3.91
+  },
+  {
+   "md": 3111.0,
+   "inclination_deg": 88.53,
+   "azimuth_deg": 236.58,
+   "tvd": 2940.05,
+   "north_south": -145.27,
+   "east_west": -263.3,
+   "vertical_section": 177.98,
+   "dogleg_severity": 4.27
+  },
+  {
+   "md": 3111.08,
+   "inclination_deg": 88.54,
+   "azimuth_deg": 236.58,
+   "tvd": 2940.06,
+   "north_south": -145.32,
+   "east_west": -263.37,
+   "vertical_section": 178.03,
+   "dogleg_severity": 4.27
+  },
+  {
+   "md": 3139.9,
+   "inclination_deg": 88.85,
+   "azimuth_deg": 230.57,
+   "tvd": 2940.71,
+   "north_south": -162.42,
+   "east_west": -286.54,
+   "vertical_section": 197.97,
+   "dogleg_severity": 6.26
+  },
+  {
+   "md": 3168.71,
+   "inclination_deg": 88.83,
+   "azimuth_deg": 225.23,
+   "tvd": 2941.3,
+   "north_south": -181.72,
+   "east_west": -307.91,
+   "vertical_section": 219.87,
+   "dogleg_severity": 5.56
+  },
+  {
+   "md": 3197.51,
+   "inclination_deg": 88.72,
+   "azimuth_deg": 221.56,
+   "tvd": 2941.91,
+   "north_south": -202.64,
+   "east_west": -327.69,
+   "vertical_section": 243.16,
+   "dogleg_severity": 3.82
+  },
+  {
+   "md": 3226.31,
+   "inclination_deg": 88.25,
+   "azimuth_deg": 219.3,
+   "tvd": 2942.67,
+   "north_south": -224.55,
+   "east_west": -346.35,
+   "vertical_section": 267.29,
+   "dogleg_severity": 2.4
+  },
+  {
+   "md": 3250.0,
+   "inclination_deg": 88.39,
+   "azimuth_deg": 219.59,
+   "tvd": 2943.37,
+   "north_south": -242.84,
+   "east_west": -361.4,
+   "vertical_section": 287.36,
+   "dogleg_severity": 0.41
+  },
+  {
+   "md": 3255.15,
+   "inclination_deg": 88.5,
+   "azimuth_deg": 218.6,
+   "tvd": 2943.51,
+   "north_south": -246.84,
+   "east_west": -364.65,
+   "vertical_section": 291.75,
+   "dogleg_severity": 5.8
+  },
+  {
+   "md": 3283.94,
+   "inclination_deg": 89.3,
+   "azimuth_deg": 215.93,
+   "tvd": 2944.06,
+   "north_south": -269.74,
+   "east_west": -382.07,
+   "vertical_section": 316.7,
+   "dogleg_severity": 2.9
+  },
+  {
+   "md": 3312.72,
+   "inclination_deg": 89.4,
+   "azimuth_deg": 210.86,
+   "tvd": 2944.39,
+   "north_south": -293.76,
+   "east_west": -397.91,
+   "vertical_section": 342.56,
+   "dogleg_severity": 5.29
+  },
+  {
+   "md": 3341.47,
+   "inclination_deg": 89.46,
+   "azimuth_deg": 206.22,
+   "tvd": 2944.67,
+   "north_south": -319.01,
+   "east_west": -411.64,
+   "vertical_section": 369.37,
+   "dogleg_severity": 4.84
+  },
+  {
+   "md": 3370.26,
+   "inclination_deg": 89.51,
+   "azimuth_deg": 200.57,
+   "tvd": 2944.93,
+   "north_south": -345.42,
+   "east_west": -423.07,
+   "vertical_section": 397.03,
+   "dogleg_severity": 5.89
+  },
+  {
+   "md": 3399.09,
+   "inclination_deg": 89.9,
+   "azimuth_deg": 196.67,
+   "tvd": 2945.08,
+   "north_south": -372.74,
+   "east_west": -432.27,
+   "vertical_section": 425.31,
+   "dogleg_severity": 4.08
+  },
+  {
+   "md": 3427.92,
+   "inclination_deg": 89.3,
+   "azimuth_deg": 192.18,
+   "tvd": 2945.28,
+   "north_south": -400.65,
+   "east_west": -439.45,
+   "vertical_section": 453.91,
+   "dogleg_severity": 4.71
+  },
+  {
+   "md": 3456.72,
+   "inclination_deg": 89.58,
+   "azimuth_deg": 187.52,
+   "tvd": 2945.57,
+   "north_south": -429.02,
+   "east_west": -444.37,
+   "vertical_section": 482.68,
+   "dogleg_severity": 4.86
+  },
+  {
+   "md": 3485.49,
+   "inclination_deg": 90.1,
+   "azimuth_deg": 185.93,
+   "tvd": 2945.65,
+   "north_south": -457.59,
+   "east_west": -447.74,
+   "vertical_section": 511.44,
+   "dogleg_severity": 1.74
+  },
+  {
+   "md": 3514.32,
+   "inclination_deg": 89.52,
+   "azimuth_deg": 181.63,
+   "tvd": 2945.74,
+   "north_south": -486.35,
+   "east_west": -449.64,
+   "vertical_section": 540.21,
+   "dogleg_severity": 4.51
+  },
+  {
+   "md": 3543.11,
+   "inclination_deg": 89.75,
+   "azimuth_deg": 182.53,
+   "tvd": 2945.92,
+   "north_south": -515.12,
+   "east_west": -450.69,
+   "vertical_section": 568.87,
+   "dogleg_severity": 0.97
+  },
+  {
+   "md": 3571.89,
+   "inclination_deg": 89.96,
+   "azimuth_deg": 183.52,
+   "tvd": 2946.0,
+   "north_south": -543.86,
+   "east_west": -452.21,
+   "vertical_section": 597.57,
+   "dogleg_severity": 1.05
+  },
+  {
+   "md": 3600.69,
+   "inclination_deg": 89.49,
+   "azimuth_deg": 182.08,
+   "tvd": 2946.14,
+   "north_south": -572.62,
+   "east_west": -453.61,
+   "vertical_section": 626.27,
+   "dogleg_severity": 1.58
+  },
+  {
+   "md": 3629.49,
+   "inclination_deg": 89.14,
+   "azimuth_deg": 178.72,
+   "tvd": 2946.48,
+   "north_south": -601.41,
+   "east_west": -453.81,
+   "vertical_section": 654.85,
+   "dogleg_severity": 3.52
+  },
+  {
+   "md": 3658.33,
+   "inclination_deg": 89.29,
+   "azimuth_deg": 175.43,
+   "tvd": 2946.88,
+   "north_south": -630.21,
+   "east_west": -452.34,
+   "vertical_section": 683.22,
+   "dogleg_severity": 3.43
+  },
+  {
+   "md": 3687.12,
+   "inclination_deg": 89.36,
+   "azimuth_deg": 179.23,
+   "tvd": 2947.21,
+   "north_south": -658.96,
+   "east_west": -451.0,
+   "vertical_section": 711.56,
+   "dogleg_severity": 3.96
+  },
+  {
+   "md": 3715.9,
+   "inclination_deg": 89.17,
+   "azimuth_deg": 181.16,
+   "tvd": 2947.58,
+   "north_south": -687.74,
+   "east_west": -451.1,
+   "vertical_section": 740.11,
+   "dogleg_severity": 2.02
+  },
+  {
+   "md": 3744.69,
+   "inclination_deg": 88.86,
+   "azimuth_deg": 180.95,
+   "tvd": 2948.08,
+   "north_south": -716.52,
+   "east_west": -451.63,
+   "vertical_section": 768.72,
+   "dogleg_severity": 0.39
+  },
+  {
+   "md": 3773.52,
+   "inclination_deg": 88.11,
+   "azimuth_deg": 180.56,
+   "tvd": 2948.84,
+   "north_south": -745.33,
+   "east_west": -452.01,
+   "vertical_section": 797.34,
+   "dogleg_severity": 0.88
+  },
+  {
+   "md": 3802.33,
+   "inclination_deg": 88.18,
+   "azimuth_deg": 181.01,
+   "tvd": 2949.77,
+   "north_south": -774.13,
+   "east_west": -452.4,
+   "vertical_section": 825.95,
+   "dogleg_severity": 0.47
+  },
+  {
+   "md": 3831.07,
+   "inclination_deg": 88.01,
+   "azimuth_deg": 180.67,
+   "tvd": 2950.73,
+   "north_south": -802.85,
+   "east_west": -452.83,
+   "vertical_section": 854.48,
+   "dogleg_severity": 0.4
+  },
+  {
+   "md": 3859.87,
+   "inclination_deg": 88.23,
+   "azimuth_deg": 180.02,
+   "tvd": 2951.67,
+   "north_south": -831.63,
+   "east_west": -453.0,
+   "vertical_section": 883.05,
+   "dogleg_severity": 0.71
+  },
+  {
+   "md": 3888.63,
+   "inclination_deg": 88.12,
+   "azimuth_deg": 179.75,
+   "tvd": 2952.59,
+   "north_south": -860.38,
+   "east_west": -452.94,
+   "vertical_section": 911.55,
+   "dogleg_severity": 0.3
+  },
+  {
+   "md": 3917.4,
+   "inclination_deg": 90.04,
+   "azimuth_deg": 178.6,
+   "tvd": 2953.05,
+   "north_south": -889.14,
+   "east_west": -452.53,
+   "vertical_section": 940.02,
+   "dogleg_severity": 2.33
+  },
+  {
+   "md": 3946.13,
+   "inclination_deg": 88.68,
+   "azimuth_deg": 178.99,
+   "tvd": 2953.37,
+   "north_south": -917.86,
+   "east_west": -451.92,
+   "vertical_section": 968.42,
+   "dogleg_severity": 1.48
+  },
+  {
+   "md": 3974.88,
+   "inclination_deg": 88.08,
+   "azimuth_deg": 179.21,
+   "tvd": 2954.19,
+   "north_south": -946.59,
+   "east_west": -451.47,
+   "vertical_section": 996.86,
+   "dogleg_severity": 0.67
+  },
+  {
+   "md": 4003.64,
+   "inclination_deg": 88.65,
+   "azimuth_deg": 180.07,
+   "tvd": 2955.01,
+   "north_south": -975.34,
+   "east_west": -451.29,
+   "vertical_section": 1025.34,
+   "dogleg_severity": 1.08
+  },
+  {
+   "md": 4032.41,
+   "inclination_deg": 87.76,
+   "azimuth_deg": 179.55,
+   "tvd": 2955.91,
+   "north_south": -1004.1,
+   "east_west": -451.2,
+   "vertical_section": 1053.85,
+   "dogleg_severity": 1.07
+  },
+  {
+   "md": 4061.2,
+   "inclination_deg": 88.2,
+   "azimuth_deg": 179.6,
+   "tvd": 2956.92,
+   "north_south": -1032.87,
+   "east_west": -450.98,
+   "vertical_section": 1082.35,
+   "dogleg_severity": 0.46
+  },
+  {
+   "md": 4089.99,
+   "inclination_deg": 87.44,
+   "azimuth_deg": 178.49,
+   "tvd": 2958.02,
+   "north_south": -1061.63,
+   "east_west": -450.5,
+   "vertical_section": 1110.81,
+   "dogleg_severity": 1.4
+  },
+  {
+   "md": 4118.81,
+   "inclination_deg": 91.66,
+   "azimuth_deg": 179.06,
+   "tvd": 2958.24,
+   "north_south": -1090.44,
+   "east_west": -449.89,
+   "vertical_section": 1139.3,
+   "dogleg_severity": 4.43
+  },
+  {
+   "md": 4147.64,
+   "inclination_deg": 91.19,
+   "azimuth_deg": 177.86,
+   "tvd": 2957.53,
+   "north_south": -1119.25,
+   "east_west": -449.11,
+   "vertical_section": 1167.77,
+   "dogleg_severity": 1.34
+  },
+  {
+   "md": 4176.43,
+   "inclination_deg": 91.34,
+   "azimuth_deg": 178.47,
+   "tvd": 2956.89,
+   "north_south": -1148.02,
+   "east_west": -448.19,
+   "vertical_section": 1196.18,
+   "dogleg_severity": 0.65
+  },
+  {
+   "md": 4205.2,
+   "inclination_deg": 89.7,
+   "azimuth_deg": 176.25,
+   "tvd": 2956.63,
+   "north_south": -1176.75,
+   "east_west": -446.87,
+   "vertical_section": 1224.51,
+   "dogleg_severity": 2.88
+  },
+  {
+   "md": 4234.01,
+   "inclination_deg": 91.67,
+   "azimuth_deg": 176.83,
+   "tvd": 2956.29,
+   "north_south": -1205.51,
+   "east_west": -445.13,
+   "vertical_section": 1252.8,
+   "dogleg_severity": 2.14
+  },
+  {
+   "md": 4262.81,
+   "inclination_deg": 91.85,
+   "azimuth_deg": 175.59,
+   "tvd": 2955.4,
+   "north_south": -1234.23,
+   "east_west": -443.22,
+   "vertical_section": 1281.03,
+   "dogleg_severity": 1.3
+  },
+  {
+   "md": 4291.59,
+   "inclination_deg": 91.47,
+   "azimuth_deg": 175.64,
+   "tvd": 2954.57,
+   "north_south": -1262.91,
+   "east_west": -441.02,
+   "vertical_section": 1309.2,
+   "dogleg_severity": 0.4
+  },
+  {
+   "md": 4320.42,
+   "inclination_deg": 91.73,
+   "azimuth_deg": 175.94,
+   "tvd": 2953.76,
+   "north_south": -1291.65,
+   "east_west": -438.91,
+   "vertical_section": 1337.43,
+   "dogleg_severity": 0.41
+  },
+  {
+   "md": 4349.19,
+   "inclination_deg": 91.53,
+   "azimuth_deg": 180.21,
+   "tvd": 2952.94,
+   "north_south": -1320.39,
+   "east_west": -437.94,
+   "vertical_section": 1365.8,
+   "dogleg_severity": 4.46
+  },
+  {
+   "md": 4377.97,
+   "inclination_deg": 91.44,
+   "azimuth_deg": 180.92,
+   "tvd": 2952.2,
+   "north_south": -1349.16,
+   "east_west": -438.23,
+   "vertical_section": 1394.36,
+   "dogleg_severity": 0.75
+  },
+  {
+   "md": 4406.82,
+   "inclination_deg": 90.38,
+   "azimuth_deg": 182.35,
+   "tvd": 2951.74,
+   "north_south": -1377.99,
+   "east_west": -439.05,
+   "vertical_section": 1423.06,
+   "dogleg_severity": 1.85
+  },
+  {
+   "md": 4435.63,
+   "inclination_deg": 91.21,
+   "azimuth_deg": 184.89,
+   "tvd": 2951.34,
+   "north_south": -1406.74,
+   "east_west": -440.87,
+   "vertical_section": 1451.8,
+   "dogleg_severity": 2.78
+  },
+  {
+   "md": 4464.43,
+   "inclination_deg": 90.4,
+   "azimuth_deg": 184.87,
+   "tvd": 2950.93,
+   "north_south": -1435.43,
+   "east_west": -443.32,
+   "vertical_section": 1480.57,
+   "dogleg_severity": 0.84
+  },
+  {
+   "md": 4493.22,
+   "inclination_deg": 89.4,
+   "azimuth_deg": 184.83,
+   "tvd": 2950.98,
+   "north_south": -1464.12,
+   "east_west": -445.75,
+   "vertical_section": 1509.33,
+   "dogleg_severity": 1.04
+  },
+  {
+   "md": 4521.99,
+   "inclination_deg": 88.79,
+   "azimuth_deg": 186.27,
+   "tvd": 2951.44,
+   "north_south": -1492.75,
+   "east_west": -448.53,
+   "vertical_section": 1538.08,
+   "dogleg_severity": 1.63
+  },
+  {
+   "md": 4550.8,
+   "inclination_deg": 89.2,
+   "azimuth_deg": 184.47,
+   "tvd": 2951.94,
+   "north_south": -1521.43,
+   "east_west": -451.23,
+   "vertical_section": 1566.87,
+   "dogleg_severity": 1.92
+  },
+  {
+   "md": 4579.57,
+   "inclination_deg": 89.06,
+   "azimuth_deg": 180.2,
+   "tvd": 2952.38,
+   "north_south": -1550.16,
+   "east_west": -452.4,
+   "vertical_section": 1595.52,
+   "dogleg_severity": 4.45
+  },
+  {
+   "md": 4608.38,
+   "inclination_deg": 89.25,
+   "azimuth_deg": 179.41,
+   "tvd": 2952.81,
+   "north_south": -1578.97,
+   "east_west": -452.3,
+   "vertical_section": 1624.07,
+   "dogleg_severity": 0.85
+  },
+  {
+   "md": 4637.11,
+   "inclination_deg": 89.18,
+   "azimuth_deg": 180.66,
+   "tvd": 2953.2,
+   "north_south": -1607.7,
+   "east_west": -452.32,
+   "vertical_section": 1652.56,
+   "dogleg_severity": 1.31
+  },
+  {
+   "md": 4665.91,
+   "inclination_deg": 88.58,
+   "azimuth_deg": 180.3,
+   "tvd": 2953.76,
+   "north_south": -1636.49,
+   "east_west": -452.56,
+   "vertical_section": 1681.15,
+   "dogleg_severity": 0.73
+  },
+  {
+   "md": 4694.72,
+   "inclination_deg": 89.21,
+   "azimuth_deg": 180.17,
+   "tvd": 2954.32,
+   "north_south": -1665.29,
+   "east_west": -452.68,
+   "vertical_section": 1709.73,
+   "dogleg_severity": 0.67
+  },
+  {
+   "md": 4723.55,
+   "inclination_deg": 89.04,
+   "azimuth_deg": 179.62,
+   "tvd": 2954.76,
+   "north_south": -1694.12,
+   "east_west": -452.63,
+   "vertical_section": 1738.31,
+   "dogleg_severity": 0.6
+  },
+  {
+   "md": 4752.36,
+   "inclination_deg": 89.09,
+   "azimuth_deg": 180.11,
+   "tvd": 2955.23,
+   "north_south": -1722.93,
+   "east_west": -452.56,
+   "vertical_section": 1766.86,
+   "dogleg_severity": 0.51
+  },
+  {
+   "md": 4781.16,
+   "inclination_deg": 88.57,
+   "azimuth_deg": 179.7,
+   "tvd": 2955.82,
+   "north_south": -1751.72,
+   "east_west": -452.51,
+   "vertical_section": 1795.41,
+   "dogleg_severity": 0.69
+  },
+  {
+   "md": 4809.97,
+   "inclination_deg": 88.21,
+   "azimuth_deg": 179.24,
+   "tvd": 2956.63,
+   "north_south": -1780.52,
+   "east_west": -452.25,
+   "vertical_section": 1823.93,
+   "dogleg_severity": 0.61
+  },
+  {
+   "md": 4838.79,
+   "inclination_deg": 89.69,
+   "azimuth_deg": 179.34,
+   "tvd": 2957.15,
+   "north_south": -1809.33,
+   "east_west": -451.89,
+   "vertical_section": 1852.46,
+   "dogleg_severity": 1.54
+  },
+  {
+   "md": 4867.6,
+   "inclination_deg": 89.37,
+   "azimuth_deg": 179.89,
+   "tvd": 2957.39,
+   "north_south": -1838.14,
+   "east_west": -451.7,
+   "vertical_section": 1881.0,
+   "dogleg_severity": 0.66
+  },
+  {
+   "md": 4896.45,
+   "inclination_deg": 89.69,
+   "azimuth_deg": 180.65,
+   "tvd": 2957.63,
+   "north_south": -1866.99,
+   "east_west": -451.83,
+   "vertical_section": 1909.63,
+   "dogleg_severity": 0.86
+  },
+  {
+   "md": 4925.28,
+   "inclination_deg": 89.8,
+   "azimuth_deg": 181.09,
+   "tvd": 2957.76,
+   "north_south": -1895.81,
+   "east_west": -452.27,
+   "vertical_section": 1938.27,
+   "dogleg_severity": 0.47
+  },
+  {
+   "md": 4954.1,
+   "inclination_deg": 89.64,
+   "azimuth_deg": 181.5,
+   "tvd": 2957.9,
+   "north_south": -1924.62,
+   "east_west": -452.92,
+   "vertical_section": 1966.93,
+   "dogleg_severity": 0.46
+  },
+  {
+   "md": 4982.92,
+   "inclination_deg": 87.95,
+   "azimuth_deg": 180.43,
+   "tvd": 2958.5,
+   "north_south": -1953.43,
+   "east_west": -453.41,
+   "vertical_section": 1995.56,
+   "dogleg_severity": 2.08
+  },
+  {
+   "md": 5011.73,
+   "inclination_deg": 89.69,
+   "azimuth_deg": 180.53,
+   "tvd": 2959.1,
+   "north_south": -1982.23,
+   "east_west": -453.65,
+   "vertical_section": 2024.15,
+   "dogleg_severity": 1.81
+  },
+  {
+   "md": 5040.56,
+   "inclination_deg": 89.18,
+   "azimuth_deg": 181.0,
+   "tvd": 2959.38,
+   "north_south": -2011.06,
+   "east_west": -454.03,
+   "vertical_section": 2052.79,
+   "dogleg_severity": 0.72
+  },
+  {
+   "md": 5069.39,
+   "inclination_deg": 88.47,
+   "azimuth_deg": 179.76,
+   "tvd": 2959.97,
+   "north_south": -2039.88,
+   "east_west": -454.22,
+   "vertical_section": 2081.39,
+   "dogleg_severity": 1.49
+  },
+  {
+   "md": 5098.18,
+   "inclination_deg": 90.29,
+   "azimuth_deg": 179.22,
+   "tvd": 2960.28,
+   "north_south": -2068.67,
+   "east_west": -453.97,
+   "vertical_section": 2109.91,
+   "dogleg_severity": 1.98
+  },
+  {
+   "md": 5127.01,
+   "inclination_deg": 88.61,
+   "azimuth_deg": 177.84,
+   "tvd": 2960.56,
+   "north_south": -2097.49,
+   "east_west": -453.23,
+   "vertical_section": 2138.39,
+   "dogleg_severity": 2.26
+  },
+  {
+   "md": 5155.84,
+   "inclination_deg": 90.92,
+   "azimuth_deg": 179.19,
+   "tvd": 2960.68,
+   "north_south": -2126.3,
+   "east_west": -452.48,
+   "vertical_section": 2166.87,
+   "dogleg_severity": 2.78
+  },
+  {
+   "md": 5184.65,
+   "inclination_deg": 90.83,
+   "azimuth_deg": 179.54,
+   "tvd": 2960.24,
+   "north_south": -2155.11,
+   "east_west": -452.16,
+   "vertical_section": 2195.39,
+   "dogleg_severity": 0.38
+  },
+  {
+   "md": 5213.47,
+   "inclination_deg": 88.13,
+   "azimuth_deg": 179.15,
+   "tvd": 2960.5,
+   "north_south": -2183.92,
+   "east_west": -451.83,
+   "vertical_section": 2223.93,
+   "dogleg_severity": 2.84
+  },
+  {
+   "md": 5242.3,
+   "inclination_deg": 87.72,
+   "azimuth_deg": 181.61,
+   "tvd": 2961.54,
+   "north_south": -2212.73,
+   "east_west": -452.02,
+   "vertical_section": 2252.52,
+   "dogleg_severity": 2.59
+  },
+  {
+   "md": 5271.1,
+   "inclination_deg": 86.56,
+   "azimuth_deg": 180.37,
+   "tvd": 2962.98,
+   "north_south": -2241.49,
+   "east_west": -452.52,
+   "vertical_section": 2281.1,
+   "dogleg_severity": 1.77
+  },
+  {
+   "md": 5299.93,
+   "inclination_deg": 86.21,
+   "azimuth_deg": 179.64,
+   "tvd": 2964.8,
+   "north_south": -2270.26,
+   "east_west": -452.52,
+   "vertical_section": 2309.64,
+   "dogleg_severity": 0.84
+  },
+  {
+   "md": 5328.74,
+   "inclination_deg": 89.02,
+   "azimuth_deg": 179.41,
+   "tvd": 2966.0,
+   "north_south": -2299.04,
+   "east_west": -452.28,
+   "vertical_section": 2338.15,
+   "dogleg_severity": 2.94
+  },
+  {
+   "md": 5357.57,
+   "inclination_deg": 89.02,
+   "azimuth_deg": 180.36,
+   "tvd": 2966.49,
+   "north_south": -2327.87,
+   "east_west": -452.23,
+   "vertical_section": 2366.72,
+   "dogleg_severity": 0.99
+  },
+  {
+   "md": 5386.37,
+   "inclination_deg": 88.86,
+   "azimuth_deg": 180.81,
+   "tvd": 2967.02,
+   "north_south": -2356.66,
+   "east_west": -452.52,
+   "vertical_section": 2395.32,
+   "dogleg_severity": 0.5
+  },
+  {
+   "md": 5415.18,
+   "inclination_deg": 89.28,
+   "azimuth_deg": 181.12,
+   "tvd": 2967.49,
+   "north_south": -2385.46,
+   "east_west": -453.01,
+   "vertical_section": 2423.94,
+   "dogleg_severity": 0.54
+  },
+  {
+   "md": 5444.01,
+   "inclination_deg": 89.22,
+   "azimuth_deg": 180.79,
+   "tvd": 2967.87,
+   "north_south": -2414.29,
+   "east_west": -453.49,
+   "vertical_section": 2452.59,
+   "dogleg_severity": 0.35
+  },
+  {
+   "md": 5472.81,
+   "inclination_deg": 89.16,
+   "azimuth_deg": 181.26,
+   "tvd": 2968.28,
+   "north_south": -2443.08,
+   "east_west": -454.0,
+   "vertical_section": 2481.2,
+   "dogleg_severity": 0.49
+  },
+  {
+   "md": 5501.63,
+   "inclination_deg": 88.95,
+   "azimuth_deg": 180.66,
+   "tvd": 2968.75,
+   "north_south": -2471.89,
+   "east_west": -454.48,
+   "vertical_section": 2509.84,
+   "dogleg_severity": 0.66
+  },
+  {
+   "md": 5530.42,
+   "inclination_deg": 89.18,
+   "azimuth_deg": 181.11,
+   "tvd": 2969.22,
+   "north_south": -2500.67,
+   "east_west": -454.93,
+   "vertical_section": 2538.44,
+   "dogleg_severity": 0.53
+  },
+  {
+   "md": 5559.25,
+   "inclination_deg": 90.08,
+   "azimuth_deg": 181.07,
+   "tvd": 2969.41,
+   "north_south": -2529.5,
+   "east_west": -455.48,
+   "vertical_section": 2567.09,
+   "dogleg_severity": 0.94
+  },
+  {
+   "md": 5588.1,
+   "inclination_deg": 84.81,
+   "azimuth_deg": 180.04,
+   "tvd": 2970.69,
+   "north_south": -2558.31,
+   "east_west": -455.76,
+   "vertical_section": 2595.7,
+   "dogleg_severity": 5.58
+  },
+  {
+   "md": 5616.9,
+   "inclination_deg": 90.32,
+   "azimuth_deg": 178.38,
+   "tvd": 2971.92,
+   "north_south": -2587.07,
+   "east_west": -455.36,
+   "vertical_section": 2624.17,
+   "dogleg_severity": 5.99
+  },
+  {
+   "md": 5645.73,
+   "inclination_deg": 90.15,
+   "azimuth_deg": 181.01,
+   "tvd": 2971.8,
+   "north_south": -2615.89,
+   "east_west": -455.21,
+   "vertical_section": 2652.73,
+   "dogleg_severity": 2.74
+  },
+  {
+   "md": 5674.53,
+   "inclination_deg": 90.04,
+   "azimuth_deg": 180.52,
+   "tvd": 2971.75,
+   "north_south": -2644.69,
+   "east_west": -455.59,
+   "vertical_section": 2681.34,
+   "dogleg_severity": 0.52
+  },
+  {
+   "md": 5703.36,
+   "inclination_deg": 90.23,
+   "azimuth_deg": 179.55,
+   "tvd": 2971.68,
+   "north_south": -2673.52,
+   "east_west": -455.61,
+   "vertical_section": 2709.93,
+   "dogleg_severity": 1.03
+  },
+  {
+   "md": 5732.17,
+   "inclination_deg": 89.8,
+   "azimuth_deg": 180.88,
+   "tvd": 2971.67,
+   "north_south": -2702.33,
+   "east_west": -455.72,
+   "vertical_section": 2738.52,
+   "dogleg_severity": 1.46
+  },
+  {
+   "md": 5760.96,
+   "inclination_deg": 88.18,
+   "azimuth_deg": 178.99,
+   "tvd": 2972.18,
+   "north_south": -2731.11,
+   "east_west": -455.68,
+   "vertical_section": 2767.06,
+   "dogleg_severity": 2.59
+  },
+  {
+   "md": 5789.75,
+   "inclination_deg": 88.32,
+   "azimuth_deg": 179.38,
+   "tvd": 2973.06,
+   "north_south": -2759.89,
+   "east_west": -455.27,
+   "vertical_section": 2795.54,
+   "dogleg_severity": 0.43
+  },
+  {
+   "md": 5818.56,
+   "inclination_deg": 88.3,
+   "azimuth_deg": 179.19,
+   "tvd": 2973.91,
+   "north_south": -2788.68,
+   "east_west": -454.91,
+   "vertical_section": 2824.05,
+   "dogleg_severity": 0.2
+  },
+  {
+   "md": 5847.36,
+   "inclination_deg": 89.01,
+   "azimuth_deg": 178.78,
+   "tvd": 2974.59,
+   "north_south": -2817.47,
+   "east_west": -454.4,
+   "vertical_section": 2852.53,
+   "dogleg_severity": 0.85
+  },
+  {
+   "md": 5876.16,
+   "inclination_deg": 91.14,
+   "azimuth_deg": 178.33,
+   "tvd": 2974.55,
+   "north_south": -2846.26,
+   "east_west": -453.68,
+   "vertical_section": 2880.98,
+   "dogleg_severity": 2.27
+  },
+  {
+   "md": 5904.94,
+   "inclination_deg": 89.21,
+   "azimuth_deg": 178.8,
+   "tvd": 2974.46,
+   "north_south": -2875.03,
+   "east_west": -452.96,
+   "vertical_section": 2909.42,
+   "dogleg_severity": 2.07
+  },
+  {
+   "md": 5933.74,
+   "inclination_deg": 89.19,
+   "azimuth_deg": 178.63,
+   "tvd": 2974.86,
+   "north_south": -2903.82,
+   "east_west": -452.31,
+   "vertical_section": 2937.89,
+   "dogleg_severity": 0.18
+  },
+  {
+   "md": 5962.56,
+   "inclination_deg": 89.12,
+   "azimuth_deg": 179.09,
+   "tvd": 2975.29,
+   "north_south": -2932.63,
+   "east_west": -451.74,
+   "vertical_section": 2966.38,
+   "dogleg_severity": 0.48
+  },
+  {
+   "md": 5991.37,
+   "inclination_deg": 87.95,
+   "azimuth_deg": 179.05,
+   "tvd": 2976.02,
+   "north_south": -2961.42,
+   "east_west": -451.27,
+   "vertical_section": 2994.88,
+   "dogleg_severity": 1.22
+  },
+  {
+   "md": 6020.14,
+   "inclination_deg": 89.36,
+   "azimuth_deg": 180.7,
+   "tvd": 2976.7,
+   "north_south": -2990.18,
+   "east_west": -451.21,
+   "vertical_section": 3023.39,
+   "dogleg_severity": 2.26
+  },
+  {
+   "md": 6048.98,
+   "inclination_deg": 89.22,
+   "azimuth_deg": 180.21,
+   "tvd": 2977.06,
+   "north_south": -3019.02,
+   "east_west": -451.44,
+   "vertical_section": 3052.02,
+   "dogleg_severity": 0.53
+  },
+  {
+   "md": 6077.77,
+   "inclination_deg": 90.27,
+   "azimuth_deg": 179.19,
+   "tvd": 2977.19,
+   "north_south": -3047.81,
+   "east_west": -451.29,
+   "vertical_section": 3080.55,
+   "dogleg_severity": 1.53
+  },
+  {
+   "md": 6106.56,
+   "inclination_deg": 89.86,
+   "azimuth_deg": 180.4,
+   "tvd": 2977.15,
+   "north_south": -3076.6,
+   "east_west": -451.18,
+   "vertical_section": 3109.09,
+   "dogleg_severity": 1.33
+  },
+  {
+   "md": 6135.37,
+   "inclination_deg": 89.63,
+   "azimuth_deg": 180.81,
+   "tvd": 2977.28,
+   "north_south": -3105.41,
+   "east_west": -451.49,
+   "vertical_section": 3137.69,
+   "dogleg_severity": 0.49
+  },
+  {
+   "md": 6164.18,
+   "inclination_deg": 89.22,
+   "azimuth_deg": 180.47,
+   "tvd": 2977.57,
+   "north_south": -3134.21,
+   "east_west": -451.81,
+   "vertical_section": 3166.3,
+   "dogleg_severity": 0.55
+  },
+  {
+   "md": 6193.01,
+   "inclination_deg": 89.94,
+   "azimuth_deg": 181.17,
+   "tvd": 2977.78,
+   "north_south": -3163.04,
+   "east_west": -452.22,
+   "vertical_section": 3194.94,
+   "dogleg_severity": 1.04
+  },
+  {
+   "md": 6221.8,
+   "inclination_deg": 89.7,
+   "azimuth_deg": 179.97,
+   "tvd": 2977.87,
+   "north_south": -3191.83,
+   "east_west": -452.51,
+   "vertical_section": 3223.52,
+   "dogleg_severity": 1.28
+  },
+  {
+   "md": 6250.63,
+   "inclination_deg": 89.63,
+   "azimuth_deg": 180.08,
+   "tvd": 2978.04,
+   "north_south": -3220.66,
+   "east_west": -452.52,
+   "vertical_section": 3252.12,
+   "dogleg_severity": 0.14
+  },
+  {
+   "md": 6279.4,
+   "inclination_deg": 90.26,
+   "azimuth_deg": 179.52,
+   "tvd": 2978.07,
+   "north_south": -3249.43,
+   "east_west": -452.42,
+   "vertical_section": 3280.63,
+   "dogleg_severity": 0.88
+  },
+  {
+   "md": 6308.15,
+   "inclination_deg": 90.2,
+   "azimuth_deg": 180.05,
+   "tvd": 2977.95,
+   "north_south": -3278.18,
+   "east_west": -452.31,
+   "vertical_section": 3309.13,
+   "dogleg_severity": 0.56
+  },
+  {
+   "md": 6336.88,
+   "inclination_deg": 90.18,
+   "azimuth_deg": 179.89,
+   "tvd": 2977.86,
+   "north_south": -3306.91,
+   "east_west": -452.3,
+   "vertical_section": 3337.62,
+   "dogleg_severity": 0.17
+  },
+  {
+   "md": 6365.66,
+   "inclination_deg": 90.08,
+   "azimuth_deg": 180.25,
+   "tvd": 2977.79,
+   "north_south": -3335.69,
+   "east_west": -452.33,
+   "vertical_section": 3366.16,
+   "dogleg_severity": 0.39
+  },
+  {
+   "md": 6394.45,
+   "inclination_deg": 90.17,
+   "azimuth_deg": 180.17,
+   "tvd": 2977.73,
+   "north_south": -3364.48,
+   "east_west": -452.44,
+   "vertical_section": 3394.73,
+   "dogleg_severity": 0.13
+  },
+  {
+   "md": 6423.23,
+   "inclination_deg": 90.12,
+   "azimuth_deg": 179.68,
+   "tvd": 2977.66,
+   "north_south": -3393.26,
+   "east_west": -452.4,
+   "vertical_section": 3423.26,
+   "dogleg_severity": 0.51
+  },
+  {
+   "md": 6452.04,
+   "inclination_deg": 90.04,
+   "azimuth_deg": 180.15,
+   "tvd": 2977.62,
+   "north_south": -3422.07,
+   "east_west": -452.36,
+   "vertical_section": 3451.83,
+   "dogleg_severity": 0.5
+  },
+  {
+   "md": 6480.86,
+   "inclination_deg": 89.99,
+   "azimuth_deg": 179.79,
+   "tvd": 2977.61,
+   "north_south": -3450.89,
+   "east_west": -452.34,
+   "vertical_section": 3480.4,
+   "dogleg_severity": 0.38
+  },
+  {
+   "md": 6502.0,
+   "inclination_deg": 89.68,
+   "azimuth_deg": 179.54,
+   "tvd": 2977.67,
+   "north_south": -3472.02,
+   "east_west": -452.22,
+   "vertical_section": 3501.35,
+   "dogleg_severity": 0.57
+  },
+  {
+   "md": 6510.0,
+   "inclination_deg": 89.68,
+   "azimuth_deg": 179.54,
+   "tvd": 2977.71,
+   "north_south": -3480.02,
+   "east_west": -452.16,
+   "vertical_section": 3509.28,
+   "dogleg_severity": 0.0
+  }
+ ]
+}
