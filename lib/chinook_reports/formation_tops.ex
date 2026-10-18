@@ -122,6 +122,20 @@ defmodule ChinookReports.FormationTops do
     numeric(imported) || numeric(typed)
   end
 
+  @doc """
+  KB to Ground: Kelly Bushing minus Ground Level, to the centimetre. Always
+  derived, never taken as entered, so it can't disagree with the two
+  elevations; `nil` unless both are present. Accepts numbers, Decimals or
+  numeric strings (welldata, typed columns, or form text).
+  """
+  @spec kb_to_ground(term(), term()) :: float() | nil
+  def kb_to_ground(ground_level, kelly_bushing) do
+    case {numeric(ground_level), numeric(kelly_bushing)} do
+      {gl, kb} when is_number(gl) and is_number(kb) -> Float.round((kb - gl) / 1, 2)
+      _ -> nil
+    end
+  end
+
   defp survey_points(import_data) do
     (import_data["reservoir_data"] || [])
     |> Enum.flat_map(fn leg -> get_in(leg, ["survey", "survey_points"]) || [] end)

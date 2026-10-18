@@ -276,6 +276,27 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       refute Map.has_key?(wd, "geological_services")
     end
 
+    test "KB to Ground is derived from Ground Level and Kelly Bushing", %{conn: conn} do
+      report = tops_report()
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "well_data")
+
+      # Only the KB is known yet, so there is no KB to Ground to show.
+      refute view |> element("#well-data-elevations") |> render() =~ "4.5 m"
+
+      edit_card(view, "elevations")
+
+      view
+      |> form("#well-data-elevations-form",
+        fields: fields("elevations", %{"Ground Level" => "595.5"})
+      )
+      |> render_submit()
+
+      assert view |> element("#well-data-elevations") |> render() =~ "4.5 m"
+      wd = Reports.get_report!(report.id).import_data["welldata"]
+      assert wd["elevations"]["kb_to_ground"] == 4.5
+    end
+
     test "changing the Kelly Bushing re-derives Formation Tops", %{conn: conn} do
       report = tops_report()
       {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")

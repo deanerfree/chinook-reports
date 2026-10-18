@@ -874,7 +874,13 @@ defmodule ChinookReportsWeb.ReportComponents do
                   <%= for {label, val} <- [
                       {"Ground Level", "#{elev["ground_level"]} m"},
                       {"Kelly Bushing", "#{elev["kelly_bushing"]} m"},
-                      {"KB to Ground", "#{elev["kb_to_ground"]} m"},
+                      {"KB to Ground",
+                       elev_m(
+                         ChinookReports.FormationTops.kb_to_ground(
+                           elev["ground_level"],
+                           elev["kelly_bushing"]
+                         )
+                       ) || "—"},
                       {"Datum", "#{elev["reference"]}"}
                     ] do %>
                     <div class="rounded-md bg-bg p-2">
@@ -1088,7 +1094,13 @@ defmodule ChinookReportsWeb.ReportComponents do
             <%= for {label, val} <- [
                 {"Ground Level", elev_m(@data.gl_elevation || imported_elev["ground_level"])},
                 {"Kelly Bushing", elev_m(@data.kb_elevation || imported_elev["kelly_bushing"])},
-                {"KB to Ground", elev_m(@data.kb_to_ground || imported_elev["kb_to_ground"])},
+                {"KB to Ground",
+                 elev_m(
+                   ChinookReports.FormationTops.kb_to_ground(
+                     @data.gl_elevation || imported_elev["ground_level"],
+                     @data.kb_elevation || imported_elev["kelly_bushing"]
+                   )
+                 )},
                 {"Datum", @data.datum || imported_elev["reference"]}
               ] do %>
               <div class="rounded-md bg-bg p-2">

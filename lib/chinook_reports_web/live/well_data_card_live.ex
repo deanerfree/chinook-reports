@@ -14,6 +14,10 @@ defmodule ChinookReportsWeb.WellDataCardLive do
   update, so the two never disagree. A field with `typed` and no `path`
   (Status) lives only in the column.
 
+  A field with `derived` (KB to Ground) isn't an input: it's computed from the
+  card's other values (`derive/3`), shown read-only while editing, and saved
+  with them.
+
   On save the parent gets `{:import_updated, report, title, card}`. The
   Elevations card's KB feeds Formation Tops, so that card saves the re-derived
   tops in the same update (`FormationTops.with_tops/2`).
@@ -129,7 +133,7 @@ defmodule ChinookReportsWeb.WellDataCardLive do
           label: "KB to Ground",
           type: :number,
           unit: "m",
-          fallback: {:data, :kb_to_ground}
+          derived: :kb_to_ground
         },
         %{path: ["elevations", "reference"], label: "Datum", fallback: {:data, :datum}}
       ]
@@ -243,7 +247,7 @@ defmodule ChinookReportsWeb.WellDataCardLive do
         {Integer.to_string(i), input_value(f, current(report, f))}
       end)
 
-    assign(socket, values: values, errors: %{})
+    assign(socket, values: with_derived(socket.assigns.spec, values), errors: %{})
   end
 
   # ── events ────────────────────────────────────────────────────────────────
@@ -258,13 +262,13 @@ defmodule ChinookReportsWeb.WellDataCardLive do
   end
 
   def handle_event("validate", %{"fields" => params}, socket) do
-    values = Map.merge(socket.assigns.values, params)
+    values = with_derived(socket.assigns.spec, Map.merge(socket.assigns.values, params))
     {:noreply, assign(socket, values: values, errors: parse_errors(socket.assigns.spec, values))}
   end
 
   def handle_event("save", %{"fields" => params}, socket) do
     %{report: report, spec: spec, card: card} = socket.assigns
-    values = Map.merge(socket.assigns.values, params)
+    values = with_derived(spec, Map.merge(socket.assigns.values, params))
 
     with errors when errors == %{} <- parse_errors(spec, values),
          {welldata, typed} = build(report, spec, values),
@@ -308,6 +312,27 @@ defmodule ChinookReportsWeb.WellDataCardLive do
     do: Map.get(data, field)
 
   defp fallback(_report, _f), do: nil
+
+  # Recompute every `derived` field from the (possibly unsaved) values it
+  # depends on, so a typed-in value can never stand.
+  defp with_derived(spec, values) do
+    spec.fields
+    |> Enum.with_index()
+    |> Enum.reduce(values, fn
+      {%{derived: kind} = f, i}, acc ->
+        Map.put(acc, Integer.to_string(i), input_value(f, derive(kind, spec, acc)))
+
+      _, acc ->
+        acc
+    end)
+  end
+
+  defp derive(:kb_to_ground, spec, values) do
+    FormationTops.kb_to_ground(
+      field_value(spec, values, ["elevations", "ground_level"]),
+      field_value(spec, values, ["elevations", "kelly_bushing"])
+    )
+  end
 
   # {new welldata, typed-column attrs} from the submitted values.
   defp build(report, spec, values) do
@@ -475,7 +500,11 @@ defmodule ChinookReportsWeb.WellDataCardLive do
                 error && "border-danger",
                 !error && "border-border focus:border-primary"
               ] %>
-              <%= case Map.get(f, :type, :text) do %>
+              <%= case (f[:derived] && :derived) || Map.get(f, :type, :text) do %>
+                <% :derived -> %>
+                  <span class="px-3 py-2 text-sm text-text">
+                    {display(f, value)}
+                  </span>
                 <% :select -> %>
                   <select name={name} class={input_class}>
                     <option :if={!f[:required]} value="">—</option>

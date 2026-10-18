@@ -136,6 +136,18 @@ defmodule ChinookReports.FormationTopsTest do
     end
   end
 
+  describe "kb_to_ground/2" do
+    test "is Kelly Bushing minus Ground Level, without float noise" do
+      assert FormationTops.kb_to_ground(1047.8, 1052.3) == 4.5
+      assert FormationTops.kb_to_ground(Decimal.new("700.0"), "705.5") == 5.5
+    end
+
+    test "is nil unless both elevations are present" do
+      assert FormationTops.kb_to_ground(nil, 1052.3) == nil
+      assert FormationTops.kb_to_ground(1047.8, "") == nil
+    end
+  end
+
   describe "recompute/2 input shapes" do
     test "accepts the wrapped %{\"formations\" => [...]} map" do
       out = recompute(%{"formations" => [row("A", %{"md" => 100.0, "tvd" => 100.0})]})
