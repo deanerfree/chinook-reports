@@ -37,6 +37,53 @@ defmodule ChinookReports.Trajectory do
   def integrate(_), do: []
 
   @doc """
+  The trajectory at each of `stations`, for listing a planned path alongside an
+  actual survey: `md`, `tvd`, `north`, `east`, `vertical_section` and
+  `dogleg_severity` (°/30 m, `0.0` at the first station), sorted by MD with
+  unusable stations dropped.
+
+  A program that starts below surface is tied in vertically at the wellhead
+  (see `tie_in_at_surface/1`); the tie-in point itself is not returned.
+  """
+  @spec stations([station()]) :: [map()]
+  def stations(stations) when is_list(stations) do
+    case parse(stations) do
+      [] ->
+        []
+
+      parsed ->
+        tied = tie_in_at_surface(parsed)
+
+        dls =
+          tied
+          |> Enum.chunk_every(2, 1, :discard)
+          |> Enum.map(fn [a, b] ->
+            d_md = b.md - a.md
+            if d_md > 0, do: interval(a, b).dogleg_deg / d_md * 30.0, else: 0.0
+          end)
+
+        tied
+        |> build()
+        |> Enum.zip([0.0 | dls])
+        |> Enum.map(fn {p, d} -> Map.put(p, :dogleg_severity, d) end)
+        |> Enum.drop(length(tied) - length(parsed))
+    end
+  end
+
+  def stations(_), do: []
+
+  @doc """
+  Prepend a vertical station at the wellhead (MD 0) to MD-sorted `stations`
+  that start below surface — a program typed in from the kick-off point down
+  still starts vertical at the wellhead.
+  """
+  @spec tie_in_at_surface([station()]) :: [station()]
+  def tie_in_at_surface([%{md: md} | _] = rows) when md > 0,
+    do: [%{md: 0.0, inc_deg: 0.0, azi_deg: 0.0} | rows]
+
+  def tie_in_at_surface(rows), do: rows
+
+  @doc """
   Position (`md`, `tvd`, `north`, `east`) of the trajectory described by
   `stations` at measured depth `md`.
 
@@ -47,17 +94,31 @@ defmodule ChinookReports.Trajectory do
   """
   @spec position_at([station()], number()) ::
           %{md: float(), tvd: float(), north: float(), east: float()} | nil
-  def position_at(stations, md) when is_list(stations) and is_number(md) do
-    with [_, _ | _] = parsed <- parse(stations),
-         curve = build(parsed),
-         true <- md >= hd(curve).md do
-      locate(curve, List.last(parsed), md)
-    else
-      _ -> nil
+  def position_at(stations, md) when is_number(md), do: hd(positions_at(stations, [md]))
+  def position_at(_, _), do: nil
+
+  @doc """
+  `position_at/2` for each of `mds`, integrating `stations` once. Each entry is
+  `nil` where `position_at/2` would be.
+  """
+  @spec positions_at([station()], [number()]) ::
+          [%{md: float(), tvd: float(), north: float(), east: float()} | nil]
+  def positions_at(stations, mds) when is_list(stations) and is_list(mds) do
+    case parse(stations) do
+      [_, _ | _] = parsed ->
+        curve = build(parsed)
+        last = List.last(parsed)
+
+        Enum.map(mds, fn md ->
+          if is_number(md) and md >= hd(curve).md, do: locate(curve, last, md)
+        end)
+
+      _ ->
+        Enum.map(mds, fn _ -> nil end)
     end
   end
 
-  def position_at(_, _), do: nil
+  def positions_at(_, mds) when is_list(mds), do: Enum.map(mds, fn _ -> nil end)
 
   defp locate(curve, last_station, md) do
     last = List.last(curve)
@@ -174,6 +235,7 @@ defmodule ChinookReports.Trajectory do
   defp normalize_station(_), do: nil
 
   defp num(v) when is_number(v), do: v
+  defp num(%Decimal{} = v), do: Decimal.to_float(v)
 
   defp num(v) when is_binary(v) do
     case Float.parse(v) do

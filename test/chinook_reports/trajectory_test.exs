@@ -91,4 +91,38 @@ defmodule ChinookReports.TrajectoryTest do
              ) == nil
     end
   end
+
+  describe "stations/1" do
+    test "lists each station with its position and dogleg severity per 30 m" do
+      rows =
+        Trajectory.stations([
+          %{md: Decimal.new(200), inc_deg: Decimal.new(90), azi_deg: Decimal.new(90)},
+          %{md: Decimal.new(100), inc_deg: Decimal.new(0), azi_deg: Decimal.new(90)},
+          %{md: Decimal.new(400), inc_deg: Decimal.new(90), azi_deg: Decimal.new(90)}
+        ])
+
+      # Tied in vertically at surface, but the tie-in isn't listed.
+      assert Enum.map(rows, & &1.md) == [100.0, 200.0, 400.0]
+
+      [kop, landing, td] = rows
+      assert_in_delta kop.tvd, 100.0, 0.001
+      assert_in_delta kop.dogleg_severity, 0.0, 0.001
+
+      # 90° over 100 m of MD.
+      assert_in_delta landing.dogleg_severity, 27.0, 0.001
+      r = 200.0 / :math.pi()
+      assert_in_delta landing.tvd, 100.0 + r, 0.001
+      assert_in_delta landing.east, r, 0.001
+      assert_in_delta landing.north, 0.0, 0.001
+
+      assert_in_delta td.dogleg_severity, 0.0, 0.001
+      assert_in_delta td.east, r + 200.0, 0.001
+      assert_in_delta td.vertical_section, r + 200.0, 0.001
+    end
+
+    test "drops unusable stations and handles none" do
+      assert Trajectory.stations([]) == []
+      assert Trajectory.stations([%{md: 100, inc_deg: nil, azi_deg: 0}]) == []
+    end
+  end
 end
