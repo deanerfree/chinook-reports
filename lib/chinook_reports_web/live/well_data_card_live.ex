@@ -31,7 +31,7 @@ defmodule ChinookReportsWeb.WellDataCardLive do
       title: "Well Identification",
       fields: [
         %{path: ["well_name"], label: "Well Name", sync: :well_name, wide: true},
-        %{path: ["unique_well_id"], label: "Unique Well ID", sync: :unique_well_id},
+        %{path: ["unique_well_id"], label: "Unique Well ID", sync: :unique_well_id, mask: :uwi},
         %{
           typed: :status,
           label: "Status",
@@ -430,6 +430,15 @@ defmodule ChinookReportsWeb.WellDataCardLive do
   defp display(%{unit: unit}, v), do: "#{v} #{unit}"
   defp display(_f, v), do: v
 
+  # The current (possibly unsaved) value of the card's field at `path`, e.g.
+  # the Country the UWI mask follows.
+  defp field_value(spec, values, path) do
+    case Enum.find_index(spec.fields, &(&1[:path] == path)) do
+      nil -> nil
+      i -> values[Integer.to_string(i)]
+    end
+  end
+
   defp options(%{options: fun}), do: fun.()
 
   # ── render ───────────────────────────────────────────────────────────────
@@ -486,6 +495,9 @@ defmodule ChinookReportsWeb.WellDataCardLive do
                     name={name}
                     value={value}
                     placeholder={f[:placeholder]}
+                    id={f[:mask] && "#{@id}-field-#{i}"}
+                    phx-hook={f[:mask] == :uwi && "UWIMaskHook"}
+                    data-uwi-country={f[:mask] == :uwi && field_value(@spec, @values, ["country"])}
                     phx-debounce="blur"
                     class={input_class}
                   />

@@ -57,6 +57,8 @@
           else: "Enter the well's UWI"
       }
       pattern={ChinookReports.Reports.UWI.html_pattern(@new_report_form[:country].value)}
+      phx-hook="UWIMaskHook"
+      data-uwi-country={@new_report_form[:country].value}
     />
     <.field
       field={@new_report_form[:operator]}

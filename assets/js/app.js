@@ -21,7 +21,7 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import { getHooks } from "live_svelte"
-import { SidebarCollapseHook, DialogHook } from "./hooks/index.ts"
+import { SidebarCollapseHook, DialogHook, UWIMaskHook } from "./hooks/index.ts"
 
 const rawComponents = import.meta.glob("../svelte/**/*.svelte", { eager: true })
 const Components = Object.fromEntries(
@@ -35,7 +35,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: (() => { const h = { ...getHooks(Components), SidebarCollapseHook, DialogHook }; return h })(),
+  hooks: (() => { const h = { ...getHooks(Components), SidebarCollapseHook, DialogHook, UWIMaskHook }; return h })(),
   dom: {
     // Native <dialog> open state only exists client-side (set by showModal()),
     // so DOM patches would strip the `open` attribute and force-close the

@@ -31,7 +31,12 @@ defmodule ChinookReportsWeb.CreateReportLive do
   @identity_fields [
     %{field: :well_name, label: "Well Name", placeholder: "GEAR SODA LAKE 103 HZ…", wide: true},
     %{field: :spud_date, label: "Spud Date", type: :datetime},
-    %{field: :unique_well_id, label: "Unique Well I.D.", placeholder: "XXX/XX-XX-XXX-XXWX/XX"},
+    %{
+      field: :unique_well_id,
+      label: "Unique Well I.D.",
+      placeholder: "XXX/XX-XX-XXX-XXWX/XX",
+      mask: :uwi
+    },
     %{field: :operator, label: "Operator", placeholder: "Operator name"},
     %{field: :country, label: "Country", input: :select, options: &Countries.all/0},
     %{field: :province, label: "Province", placeholder: "Alberta"},

@@ -181,6 +181,8 @@ defmodule ChinookReportsWeb.ReportFormComponents do
           placeholder={@spec[:placeholder]}
           unit={resolve_unit(@spec[:unit], @form)}
           wide={@spec[:wide] || false}
+          phx-hook={@spec[:mask] == :uwi && "UWIMaskHook"}
+          data-uwi-country={@spec[:mask] == :uwi && @form[:country].value}
         />
     <% end %>
     """
