@@ -464,22 +464,36 @@ defmodule ChinookReports.ReportSummary do
 
   defp formation_row?(t), do: not Regex.match?(@non_formation, to_string(t["formation"]))
 
-  defp top_md(t), do: num(get_in(t, ["samples", "md"])) || num(get_in(t, ["mwd_gamma", "md"]))
+  # A formation's actual top: the first set of tops that picked it — Samples,
+  # then MWD / Gamma (the drilling tops), Wireline (FormationTops.compared_groups/0).
+  defp actual_group(t) do
+    Enum.find(ChinookReports.FormationTops.compared_groups(), &num(get_in(t, [&1, "md"])))
+  end
 
-  defp top_subsea(t),
-    do: num(get_in(t, ["samples", "subsea"])) || num(get_in(t, ["mwd_gamma", "subsea"]))
+  defp top_md(t), do: (g = actual_group(t)) && num(get_in(t, [g, "md"]))
+  defp top_subsea(t), do: (g = actual_group(t)) && num(get_in(t, [g, "subsea"]))
+
+  # That pick's difference to prognosis; tops saved before the per-group
+  # differences only carry Samples' (`difference_m`).
+  defp top_difference(t) do
+    case actual_group(t) do
+      nil -> nil
+      "samples" -> num(get_in(t, ["samples", "difference"])) || num(t["difference_m"])
+      g -> num(get_in(t, [g, "difference"]))
+    end
+  end
 
   defp top_call(nil), do: nil
 
   defp top_call(row) do
-    diff = num(row["difference_m"])
+    diff = top_difference(row)
 
     %{
       formation: row["formation"],
       md: dist(top_md(row)),
       subsea: dist(top_subsea(row)),
       diff: signed(diff),
-      # difference_m = samples.subsea - prognosis.subsea: positive came in high.
+      # difference = actual subsea - prognosis subsea: positive came in high.
       call:
         cond do
           not is_number(diff) -> :no_prognosis

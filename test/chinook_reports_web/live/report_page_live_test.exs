@@ -317,25 +317,47 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
   end
 
   describe "editing a row-based section" do
-    test "adding a formation top row and saving persists it", %{conn: conn} do
-      report = create_report(%{"status" => "active"})
-      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")
+    test "wizard tops are listed as Prognosis; a Wireline pick saves the table", %{conn: conn} do
+      report =
+        create_report(%{
+          "status" => "active",
+          "report_data" => %{
+            "kb_elevation" => "600",
+            "formation_tops" => %{
+              "0" => %{"formation" => "Colony", "md" => "300", "subsea" => "302"},
+              "1" => %{"formation" => "McLaren", "md" => "500", "subsea" => "105"}
+            }
+          }
+        })
 
-      open_tab(view, "formation_tops")
-      view |> element(~s(button[phx-value-section="formation_tops"])) |> render_click()
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")
+      html = open_tab(view, "formation_tops")
+
+      # The full table, names from the wizard, not the plain typed one
+      assert has_element?(view, "#tops-form-formation-tops")
+      assert html =~ "Colony" and html =~ "McLaren"
+      assert html =~ "+/− (m)"
 
       view
-      |> element(~s(button[phx-click="add_row"][phx-value-list="formation_tops"]))
+      |> element(~s(button[phx-click="compare"][phx-value-group="wireline"]))
       |> render_click()
 
       view
-      |> form(~s(form[phx-submit="save_section"]),
-        report: %{report_data: %{formation_tops: %{"0" => %{formation: "Sparky", md: "1200"}}}}
-      )
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="wireline"]))
+      |> render_click()
+
+      # Empty picks show the prognosed MD as a placeholder
+      assert has_element?(view, ~s(input[name="tops[rows][0][wireline][md]"][placeholder="300"]))
+
+      view
+      |> form("#tops-form-formation-tops", tops: %{rows: %{"0" => %{wireline: %{md: "295"}}}})
       |> render_submit()
 
-      updated = Reports.get_report!(report.id)
-      assert [%{formation: "Sparky"}] = updated.report_data.formation_tops
+      [colony, mclaren] = Reports.get_report!(report.id).import_data["tops"]["formations"]
+      assert colony["formation"] == "Colony"
+      assert colony["prognosis"]["subsea"] == 302.0
+      assert colony["wireline"]["md"] == 295.0
+      assert mclaren["prognosis"]["md"] == 500.0
     end
 
     test "removing a survey row and saving drops it (typed embed fallback)", %{conn: conn} do
@@ -432,12 +454,23 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       assert html =~ "Formation Tops"
       assert html =~ "Last survey"
       assert html =~ "Colony"
-      # Samples MD 305 interpolates to TVD 305 on the 1:1 demo survey → subsea 295
-      assert html =~ ">295</span>"
-      # every group has a pencil
-      assert has_element?(view, ~s(button[phx-click="edit_group"][phx-value-group="samples"]))
-      assert has_element?(view, ~s(button[phx-click="edit_group"][phx-value-group="mwd_gamma"]))
+      # Prognosis subsea: KB 600 − TVD 298
+      assert html =~ ">302</span>"
+      # Prognosis, plus the compared tab (MWD / Gamma by default), each with a pencil
       assert has_element?(view, ~s(button[phx-click="edit_group"][phx-value-group="prognosis"]))
+      assert has_element?(view, ~s(button[phx-click="edit_group"][phx-value-group="mwd_gamma"]))
+
+      for g <- ~w(mwd_gamma wireline) do
+        assert has_element?(view, ~s(button[phx-click="compare"][phx-value-group="#{g}"]))
+      end
+
+      # MWD / Gamma is the drilling tops; there's no separate Drilling group
+      assert html =~ "Drilling (MWD / Gamma)"
+      refute has_element?(view, ~s(button[phx-value-group="drilling"]))
+
+      # No Samples tab, column or pencil
+      refute has_element?(view, ~s(button[phx-value-group="samples"]))
+      refute html =~ "Samples"
     end
 
     test "a draft report shows no group pencils", %{conn: conn} do
@@ -448,25 +481,29 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       refute has_element?(view, ~s(button[phx-click="edit_group"]))
     end
 
-    test "editing a Samples MD saves and recomputes TVD/Subsea", %{conn: conn} do
+    test "editing an MWD / Gamma MD saves and recomputes TVD/Subsea", %{conn: conn} do
       report = tops_report()
       {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
       open_tab(view, "formation_tops")
 
-      view |> element(~s(button[phx-value-group="samples"])) |> render_click()
+      view
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="mwd_gamma"]))
+      |> render_click()
 
       view
       |> form("#tops-form-formation-tops",
-        tops: %{rows: %{"0" => %{samples: %{md: "320"}}, "1" => %{samples: %{md: "510"}}}}
+        tops: %{rows: %{"0" => %{mwd_gamma: %{md: "320"}}, "1" => %{mwd_gamma: %{md: "510"}}}}
       )
       |> render_submit()
 
       tops = Reports.get_report!(report.id).import_data["tops"]["formations"]
       colony = Enum.find(tops, &(&1["formation"] == "Colony"))
 
-      assert colony["samples"]["md"] == 320.0
-      assert colony["samples"]["tvd"] == 320.0
-      assert colony["samples"]["subsea"] == 280.0
+      assert colony["mwd_gamma"]["md"] == 320.0
+      assert colony["mwd_gamma"]["tvd"] == 320.0
+      assert colony["mwd_gamma"]["subsea"] == 280.0
+      # an imported Samples pick is kept as it was
+      assert colony["samples"]["md"] == 305.0
     end
 
     test "editing a Prognosis MD and Subsea saves both and recomputes TVD", %{conn: conn} do
@@ -474,7 +511,9 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
       open_tab(view, "formation_tops")
 
-      view |> element(~s(button[phx-value-group="prognosis"])) |> render_click()
+      view
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="prognosis"]))
+      |> render_click()
 
       # a Subsea below sea level is a valid (negative) datum, not an error
       view
@@ -498,34 +537,84 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
     end
 
     test "a pick beyond the survey is flagged as extrapolated", %{conn: conn} do
-      # survey reaches 900 m; add a sample pick past it
+      # survey reaches 900 m; add an MWD pick past it
       base = tops_report()
 
       deep = %{
         "formation" => "Deep",
         "prognosis" => %{},
-        "samples" => %{"md" => 1200.0},
-        "mwd_gamma" => %{}
+        "mwd_gamma" => %{"md" => 1200.0},
+        "wireline" => %{}
       }
 
       tops = update_in(base.import_data["tops"], ["formations"], &(&1 ++ [deep]))
       {:ok, report} = Reports.update_import_section(base, "tops", tops)
 
       {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
-      html = open_tab(view, "formation_tops")
+      open_tab(view, "formation_tops")
 
-      assert html =~ "extrapolated"
+      # "(extrapolated)" beside the name of the deep row only
+      assert view |> element("tbody tr", "Deep") |> render() =~ "(extrapolated)"
+      refute view |> element("tbody tr", "Colony") |> render() =~ "(extrapolated)"
+
+      # It follows the tab: Deep has no Wireline pick, so nothing is extrapolated there.
+      view
+      |> element(~s(button[phx-click="compare"][phx-value-group="wireline"]))
+      |> render_click()
+
+      refute render(view) =~ "(extrapolated)"
+    end
+
+    test "a Wireline tab: its pick saves, derives TVD/Subsea and drives Diff", %{conn: conn} do
+      report = tops_report()
+      {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "formation_tops")
+
+      view
+      |> element(~s(button[phx-click="compare"][phx-value-group="wireline"]))
+      |> render_click()
+
+      view
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="wireline"]))
+      |> render_click()
+
+      # Switching tabs mid-edit of a compared group is locked.
+      assert has_element?(
+               view,
+               ~s(button[phx-click="compare"][phx-value-group="mwd_gamma"][disabled])
+             )
+
+      html =
+        view
+        |> form("#tops-form-formation-tops", tops: %{rows: %{"0" => %{wireline: %{md: "310"}}}})
+        |> render_submit()
+
+      colony =
+        Enum.find(
+          Reports.get_report!(report.id).import_data["tops"]["formations"],
+          &(&1["formation"] == "Colony")
+        )
+
+      # 1:1 survey, KB 600: TVD 310, subsea 290; prognosis subsea is 600 − 298 = 302
+      assert colony["wireline"]["tvd"] == 310.0
+      assert colony["wireline"]["subsea"] == 290.0
+      assert colony["wireline"]["difference"] == -12.0
+      # Still on the Wireline tab, whose +/− shows
+      assert html =~ "-12"
     end
 
     test "a negative MD blocks the save", %{conn: conn} do
       report = tops_report()
       {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
       open_tab(view, "formation_tops")
-      view |> element(~s(button[phx-value-group="samples"])) |> render_click()
+
+      view
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="mwd_gamma"]))
+      |> render_click()
 
       html =
         view
-        |> form("#tops-form-formation-tops", tops: %{rows: %{"0" => %{samples: %{md: "-5"}}}})
+        |> form("#tops-form-formation-tops", tops: %{rows: %{"0" => %{mwd_gamma: %{md: "-5"}}}})
         |> render_change()
 
       assert html =~ "needs a fix" or html =~ "need a fix"
@@ -1218,7 +1307,10 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       report = tops_report()
       {:ok, view, _} = live(conn, ~p"/reports/#{report.id}")
       open_tab(view, "formation_tops")
-      view |> element(~s(button[phx-value-group="samples"])) |> render_click()
+
+      view
+      |> element(~s(button[phx-click="edit_group"][phx-value-group="mwd_gamma"]))
+      |> render_click()
 
       view
       |> element(~s(#row-menu-formation-tops-0 button[phx-click*="ask_delete"]))
@@ -1229,10 +1321,10 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       press_escape(view, "#tops-form-formation-tops")
       refute render(view) =~ "Delete this formation?"
       # still editing, nothing deleted
-      assert has_element?(view, ~s(input[name="tops[rows][0][samples][md]"]))
+      assert has_element?(view, ~s(input[name="tops[rows][0][mwd_gamma][md]"]))
 
       press_escape(view, "#tops-form-formation-tops")
-      refute has_element?(view, ~s(input[name="tops[rows][0][samples][md]"]))
+      refute has_element?(view, ~s(input[name="tops[rows][0][mwd_gamma][md]"]))
       assert length(import_data(report)["tops"]["formations"]) == 2
     end
   end

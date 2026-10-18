@@ -2,40 +2,50 @@ defmodule ChinookReports.FormationTops do
   @moduledoc """
   Recompute the calculated columns of the `import_data["tops"]` table.
 
-  Each formation row carries three groups — `"prognosis"`, `"samples"`,
-  `"mwd_gamma"` — every one a `%{"md", "tvd", "isopach", "subsea"}` map. Only a
-  few of those values are ever authored by a person:
+  Each formation row carries a `"prognosis"` group and the picks compared to
+  it — `"samples"`, `"mwd_gamma"` (the drilling tops) and `"wireline"`
+  (`compared_groups/0`) — every one a `%{"md", "tvd", "isopach", "subsea"}`
+  map. Only a few of those values are ever authored by a person:
 
     * `prognosis` md + subsea — entered from the operator's prognosis in the
       draft phase, then frozen. A prognosis top is a geologic surface, so its
       datum-stable value is the **subsea** depth; some sheets give a TVD
       instead, which we accept and convert.
-    * `samples` / `mwd_gamma` md — the pick, entered while drilling.
+    * each compared group's md — the pick (from cuttings, the MWD gamma while
+      drilling, or the wireline logs), entered at the wellsite.
 
   Everything else is derived here, and `recompute/2` is the single place that
   does it — the tops editor, the elevations editor (a KB change) and a survey
   update all funnel through it:
 
     * `tvd` — prognosis is `kb_elevation - subsea` (so it moves with any KB
-      correction while the geologic pick stays put); samples/mwd **interpolate**
+      correction while the geologic pick stays put); compared groups **interpolate**
       the directional survey where it has data and **extrapolate** forward from
       the last station beyond it. Extrapolated groups carry `"method" =>
       "extrapolated"` (interpolated ones `"interpolated"`); prognosis carries
       no method.
     * `subsea` — prognosis keeps its given value (or `kb_elevation - tvd` when
-      the sheet gave only a TVD); samples/mwd are `kb_elevation - tvd`.
-    * `isopach` — the next formation's `tvd` minus this one's, within a group,
-      taken in MD order; the deepest formation in a group has no isopach.
-    * top-level `"difference_m"` — `samples.subsea - prognosis.subsea`
+      the sheet gave only a TVD); compared groups are `kb_elevation - tvd`.
+    * `isopach` — the formation's vertical thickness: the next formation's
+      `tvd` minus this one's, within a group, taken in depth order (see
+      `isopachs/1` for the fallbacks when a TVD is missing); the deepest
+      formation in a group has no isopach.
+    * `difference` in each compared group — its `subsea - prognosis.subsea`
+      (positive: the top came in high); the top-level `"difference_m"` is
+      Samples' (what the Summary reports).
 
-  A row is *provisional* when any of its samples/mwd groups was extrapolated
+  A row is *provisional* when any of its compared groups was extrapolated
   (`provisional?/1`).
   """
 
   alias ChinookReports.Trajectory
 
-  @groups ~w(prognosis samples mwd_gamma)
-  @derived_groups ~w(samples mwd_gamma)
+  @groups ~w(prognosis samples mwd_gamma wireline)
+  @derived_groups ~w(samples mwd_gamma wireline)
+
+  @doc "The pick groups compared to Prognosis, in display order."
+  @spec compared_groups() :: [String.t()]
+  def compared_groups, do: @derived_groups
 
   @type survey_point :: %{required(String.t()) => number()}
 
@@ -97,22 +107,6 @@ defmodule ChinookReports.FormationTops do
     end
   end
 
-  @doc """
-  `sections` (top-level `import_data` keys about to be saved, e.g. an edited
-  `"welldata"` or `"reservoir_data"`) plus the `"tops"` they imply, so a KB or
-  survey edit and the tops it re-derives are persisted in one update. Returns
-  `sections` unchanged when the report carries no tops.
-  """
-  @spec with_tops(struct(), map()) :: map()
-  def with_tops(report, sections) do
-    pending = %{report | import_data: Map.merge(report.import_data || %{}, sections)}
-
-    case recompute_for_report(pending) do
-      nil -> sections
-      tops -> Map.put(sections, "tops", tops)
-    end
-  end
-
   defp base_tops(report, overrides) do
     case {(report.import_data || %{})["tops"], seeded_formations(report)} do
       {%{"formations" => _} = tops, _} -> tops
@@ -144,6 +138,22 @@ defmodule ChinookReports.FormationTops do
   end
 
   def seeded_formations(_report), do: []
+
+  @doc """
+  `sections` (top-level `import_data` keys about to be saved, e.g. an edited
+  `"welldata"` or `"reservoir_data"`) plus the `"tops"` they imply, so a KB or
+  survey edit and the tops it re-derives are persisted in one update. Returns
+  `sections` unchanged when the report carries no tops.
+  """
+  @spec with_tops(struct(), map()) :: map()
+  def with_tops(report, sections) do
+    pending = %{report | import_data: Map.merge(report.import_data || %{}, sections)}
+
+    case recompute_for_report(pending) do
+      nil -> sections
+      tops -> Map.put(sections, "tops", tops)
+    end
+  end
 
   @doc """
   The KB elevation a tops recompute should use.
@@ -193,11 +203,17 @@ defmodule ChinookReports.FormationTops do
     end
   end
 
-  @doc "True when any of the row's samples/mwd tvd was extrapolated ahead of the survey."
+  @doc "True when any of the row's compared groups' TVD was extrapolated ahead of the survey."
   @spec provisional?(map()) :: boolean()
-  def provisional?(row) do
-    Enum.any?(@derived_groups, fn g -> get_in(row, [g, "method"]) == "extrapolated" end)
-  end
+  def provisional?(row), do: Enum.any?(@derived_groups, &extrapolated?(row, &1))
+
+  @doc """
+  True when the row's `group` pick lies beyond the actual survey, so its TVD
+  and subsea are extrapolated from the last stations (and will firm up once
+  the survey passes that depth).
+  """
+  @spec extrapolated?(map(), String.t()) :: boolean()
+  def extrapolated?(row, group), do: get_in(row, [group, "method"]) == "extrapolated"
 
   # ── one row ────────────────────────────────────────────────────────────────
 

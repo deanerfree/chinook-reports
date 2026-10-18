@@ -265,6 +265,39 @@ defmodule ChinookReports.FormationTopsTest do
     end
   end
 
+  describe "wireline / mwd (drilling)" do
+    test "derive TVD and subsea off the survey, and a difference to prognosis, like samples" do
+      [r] =
+        recompute([
+          %{
+            "formation" => "A",
+            "prognosis" => %{"subsea" => 352.0},
+            "wireline" => %{"md" => 250.0},
+            "mwd_gamma" => %{"md" => 700.0}
+          }
+        ])
+
+      assert r["wireline"]["tvd"] == 250.0
+      assert r["wireline"]["subsea"] == 350.0
+      assert r["wireline"]["difference"] == -2.0
+      assert r["mwd_gamma"]["method"] == "extrapolated"
+      assert FormationTops.provisional?(r)
+      # difference_m stays Samples', which has no pick here
+      assert r["difference_m"] == nil
+    end
+
+    test "isopach is per group" do
+      [a, _] =
+        recompute([
+          %{"formation" => "A", "wireline" => %{"md" => 100.0}},
+          %{"formation" => "B", "wireline" => %{"md" => 180.0}}
+        ])
+
+      assert a["wireline"]["isopach"] == 80.0
+      assert a["samples"]["isopach"] == nil
+    end
+  end
+
   describe "difference_m" do
     test "is samples.subsea minus prognosis.subsea" do
       [r] =

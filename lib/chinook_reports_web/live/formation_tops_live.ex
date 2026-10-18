@@ -3,14 +3,18 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   The rich Formation Tops table (`import_data["tops"]`), with per-column-group
   editing while the report is active.
 
+  Prognosis is always shown; tabs pick the set of tops compared against it —
+  Drilling (the MWD / gamma picks) or Wireline — and +/− (Diff) is that set's Subsea
+  minus Prognosis'.
+
   The user edits one group at a time (its pencil). Prognosis takes an MD and a
-  Subsea (the datum-stable geologic pick); Samples and MWD / Gamma take only the
-  MD read at the wellsite. Everything else is derived by
+  Subsea (the datum-stable geologic pick); the compared groups take only the
+  MD picked at the wellsite. Everything else is derived by
   `ChinookReports.FormationTops` on save (and on any KB / survey change
-  elsewhere): for Samples / MWD the TVD comes from the directional survey
+  elsewhere): for a compared group the TVD comes from the directional survey
   (interpolated where it has reached, extrapolated beyond — those rows are
   flagged) and Subsea is `KB − TVD`; for Prognosis the TVD is `KB − Subsea`.
-  Isopach and Diff follow.
+  Isopach and +/− follow.
 
   `editable_fields/1` is the single source of truth for which columns a group's
   pick lives in.
@@ -20,13 +24,23 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   alias ChinookReports.{FormationTops, Reports}
   alias ChinookReportsWeb.NumberFormat
 
-  @groups ~w(prognosis samples mwd_gamma)
-  @editable_groups ~w(prognosis samples mwd_gamma)
-  @labels %{"prognosis" => "Prognosis", "samples" => "Samples", "mwd_gamma" => "MWD / Gamma"}
+  @compared FormationTops.compared_groups()
+  @groups ["prognosis" | @compared]
+  # The comparison tabs. Samples has no tab: a workbook's Samples picks are
+  # kept on the rows as imported, but aren't shown or edited here.
+  @tabs @compared -- ["samples"]
+  @editable_groups @groups
+  @labels %{
+    "prognosis" => "Prognosis",
+    "samples" => "Samples",
+    "mwd_gamma" => "Drilling (MWD / Gamma)",
+    "wireline" => "Wireline"
+  }
   @group_notes %{
     "prognosis" => "Enter the prognosed MD and Subsea (TVDSS — negative below sea level).",
     "samples" => "Enter the MD picked from cuttings at the wellsite.",
-    "mwd_gamma" => "Enter the MD read from the MWD / gamma log."
+    "mwd_gamma" => "Enter the MD picked from the MWD / gamma log while drilling.",
+    "wireline" => "Enter the MD picked from the wireline logs."
   }
 
   @impl true
@@ -34,7 +48,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:groups, @groups)
+      |> assign_new(:compare, fn -> hd(@tabs) end)
       |> assign_new(:editing, fn -> nil end)
       |> assign_new(:errors, fn -> [] end)
       |> assign_new(:pending_delete, fn -> nil end)
@@ -65,6 +79,15 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   def handle_event("edit_group", %{"group" => g}, socket) when g in @editable_groups do
     {:noreply, assign(socket, editing: g, errors: [])}
   end
+
+  # Switch the compared tops. Locked while a compared group is being edited
+  # (its inputs would vanish); Prognosis edits carry on across tabs.
+  def handle_event("compare", %{"group" => g}, %{assigns: %{editing: editing}} = socket)
+      when g in @tabs and editing in [nil, "prognosis"] do
+    {:noreply, assign(socket, compare: g)}
+  end
+
+  def handle_event("compare", _params, socket), do: {:noreply, socket}
 
   # Escape fires "cancel" too; with the delete confirmation open it only
   # dismisses that, rather than throwing away the whole edit.
@@ -205,7 +228,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   end
 
   defp blank_row do
-    %{"formation" => nil, "prognosis" => %{}, "samples" => %{}, "mwd_gamma" => %{}}
+    Map.new(@groups, &{&1, %{}}) |> Map.put("formation", nil)
   end
 
   defp blank?(row) do
@@ -248,16 +271,23 @@ defmodule ChinookReportsWeb.FormationTopsLive do
   # ── view helpers ─────────────────────────────────────────────────────────
 
   defp group_label(g), do: @labels[g]
+  defp compared_groups, do: @tabs
+  defp shown_groups(compare), do: ["prognosis", compare]
+
+  # How many formations carry a pick in `group`, for its tab.
+  defp pick_count(rows, group), do: Enum.count(rows, &is_number(get_in(&1, [group, "md"])))
   defp group_note(g), do: Map.get(@group_notes, g, "")
   defp editable_group?(g), do: g in @editable_groups
 
   # The columns a group's pick is entered and stored in; every other cell is derived.
   # Prognosis carries an MD and a Subsea (the datum-stable pick TVD is `KB − Subsea`
-  # from); Samples / MWD carry only the MD read at the wellsite.
+  # from); the compared groups carry only the MD picked at the wellsite.
   defp editable_fields("prognosis"), do: ~w(md subsea)
   defp editable_fields(_group), do: ~w(md)
 
-  defp provisional_row?(row), do: FormationTops.provisional?(row)
+  # The shown tab's pick lies past the actual survey: its TVD / Subsea are
+  # extrapolated, not interpolated.
+  defp provisional_row?(row, group), do: FormationTops.extrapolated?(row, group)
 
   defp cell_editable?(_group, editing) when is_nil(editing), do: false
   defp cell_editable?(group, editing), do: group == editing
@@ -278,6 +308,17 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     end
   end
 
+  # An empty compared-group MD shows the formation's prognosed MD as a guide
+  # to where the pick should land; other empty cells show "—".
+  defp pick_placeholder(row, group, "md") when group != "prognosis" do
+    case get_in(row, ["prognosis", "md"]) do
+      n when is_number(n) -> NumberFormat.up_to_2(n)
+      _ -> "—"
+    end
+  end
+
+  defp pick_placeholder(_row, _group, _field), do: "—"
+
   # Current value of an editable cell, as an input-ready string.
   defp pick_value(row, group, field) do
     case get_in(row, [group, field]) do
@@ -288,15 +329,15 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     end
   end
 
-  defp diff_display(row) do
-    case row["difference_m"] do
+  defp diff_display(row, group) do
+    case get_in(row, [group, "difference"]) do
       d when is_number(d) -> "#{if d > 0, do: "+"}#{NumberFormat.up_to_2(d)}"
       _ -> "—"
     end
   end
 
-  defp diff_class(row) do
-    case row["difference_m"] do
+  defp diff_class(row, group) do
+    case get_in(row, [group, "difference"]) do
       d when is_number(d) and d > 0 -> "text-amber-500"
       d when is_number(d) -> "text-primary"
       _ -> "text-muted"
@@ -335,10 +376,10 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                 </span>
                 MD
                 <span
-                  :if={Enum.count(@rows, &provisional_row?/1) > 0}
+                  :if={Enum.count(@rows, &provisional_row?(&1, @compare)) > 0}
                   class="ml-1.5 rounded-full bg-amber-400/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-100"
                 >
-                  {Enum.count(@rows, &provisional_row?/1)} extrapolated
+                  {Enum.count(@rows, &provisional_row?(&1, @compare))} extrapolated
                 </span>
               </span>
               <button
@@ -364,8 +405,8 @@ defmodule ChinookReportsWeb.FormationTopsLive do
               (TVDSS, negative below sea level); its TVD is KB elevation − Subsea.
             </p>
             <p class="m-0 mb-1.5">
-              <span class="font-semibold text-text">Samples</span>
-              and <span class="font-semibold text-text">MWD / Gamma</span>
+              The tops compared to it — <span class="font-semibold text-text">Drilling</span>
+              (MWD / gamma) and <span class="font-semibold text-text">Wireline</span>, one tab at a time —
               take the <span class="font-semibold text-text">MD</span>
               you picked (≥ 0); their TVD comes from the directional survey — interpolated where the
               survey has reached, extrapolated beyond it (those rows are highlighted and finalise once
@@ -373,13 +414,53 @@ defmodule ChinookReportsWeb.FormationTopsLive do
             </p>
             <p class="m-0 mb-1.5">
               <span class="font-semibold text-text">Isopach</span>
-              and <span class="font-semibold text-text">Diff</span>
-              are always derived.
+              (the formation's vertical thickness) and
+              <span class="font-semibold text-text">+/−</span>
+              (the tab's Subsea − Prognosis Subsea; positive came in high) are always derived.
             </p>
             <p class="m-0">
               <span class="font-semibold text-text">KB elevation</span>
               ({fmt(@kb)} m) is edited in Well Data · Elevations.
             </p>
+          </div>
+
+          <div
+            role="tablist"
+            aria-label="Compare to Prognosis"
+            class="flex flex-wrap items-center gap-1.5 border-b border-border-light px-5 pt-3 pb-2"
+          >
+            <span class="mr-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
+              Compare to Prognosis
+            </span>
+            <button
+              :for={g <- compared_groups()}
+              type="button"
+              role="tab"
+              aria-selected={to_string(g == @compare)}
+              phx-click="compare"
+              phx-value-group={g}
+              phx-target={@myself}
+              disabled={g != @compare and @editing not in [nil, "prognosis"]}
+              class={[
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                g == @compare && "border-primary bg-primary text-on-primary",
+                g != @compare &&
+                  "cursor-pointer border-border text-text-secondary hover:border-primary hover:text-primary",
+                "disabled:cursor-default disabled:opacity-40 disabled:hover:border-border disabled:hover:text-text-secondary"
+              ]}
+            >
+              {group_label(g)}
+              <span
+                :if={(n = pick_count(@rows, g)) > 0}
+                class={[
+                  "rounded-full px-1.5 text-[10px] font-bold tabular-nums",
+                  g == @compare && "bg-white/25",
+                  g != @compare && "bg-bg"
+                ]}
+              >
+                {n}
+              </span>
+            </button>
           </div>
 
           <div class="overflow-x-auto px-5 py-4">
@@ -393,7 +474,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                     Formation
                   </th>
                   <th
-                    :for={g <- @groups}
+                    :for={g <- shown_groups(@compare)}
                     colspan="4"
                     class="border-l border-border-light px-2 py-2 text-center text-xs font-semibold uppercase tracking-wider text-table-header-label"
                   >
@@ -425,13 +506,14 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                   <th
                     rowspan="2"
                     class="border-l border-border-light pl-2 py-2 text-center text-xs font-semibold uppercase tracking-wider text-table-header-label"
+                    title={"#{group_label(@compare)} Subsea − Prognosis Subsea (positive: came in high)"}
                   >
-                    Diff (m)
+                    +/− (m)
                   </th>
                   <th :if={@editing} rowspan="2" class="w-8"></th>
                 </tr>
                 <tr class="border-b-2 border-border-light">
-                  <%= for _g <- @groups do %>
+                  <%= for _g <- shown_groups(@compare) do %>
                     <th
                       :for={l <- ~w(MD TVD Isopach Subsea)}
                       class={[
@@ -449,13 +531,13 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                   :for={{row, i} <- Enum.with_index(@rows)}
                   class={[
                     "border-b border-border-light transition-colors",
-                    provisional_row?(row) && "bg-amber-50",
-                    !provisional_row?(row) && "hover:bg-bg"
+                    provisional_row?(row, @compare) && "bg-amber-50",
+                    !provisional_row?(row, @compare) && "hover:bg-bg"
                   ]}
                 >
                   <td class={[
                     "py-1.5 pr-4 font-medium text-text",
-                    provisional_row?(row) && "border-l-2 border-amber-400"
+                    provisional_row?(row, @compare) && "border-l-2 border-amber-400"
                   ]}>
                     <%= if @editing do %>
                       <input
@@ -469,9 +551,16 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                     <% else %>
                       {row["formation"]}
                     <% end %>
+                    <span
+                      :if={provisional_row?(row, @compare)}
+                      class="whitespace-nowrap text-xs font-normal italic text-amber-600"
+                      title={"#{group_label(@compare)} TVD and Subsea are extrapolated past the last survey station; they firm up once the survey reaches this depth."}
+                    >
+                      (extrapolated)
+                    </span>
                   </td>
 
-                  <%= for g <- @groups do %>
+                  <%= for g <- shown_groups(@compare) do %>
                     <%= for f <- ~w(md tvd isopach subsea) do %>
                       <td class={[
                         "px-2 py-1.5 text-right tabular-nums text-text-secondary",
@@ -486,7 +575,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                             phx-debounce="blur"
                             name={"tops[rows][#{i}][#{g}][#{f}]"}
                             value={pick_value(row, g, f)}
-                            placeholder="—"
+                            placeholder={pick_placeholder(row, g, f)}
                             class={[
                               "w-20 rounded border bg-white px-2 py-1 text-right tabular-nums focus:outline-none",
                               error?(@errors, i, g) && "border-danger",
@@ -502,9 +591,9 @@ defmodule ChinookReportsWeb.FormationTopsLive do
 
                   <td class={[
                     "border-l border-border-light pl-2 py-1.5 text-right font-medium tabular-nums",
-                    diff_class(row)
+                    diff_class(row, @compare)
                   ]}>
-                    {diff_display(row)}
+                    {diff_display(row, @compare)}
                   </td>
 
                   <td :if={@editing} class="px-1 text-center">
@@ -537,7 +626,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                   </td>
                 </tr>
                 <tr :if={@rows == []}>
-                  <td colspan="14" class="py-4 text-sm text-muted">No formation tops recorded.</td>
+                  <td colspan="11" class="py-4 text-sm text-muted">No formation tops recorded.</td>
                 </tr>
               </tbody>
             </table>
@@ -586,7 +675,7 @@ defmodule ChinookReportsWeb.FormationTopsLive do
                 <% else %>
                   This formation
                 <% end %>
-                and its Prognosis, Samples and MWD / Gamma values will be removed from the report.
+                and its Prognosis, Drilling (MWD / Gamma) and Wireline values will be removed from the report.
                 You can still cancel before saving.
               </p>
             </div>
