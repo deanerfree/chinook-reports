@@ -428,13 +428,19 @@ defmodule ChinookReportsWeb.CoreComponents do
   attr :class, :string, default: nil
   slot :title, required: true
   slot :subtitle
+  slot :actions, doc: "page-level buttons, aligned right of the title"
 
   @spec heading(map()) :: Phoenix.LiveView.Rendered.t()
   def heading(assigns) do
     ~H"""
-    <h2 class="font-bold text-5xl tracking-tight text-zinc-900">
-      {render_slot(@title)}
-    </h2>
+    <div class={@actions != [] && "flex items-center justify-between gap-6"}>
+      <h2 class="font-bold text-5xl tracking-tight text-zinc-900">
+        {render_slot(@title)}
+      </h2>
+      <div :if={@actions != []} class="flex flex-none items-center gap-2">
+        {render_slot(@actions)}
+      </div>
+    </div>
     <div class="bg-accent p-0.5 w-16.25 mt-3.75 mb-6.25" />
     <p :if={@subtitle != []} class="text-lg font-semibold text-secondary">
       {render_slot(@subtitle)}

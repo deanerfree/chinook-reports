@@ -156,6 +156,22 @@ defmodule ChinookReportsWeb.CreateReportLive do
         <:subtitle>
           Fill out the form below to {if @editing_report, do: "update", else: "create"} a well report.
         </:subtitle>
+        <:actions>
+          <button
+            type="button"
+            phx-click="cancel"
+            data-confirm={cancel_confirmation(@editing_report)}
+            class={[
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold",
+              "text-copy-secondary transition-colors",
+              draft?(@editing_report) && "hover:bg-danger/10 hover:text-danger",
+              !draft?(@editing_report) && "hover:bg-surface hover:text-copy"
+            ]}
+          >
+            <.trash_icon :if={draft?(@editing_report)} class="h-4 w-4" />
+            {if draft?(@editing_report), do: "Cancel well", else: "Cancel"}
+          </button>
+        </:actions>
       </.heading>
 
       <.stepper
@@ -229,6 +245,15 @@ defmodule ChinookReportsWeb.CreateReportLive do
   #   <% end %>
   #   """
   # end
+
+  defp draft?(%Report{status: "draft"}), do: true
+  defp draft?(_report), do: false
+
+  defp cancel_confirmation(report) do
+    if draft?(report),
+      do: "Cancel this well? Its draft will be deleted. This cannot be undone.",
+      else: "Discard your unsaved changes?"
+  end
 
   defp step_content(assigns) do
     ~H"""
@@ -439,6 +464,27 @@ defmodule ChinookReportsWeb.CreateReportLive do
 
   def handle_event("navigate_to_step", %{"step" => step}, socket) do
     {:noreply, assign(socket, :current_step, String.to_integer(step))}
+  end
+
+  # A draft only exists because the New Report dialog created it, so
+  # cancelling deletes it. A report that's already active just drops the
+  # unsaved edits.
+  def handle_event("cancel", _params, socket) do
+    case socket.assigns.editing_report do
+      %Report{status: "draft"} = report ->
+        {:ok, _} = Reports.delete_draft(report)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "Well cancelled. The draft was deleted.")
+         |> push_navigate(to: ~p"/reports")}
+
+      %Report{} = report ->
+        {:noreply, push_navigate(socket, to: ~p"/reports/#{report.id}")}
+
+      nil ->
+        {:noreply, push_navigate(socket, to: ~p"/reports")}
+    end
   end
 
   def handle_event("create_report", %{"report" => params}, socket) do
