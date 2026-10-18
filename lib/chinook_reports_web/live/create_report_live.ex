@@ -5,9 +5,11 @@ defmodule ChinookReportsWeb.CreateReportLive do
   import ChinookReportsWeb.Stepper
 
   alias ChinookReports.Countries
+  alias ChinookReports.DirectionalPlan
   alias ChinookReports.Reports
   alias ChinookReports.Reports.Editing
   alias ChinookReports.Reports.Report
+  alias ChinookReportsWeb.PlanUpload
 
   # entry type: manual vs file upload
   # @entry_types [
@@ -130,6 +132,7 @@ defmodule ChinookReportsWeb.CreateReportLive do
      |> assign(:profile_columns, @profile_columns)
      |> assign(:formation_top_columns, @formation_top_columns)
      |> assign(:survey_columns, @survey_columns)
+     |> PlanUpload.allow()
      |> assign_form(Reports.new_report_changeset())}
   end
 
@@ -312,6 +315,12 @@ defmodule ChinookReportsWeb.CreateReportLive do
           title="Directional Program — Prognosis Survey Points"
           subtitle="Planned survey stations; the actual survey appends to these as drilling proceeds"
         >
+          <.plan_drop_zone
+            upload={@uploads.plan}
+            importing={@plan_importing}
+            tops={@plan_tops}
+            tops_note="Fills the Formation Tops step, matching formations by name; plan formations not in it are added. Saved with the report."
+          />
           <.inputs_for :let={data} field={@form[:report_data]}>
             <.editable_table
               form={data}
@@ -396,6 +405,10 @@ defmodule ChinookReportsWeb.CreateReportLive do
     {:noreply, assign_form(socket, changeset)}
   end
 
+  # A plan file dropped on step 6 while that step has no rows: the upload's
+  # phx-change carries no report fields.
+  def handle_event("validate", _params, socket), do: {:noreply, socket}
+
   def handle_event("next", _params, socket) do
     current_step = socket.assigns.current_step
 
@@ -466,6 +479,36 @@ defmodule ChinookReportsWeb.CreateReportLive do
       )
 
     {:noreply, assign_form(socket, changeset)}
+  end
+
+  # A read plan's formation tops, offered by the step-6 drop zone, merged into
+  # the Formation Tops step (saved with the rest of the wizard).
+  def handle_event("import_plan_tops", _params, socket) do
+    tops = socket.assigns.plan_tops || []
+    changeset = current_changeset(socket)
+    existing = Ecto.Changeset.get_field(changeset, :report_data).formation_tops
+    rows = DirectionalPlan.merge_formation_tops(existing, tops)
+
+    {:noreply,
+     socket
+     |> assign_form(Editing.replace_rows(changeset, :formation_tops, rows))
+     |> PlanUpload.clear_tops()
+     |> put_flash(:info, "Imported #{length(tops)} formation tops into the Formation Tops step.")}
+  end
+
+  def handle_event("skip_plan_tops", _params, socket) do
+    {:noreply, PlanUpload.clear_tops(socket)}
+  end
+
+  # A dropped directional plan replaces the Directional Program rows.
+  @impl true
+  def handle_async(:plan_import, result, socket) do
+    uwi = Ecto.Changeset.get_field(current_changeset(socket), :unique_well_id)
+
+    {:noreply,
+     PlanUpload.apply_result(socket, result, uwi, fn socket, rows ->
+       assign_form(socket, Editing.replace_rows(current_changeset(socket), :surveys, rows))
+     end)}
   end
 
   # ── helpers ───────────────────────────────────────────────────────────────

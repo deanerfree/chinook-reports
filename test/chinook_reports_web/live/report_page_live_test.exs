@@ -414,6 +414,7 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       assert html =~ "No directional program on file"
 
       open_tab(view, "surveys")
+      view |> element(~s(button[phx-value-view="planned"])) |> render_click()
       view |> element(~s(button[phx-value-section="surveys"])) |> render_click()
 
       for _ <- 1..2 do
@@ -1326,6 +1327,145 @@ defmodule ChinookReportsWeb.ReportPageLiveTest do
       press_escape(view, "#tops-form-formation-tops")
       refute has_element?(view, ~s(input[name="tops[rows][0][mwd_gamma][md]"]))
       assert length(import_data(report)["tops"]["formations"]) == 2
+    end
+  end
+
+  describe "Surveys tab, Actual / Planned" do
+    defp both_surveys_report do
+      create_report(%{
+        "import_data" => %{
+          "reservoir_data" => [
+            %{
+              "leg_name" => "Main",
+              "survey" => %{
+                "survey_points" => [
+                  %{"md" => 0.0, "inclination_deg" => 0.0, "azimuth_deg" => 0.0, "tvd" => 0.0},
+                  %{
+                    "md" => 111.11,
+                    "inclination_deg" => 1.0,
+                    "azimuth_deg" => 0.0,
+                    "tvd" => 111.1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "report_data" => %{
+          "surveys" => %{
+            "0" => %{"md" => "0", "inclination" => "0", "azimuth" => "0"},
+            "1" => %{"md" => "222.22", "inclination" => "2", "azimuth" => "185"}
+          }
+        }
+      })
+    end
+
+    test "opens on the actual survey and switches to the plan", %{conn: conn} do
+      report = both_surveys_report()
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "surveys")
+
+      assert has_element?(view, ~s(button[phx-value-view="actual"][aria-selected="true"]))
+      assert has_element?(view, "#survey-0")
+      refute has_element?(view, "#surveys_table")
+
+      view |> element(~s(button[phx-value-view="planned"])) |> render_click()
+
+      assert_patch(view, "/reports/#{report.id}?tab=surveys&survey=planned")
+      assert has_element?(view, ~s(button[phx-value-view="planned"][aria-selected="true"]))
+      assert has_element?(view, "#surveys_table", "222.22")
+      refute has_element?(view, "#survey-0")
+
+      view |> element(~s(button[phx-value-view="actual"])) |> render_click()
+      assert has_element?(view, "#survey-0", "111.11")
+    end
+
+    test "the choice survives a reload", %{conn: conn} do
+      report = both_surveys_report()
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}?tab=surveys&survey=planned")
+
+      assert has_element?(view, "#surveys_table")
+      refute has_element?(view, "#survey-0")
+    end
+
+    test "switching closes an open plan editor", %{conn: conn} do
+      report = both_surveys_report()
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}?tab=surveys&survey=planned")
+      view |> element(~s(button[phx-value-section="surveys"])) |> render_click()
+      assert has_element?(view, ~s(form[phx-submit="save_section"]))
+
+      view |> element(~s(button[phx-value-view="actual"])) |> render_click()
+      view |> element(~s(button[phx-value-view="planned"])) |> render_click()
+      refute has_element?(view, ~s(form[phx-submit="save_section"]))
+    end
+
+    test "a report with only a plan opens on it", %{conn: conn} do
+      report =
+        create_report(%{
+          "report_data" => %{
+            "surveys" => %{"0" => %{"md" => "222.22", "inclination" => "2", "azimuth" => "185"}}
+          }
+        })
+
+      {:ok, view, _html} = live(conn, ~p"/reports/#{report.id}")
+      open_tab(view, "surveys")
+
+      assert has_element?(view, ~s(button[phx-value-view="planned"][aria-selected="true"]))
+      assert has_element?(view, "#surveys_table", "222.22")
+    end
+  end
+
+  describe "Surveys tab, position vs plan" do
+    # Plan runs straight down; the actual drifts 3 m north and lands 2 m high.
+    defp off_plan_report(plan? \\ true) do
+      create_report(%{
+        "import_data" => %{
+          "reservoir_data" => [
+            %{
+              "leg_name" => "Main",
+              "survey" => %{
+                "survey_points" => [
+                  %{"md" => 0.0, "tvd" => 0.0, "north_south" => 0.0, "east_west" => 0.0},
+                  %{"md" => 500.0, "tvd" => 498.0, "north_south" => 3.0, "east_west" => 0.0}
+                ]
+              }
+            }
+          ]
+        },
+        "report_data" => %{
+          "surveys" =>
+            if(plan?,
+              do: %{
+                "0" => %{"md" => "0", "inclination" => "0", "azimuth" => "0"},
+                "1" => %{"md" => "600", "inclination" => "0", "azimuth" => "0"}
+              },
+              else: %{}
+            )
+        }
+      })
+    end
+
+    test "shows where the last survey sits against the plan", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/reports/#{off_plan_report().id}?tab=surveys")
+
+      # A vertical plan has no section line of its own, so it reads along north.
+      assert has_element?(view, "#plan-comparison-0", "Last survey · 500 m MD")
+      assert has_element?(view, "#plan-comparison-0", "2 m above")
+      assert has_element?(view, "#plan-comparison-0", "3 m ahead")
+      assert has_element?(view, "#plan-comparison-0-table", "on plan")
+    end
+
+    test "says so when there is no plan to compare with", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/reports/#{off_plan_report(false).id}?tab=surveys")
+
+      assert has_element?(view, "#plan-comparison-0", "No planned survey to compare against")
+    end
+
+    test "is not shown on the Planned view", %{conn: conn} do
+      {:ok, view, _html} =
+        live(conn, ~p"/reports/#{off_plan_report().id}?tab=surveys&survey=planned")
+
+      refute has_element?(view, "#plan-comparison-0")
     end
   end
 end

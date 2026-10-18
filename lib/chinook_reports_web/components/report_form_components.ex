@@ -282,6 +282,92 @@ defmodule ChinookReportsWeb.ReportFormComponents do
     """
   end
 
+  @doc """
+  Drop target for a directional plan file over the Directional Program table.
+  Must sit inside the form (the upload rides its `phx-change`); see
+  `ChinookReportsWeb.PlanUpload`.
+  """
+  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+  attr :importing, :string, default: nil, doc: "name of the file being read, while it is"
+
+  attr :tops, :list,
+    default: nil,
+    doc: "the read plan's formation tops (`@plan_tops`), shown as an import prompt"
+
+  attr :tops_note, :string, default: nil, doc: "where imported tops go, under the prompt"
+
+  attr :hint, :string,
+    default:
+      "COMPASS PDF, CSV or TXT. Replaces the stations below; nothing is saved until you save.",
+    doc: "what a dropped plan does, under the prompt"
+
+  attr :id, :string, default: nil
+
+  def plan_drop_zone(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      class="mb-4 rounded-lg border-2 border-dashed border-border px-4 py-5 text-center transition-colors hover:border-muted [&.phx-drop-target-active]:border-primary [&.phx-drop-target-active]:bg-primary/5"
+      phx-drop-target={@upload.ref}
+    >
+      <.live_file_input upload={@upload} class="hidden" />
+      <%= if @importing do %>
+        <div class="flex items-center justify-center gap-2 text-sm text-primary">
+          <div class="h-4 w-4 shrink-0 rounded-full border-2 border-primary border-t-transparent animate-spin">
+          </div>
+          Reading {@importing}…
+        </div>
+      <% else %>
+        <p class="text-sm font-medium text-copy">
+          Drop a directional plan here, or
+          <label
+            for={@upload.ref}
+            class="cursor-pointer text-primary hover:text-primary-hover underline"
+          >
+            browse
+          </label>
+        </p>
+        <p class="mt-1 text-xs text-copy-secondary">{@hint}</p>
+      <% end %>
+
+      <div
+        :if={@tops && !@importing}
+        id="plan-tops-prompt"
+        class="mt-4 rounded-md border border-border bg-bg px-4 py-3 text-left"
+      >
+        <p class="text-sm font-medium text-copy">
+          This plan also lists {length(@tops)} formation {if length(@tops) == 1,
+            do: "top",
+            else: "tops"}. Import them into Formation Tops?
+        </p>
+        <p :if={@tops_note} class="mt-1 text-xs text-copy-secondary">{@tops_note}</p>
+        <div class="mt-3 flex gap-2">
+          <button type="button" phx-click="import_plan_tops" class="btn-primary">
+            Import tops
+          </button>
+          <button type="button" phx-click="skip_plan_tops" class="btn-secondary">
+            Skip
+          </button>
+        </div>
+      </div>
+
+      <p
+        :for={
+          err <- upload_errors(@upload) ++ Enum.flat_map(@upload.entries, &upload_errors(@upload, &1))
+        }
+        class="mt-2 text-xs text-danger"
+      >
+        {plan_upload_error(err)}
+      </p>
+    </div>
+    """
+  end
+
+  defp plan_upload_error(:too_large), do: "That file is too large (max 25 MB)."
+  defp plan_upload_error(:not_accepted), do: "Use a .pdf, .csv or .txt plan file."
+  defp plan_upload_error(:too_many_files), do: "Drop one plan file at a time."
+  defp plan_upload_error(_), do: "Upload failed."
+
   defp display_label(%{field: field, label: label}) do
     if Report.required?(field), do: label <> " *", else: label
   end

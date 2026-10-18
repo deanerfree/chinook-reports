@@ -27,6 +27,11 @@ defmodule ChinookReports.Reports.Editing do
     put_in_report_data(changeset, list, List.delete_at(current_list(changeset, list), index))
   end
 
+  @doc "Replace every row of one `report_data` embeds_many list, e.g. with an imported plan."
+  def replace_rows(%Changeset{} = changeset, list, rows) when list in @lists and is_list(rows) do
+    put_in_report_data(changeset, list, rows)
+  end
+
   defp current_list(changeset, list) do
     changeset
     |> Changeset.get_field(:report_data)

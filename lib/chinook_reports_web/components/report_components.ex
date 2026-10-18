@@ -5,6 +5,8 @@ defmodule ChinookReportsWeb.ReportComponents do
   import ChinookReportsWeb.ReportFormComponents
   import LiveSvelte
 
+  alias ChinookReportsWeb.NumberFormat
+
   attr :report, :map, required: true
 
   def report_details(assigns) do
@@ -17,7 +19,7 @@ defmodule ChinookReportsWeb.ReportComponents do
         <.configuration_section data={data} />
         <.profile_section rows={data.profile_sections} />
         <.formation_tops_section rows={data.formation_tops} />
-        <.surveys_section rows={data.surveys} />
+        <.surveys_section rows={data.surveys} kb={ChinookReports.FormationTops.kb_elevation(@report)} />
       <% end %>
 
       <%= if @report.import_data not in [nil, %{}] do %>
@@ -39,6 +41,17 @@ defmodule ChinookReportsWeb.ReportComponents do
   attr :editable, :boolean, default: false
   attr :editing, :string, default: nil
   attr :form, :any, default: nil
+
+  attr :survey_view, :string,
+    default: nil,
+    doc: ~s(Surveys tab: "actual" or "planned"; `nil` picks actual when there is one)
+
+  attr :plan_upload, :any,
+    default: nil,
+    doc: "the `:plan` UploadConfig, for the Directional Program"
+
+  attr :plan_importing, :string, default: nil
+  attr :plan_tops, :list, default: nil, doc: "a read plan's formation tops awaiting import"
 
   def tab_content(assigns) do
     assigns =
@@ -103,25 +116,62 @@ defmodule ChinookReportsWeb.ReportComponents do
             editable={@editable}
           />
         <% "surveys" -> %>
-          <.live_component
-            :for={{_leg, i} <- Enum.with_index(@import["reservoir_data"] || [])}
-            module={ChinookReportsWeb.ImportTableLive}
-            id={"survey-#{i}"}
-            section="survey"
-            leg={i}
-            report={@report}
-            editable={@editable}
+          <% legs = @import["reservoir_data"] || []
+          planned = (@data && @data.surveys) || []
+          view = @survey_view || if(legs != [], do: "actual", else: "planned") %>
+          <.survey_view_tabs
+            active={view}
+            actual_count={
+              legs |> Enum.map(&length(get_in(&1, ["survey", "survey_points"]) || [])) |> Enum.sum()
+            }
+            planned_count={length(planned)}
           />
-          <%= if @data do %>
+          <%= if view == "actual" do %>
+            <%= for {leg, i} <- Enum.with_index(legs) do %>
+              <.live_component
+                module={ChinookReportsWeb.ImportTableLive}
+                id={"survey-#{i}"}
+                section="survey"
+                leg={i}
+                report={@report}
+                editable={@editable}
+              />
+              <.plan_comparison
+                :if={get_in(leg, ["survey", "survey_points"]) not in [nil, []]}
+                id={"plan-comparison-#{i}"}
+                title={if length(legs) > 1, do: "Position vs Plan — #{leg["leg_name"]}"}
+                comparison={ChinookReports.PlanComparison.for_leg(@report, i)}
+              />
+            <% end %>
+            <p :if={legs == []} class="py-4 text-sm text-muted">No actual survey on file.</p>
+          <% end %>
+          <p
+            :if={view == "planned" and planned == [] and not @editable}
+            class="py-4 text-sm text-muted"
+          >
+            No planned survey on file.
+          </p>
+          <%= if view == "planned" and @data do %>
             <.editable_section key="surveys" editing={@editing} form={@form}>
               <:view>
-                <.surveys_section rows={@data.surveys}>
+                <.surveys_section
+                  rows={@data.surveys}
+                  kb={ChinookReports.FormationTops.kb_elevation(@report)}
+                >
                   <:action :if={@editable}>
                     <.edit_button section="surveys" />
                   </:action>
                 </.surveys_section>
               </:view>
-              <:edit :let={form}><.surveys_form form={form} /></:edit>
+              <:edit :let={form}>
+                <.surveys_form
+                  form={form}
+                  plan_upload={@plan_upload}
+                  plan_importing={@plan_importing}
+                  plan_tops={@plan_tops}
+                  plan_tops_note={plan_tops_note(@import)}
+                />
+              </:edit>
             </.editable_section>
           <% end %>
         <% "timing" -> %>
@@ -311,23 +361,32 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
-  attr :form, Phoenix.HTML.Form, required: true
-
-  def formation_tops_form(assigns) do
-    ~H"""
-    <.table_panel title="Formation Tops">
-      <.inputs_for :let={data} field={@form[:report_data]}>
-        <.editable_table form={data} list={:formation_tops} columns={formation_top_columns()} />
-      </.inputs_for>
-    </.table_panel>
-    """
-  end
+  # Report page: imported tops are saved as soon as they're imported (the open
+  # Surveys form can't carry another section), into the Formation Tops table.
+  defp plan_tops_note(_import),
+    do:
+      "Fills the Prognosis column, matching formations by name; plan formations not in the table are added. Drilling (MWD / Gamma), Wireline and any imported Samples picks are kept. Saved straight away."
 
   attr :form, Phoenix.HTML.Form, required: true
+
+  attr :plan_upload, :any,
+    default: nil,
+    doc: "the `:plan` UploadConfig; shows a plan-file drop zone"
+
+  attr :plan_importing, :string, default: nil
+  attr :plan_tops, :list, default: nil
+  attr :plan_tops_note, :string, default: nil
 
   def surveys_form(assigns) do
     ~H"""
     <.table_panel title="Directional Program">
+      <.plan_drop_zone
+        :if={@plan_upload}
+        upload={@plan_upload}
+        importing={@plan_importing}
+        tops={@plan_tops}
+        tops_note={@plan_tops_note}
+      />
       <.inputs_for :let={data} field={@form[:report_data]}>
         <.editable_table form={data} list={:surveys} columns={survey_columns()} />
       </.inputs_for>
@@ -345,16 +404,6 @@ defmodule ChinookReportsWeb.ReportComponents do
       %{key: :start_depth, label: "Start", unit: "m"},
       %{key: :end_depth, label: "End", unit: "m"},
       %{key: :start_date, label: "Start Date", type: :datetime}
-    ]
-  end
-
-  defp formation_top_columns do
-    [
-      %{key: :formation, label: "Formation", placeholder: "McLaren"},
-      %{key: :md, label: "MD", unit: "m"},
-      %{key: :tvd, label: "TVD", unit: "m"},
-      %{key: :isopach, label: "Isopach", unit: "m"},
-      %{key: :subsea, label: "Subsea", unit: "m"}
     ]
   end
 
@@ -1197,20 +1246,143 @@ defmodule ChinookReportsWeb.ReportComponents do
     """
   end
 
+  # ── Position vs plan (ChinookReports.PlanComparison) ─────────────────────
+
+  attr :id, :string, required: true
+  attr :title, :string, default: nil
+  attr :comparison, :map, default: nil
+
+  defp plan_comparison(assigns) do
+    ~H"""
+    <.table_panel title={@title || "Position vs Plan"}>
+      <div id={@id}>
+        <p :if={is_nil(@comparison)} class="py-4 text-sm text-muted">
+          No planned survey to compare against. Add one under Planned.
+        </p>
+
+        <%= if @comparison do %>
+          <div
+            :if={latest = @comparison.latest}
+            class="flex flex-wrap items-baseline gap-x-5 gap-y-1 pb-3"
+          >
+            <span class="text-xs text-text-secondary">
+              Last survey · {fmt_survey(latest.md)} m MD
+            </span>
+            <span class="text-sm font-semibold">{offset(latest.above, "above", "below")}</span>
+            <span class="text-sm font-semibold">{offset(latest.ahead, "ahead", "behind")}</span>
+            <span class="text-sm font-semibold">{offset(latest.right, "right", "left")}</span>
+            <span class="text-sm text-text-secondary">
+              {NumberFormat.up_to_2(latest.distance)} m from plan
+            </span>
+          </div>
+
+          <details>
+            <summary class="cursor-pointer text-xs font-medium text-primary hover:text-primary-hover">
+              Every station ({length(@comparison.rows)})
+            </summary>
+            <.table id={"#{@id}-table"} rows={@comparison.rows}>
+              <:col :let={r} label="MD (m)">
+                {fmt_survey(r.md)}
+                <span :if={r.projected} class="ml-1 text-[10px] text-muted">projected</span>
+                <span :if={r.beyond_plan} class="ml-1 text-[10px] text-muted">past plan</span>
+              </:col>
+              <:col :let={r} label="Above / Below">{offset(r.above, "above", "below")}</:col>
+              <:col :let={r} label="Ahead / Behind">{offset(r.ahead, "ahead", "behind")}</:col>
+              <:col :let={r} label="Left / Right">{offset(r.right, "right", "left")}</:col>
+              <:col :let={r} label="Distance (m)">{NumberFormat.up_to_2(r.distance)}</:col>
+            </.table>
+          </details>
+
+          <p class="mt-3 text-xs text-copy-secondary">
+            Each station against the plan at the same MD. Ahead / behind and left / right are
+            along and across the plan's {NumberFormat.up_to(@comparison.vs_azimuth_deg, 1)}° section line;
+            past the plan's last station it is projected straight ahead.
+          </p>
+        <% end %>
+      </div>
+    </.table_panel>
+    """
+  end
+
+  # "2.31 m above" / "0.4 m below"; anything that rounds to 0.00 is on plan.
+  defp offset(v, positive, negative) do
+    if abs(v) < 0.005,
+      do: "on plan",
+      else: "#{NumberFormat.up_to_2(abs(v))} m #{if v > 0, do: positive, else: negative}"
+  end
+
   # ── Directional Program (report_data.surveys) ────────────────────────────
 
+  attr :active, :string, required: true
+  attr :actual_count, :integer, required: true
+  attr :planned_count, :integer, required: true
+
+  # Actual / Planned switch on the Surveys tab; the choice is kept in the URL
+  # (`?survey=`) by ReportPageLive.
+  defp survey_view_tabs(assigns) do
+    ~H"""
+    <div role="tablist" aria-label="Survey" class="flex w-fit rounded-lg border border-border p-0.5">
+      <button
+        :for={
+          {id, label, count} <- [
+            {"actual", "Actual", @actual_count},
+            {"planned", "Planned", @planned_count}
+          ]
+        }
+        type="button"
+        role="tab"
+        aria-selected={to_string(id == @active)}
+        phx-click="select_survey_view"
+        phx-value-view={id}
+        class={[
+          "px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors",
+          id == @active && "bg-primary text-on-primary",
+          id != @active && "text-text-secondary hover:text-text"
+        ]}
+      >
+        {label}
+        <span :if={count > 0} class={["ml-1 text-[10px]", id != @active && "text-muted"]}>
+          {count}
+        </span>
+      </button>
+    </div>
+    """
+  end
+
   attr :rows, :list, required: true
+  attr :kb, :any, default: nil, doc: "KB elevation, for subsea; `nil` leaves it blank"
   slot :action
 
+  # Only MD / Inc / Azi are stored; the rest is integrated from them by
+  # minimum curvature (Trajectory.stations/1) each render, so it can't drift.
   defp surveys_section(assigns) do
+    by_md =
+      assigns.rows
+      |> Enum.map(&%{md: &1.md, inc_deg: &1.inclination, azi_deg: &1.azimuth})
+      |> ChinookReports.Trajectory.stations()
+      |> Map.new(&{&1.md, &1})
+
+    rows =
+      Enum.map(assigns.rows, fn s ->
+        {s, s.md && Map.get(by_md, Decimal.to_float(s.md))}
+      end)
+
+    assigns = assign(assigns, rows: rows)
+
     ~H"""
     <%= if @rows != [] or @action != [] do %>
       <.table_panel title="Directional Program">
         <:action :if={@action != []}>{render_slot(@action)}</:action>
         <.table :if={@rows != []} id="surveys_table" rows={@rows}>
-          <:col :let={s} label="MD (m)">{fmt_survey(s.md)}</:col>
-          <:col :let={s} label="Inclination (°)">{fmt_survey(s.inclination)}</:col>
-          <:col :let={s} label="Azimuth (°)">{fmt_survey(s.azimuth)}</:col>
+          <:col :let={{s, _}} label="MD (m)">{fmt_survey(s.md)}</:col>
+          <:col :let={{s, _}} label="Inclination (°)">{fmt_survey(s.inclination)}</:col>
+          <:col :let={{s, _}} label="Azimuth (°)">{fmt_survey(s.azimuth)}</:col>
+          <:col :let={{_, p}} label="TVD (m)">{fmt_survey(p && p.tvd)}</:col>
+          <:col :let={{_, p}} label="N/S (m)">{fmt_survey(p && p.north)}</:col>
+          <:col :let={{_, p}} label="E/W (m)">{fmt_survey(p && p.east)}</:col>
+          <:col :let={{_, p}} label="VS (m)">{fmt_survey(p && p.vertical_section)}</:col>
+          <:col :let={{_, p}} label="DLS">{fmt_survey(p && p.dogleg_severity)}</:col>
+          <:col :let={{_, p}} label="Subsea (m)">{fmt_survey(p && @kb && @kb - p.tvd)}</:col>
         </.table>
         <p :if={@rows == []} class="py-4 text-sm text-muted">No directional program recorded.</p>
       </.table_panel>

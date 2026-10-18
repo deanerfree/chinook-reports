@@ -12,7 +12,7 @@ defmodule ChinookReports.ReportSummary do
   yields empty sections.
   """
 
-  alias ChinookReports.{FormationTops, Trajectory}
+  alias ChinookReports.{FormationTops, PlanComparison, Trajectory}
 
   # Reservoir quality colours — kept in step with `assets/svelte/ProfileChart.svelte`.
   @quality_colours %{
@@ -75,7 +75,7 @@ defmodule ChinookReports.ReportSummary do
     kind = geometry |> to_string() |> String.downcase()
     layout = if kind in ["vertical", "deviated"], do: :vertical, else: :lateral
 
-    stations = plan_stations(report, survey)
+    stations = PlanComparison.plan_stations(report, survey)
     plan = Trajectory.integrate(stations)
 
     %{
@@ -655,47 +655,6 @@ defmodule ChinookReports.ReportSummary do
       final_status: present(well["final_well_status"])
     }
   end
-
-  # ── Plan trajectory ───────────────────────────────────────────────────────
-
-  # The planned path: the Directional Program entered in the wizard or edited
-  # on the report page while drilling (report_data.surveys) wins; otherwise the
-  # prognosed survey that came in with an Excel import. Normalised to the
-  # station shape `Trajectory` takes, sorted by MD, unusable rows dropped.
-  defp plan_stations(report, survey) do
-    entered =
-      case report.report_data do
-        %{surveys: [_ | _] = rows} ->
-          Enum.map(
-            rows,
-            &%{md: num(&1.md), inc_deg: num(&1.inclination), azi_deg: num(&1.azimuth)}
-          )
-
-        _ ->
-          []
-      end
-
-    imported =
-      Enum.map(survey["prognosed_survey"] || [], fn s ->
-        %{md: num(s["md"]), inc_deg: num(s["inclination_deg"]), azi_deg: num(s["azimuth_deg"])}
-      end)
-
-    [entered, imported]
-    |> Enum.map(fn rows ->
-      rows
-      |> Enum.filter(&(is_number(&1.md) and is_number(&1.inc_deg) and is_number(&1.azi_deg)))
-      |> Enum.sort_by(& &1.md)
-    end)
-    |> Enum.find([], &(&1 != []))
-    |> tie_in_at_surface()
-  end
-
-  # A program typed in from the kick-off point down still starts vertical at
-  # the wellhead.
-  defp tie_in_at_surface([%{md: md} | _] = rows) when md > 0,
-    do: [%{md: 0.0, inc_deg: 0.0, azi_deg: 0.0} | rows]
-
-  defp tie_in_at_surface(rows), do: rows
 
   # ── Formatting helpers ────────────────────────────────────────────────────
 

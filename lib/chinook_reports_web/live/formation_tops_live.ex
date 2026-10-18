@@ -18,11 +18,16 @@ defmodule ChinookReportsWeb.FormationTopsLive do
 
   `editable_fields/1` is the single source of truth for which columns a group's
   pick lives in.
+
+  An empty table on an active report opens straight into Prognosis editing,
+  with a drop zone for a directional plan (`ChinookReportsWeb.PlanUpload`):
+  a COMPASS PDF's Formations table fills the Prognosis column of the open
+  form, and nothing is saved until Save — or the tops can be typed in by hand.
   """
   use ChinookReportsWeb, :live_component
 
-  alias ChinookReports.{FormationTops, Reports}
-  alias ChinookReportsWeb.NumberFormat
+  alias ChinookReports.{DirectionalPlan, FormationTops, Reports}
+  alias ChinookReportsWeb.{NumberFormat, PlanUpload}
 
   @compared FormationTops.compared_groups()
   @groups ["prognosis" | @compared]
@@ -52,10 +57,17 @@ defmodule ChinookReportsWeb.FormationTopsLive do
       |> assign_new(:editing, fn -> nil end)
       |> assign_new(:errors, fn -> [] end)
       |> assign_new(:pending_delete, fn -> nil end)
+      |> allow_plan_upload()
 
     {:ok, if(socket.assigns.editing, do: socket, else: load(socket))}
   end
 
+  defp allow_plan_upload(%{assigns: %{uploads: %{plan: _}}} = socket), do: socket
+  defp allow_plan_upload(socket), do: PlanUpload.allow(socket)
+
+  # An empty table on an active report opens straight into Prognosis editing
+  # (with one blank row to type into), so tops can be dropped in from a plan
+  # or entered by hand without hunting for the pencil first.
   defp load(socket) do
     report = socket.assigns.report
 
@@ -65,8 +77,12 @@ defmodule ChinookReportsWeb.FormationTopsLive do
         _ -> []
       end
 
+    empty? = rows == [] and socket.assigns.editable
+
     socket
-    |> assign(:rows, rows)
+    |> assign(:rows, if(empty?, do: [blank_row()], else: rows))
+    |> assign(:empty, empty?)
+    |> assign(:editing, if(empty?, do: "prognosis", else: socket.assigns.editing))
     |> assign(:survey_reach, FormationTops.survey_reach(report))
     |> assign(:kb, FormationTops.kb_elevation(report))
     |> assign(:errors, [])
@@ -106,6 +122,10 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     {:noreply,
      assign(socket, rows: preview(socket, rows), errors: validate(rows, socket.assigns.editing))}
   end
+
+  # A plan file dropped on the empty table: the upload's phx-change can carry
+  # no row fields (or only the blank row's).
+  def handle_event("validate", _params, socket), do: {:noreply, socket}
 
   def handle_event("add_row", _params, socket) do
     {:noreply, assign(socket, rows: socket.assigns.rows ++ [blank_row()])}
@@ -156,6 +176,38 @@ defmodule ChinookReportsWeb.FormationTopsLive do
     else
       {:noreply, assign(socket, rows: preview(socket, rows), errors: errors)}
     end
+  end
+
+  # A dropped plan's tops fill the Prognosis column of the open form (matched
+  # by name, the rest added in MD order); blank rows are dropped first so the
+  # starter row doesn't sit above them. Saved only on Save.
+  @impl true
+  def handle_async(:plan_import, result, socket) do
+    {:noreply,
+     PlanUpload.apply_tops_result(
+       socket,
+       result,
+       fn socket, plan_tops ->
+         rows =
+           socket.assigns.rows
+           |> Enum.map(&coerce_row/1)
+           |> Enum.reject(&blank?/1)
+           |> DirectionalPlan.merge_prognosis(plan_tops)
+
+         assign(socket,
+           editing: "prognosis",
+           rows: preview(socket, rows),
+           errors: validate(rows, "prognosis")
+         )
+       end,
+       &parent_flash/3
+     )}
+  end
+
+  # A component's own put_flash only reaches the page on a redirect.
+  defp parent_flash(socket, kind, message) do
+    send(self(), {:put_flash, kind, message})
+    socket
   end
 
   # ── build / validate rows ────────────────────────────────────────────────
@@ -464,6 +516,13 @@ defmodule ChinookReportsWeb.FormationTopsLive do
           </div>
 
           <div class="overflow-x-auto px-5 py-4">
+            <.plan_drop_zone
+              :if={@empty and @editing == "prognosis"}
+              id={"tops-plan-drop-#{@id}"}
+              upload={@uploads.plan}
+              importing={@plan_importing}
+              hint="COMPASS PDF plan with a Formations table — fills the Prognosis column below. Or add formations by hand. Nothing is saved until you save."
+            />
             <table class="w-full border-collapse text-sm">
               <thead>
                 <tr class="border-b border-border-light">

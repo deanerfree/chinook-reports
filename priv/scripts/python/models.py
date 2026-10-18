@@ -449,3 +449,104 @@ class ExtractionResult(BaseModel):
     daily: list[DailyEntry] = []
     mud_log: list[MudEntry] = []
     bits: list[BitRecord] = []
+
+# ── Directional plan models (COMPASS planning report PDF) ───────────────────
+
+class PlanMagnetics(BaseModel):
+    model: str | None = None
+    sample_date: str | None = None
+    declination_deg: float | None = None
+    dip_angle_deg: float | None = None
+    field_strength_nt: float | None = None
+
+
+class PlanHeader(BaseModel):
+    provider: str | None = None
+    report_title: str | None = None
+    report_date: str | None = None
+    compass_version: str | None = None
+    company: str | None = None
+    project: str | None = None
+    site: str | None = None
+    well_name: str | None = None
+    wellbore: str | None = None
+    unique_well_id: str | None = None
+    design: str | None = None
+    kb_elevation: float | None = None
+    ground_elevation: float | None = None
+    north_reference: str | None = None
+    calculation_method: str | None = None
+    geo_datum: str | None = None
+    map_zone: str | None = None
+    northing: float | None = None
+    easting: float | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    vertical_section_azimuth_deg: float | None = None
+    magnetics: PlanMagnetics = PlanMagnetics()
+
+
+class PlanSection(BaseModel):
+    md: float | None = None
+    inclination_deg: float | None = None
+    azimuth_deg: float | None = None
+    tvd: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    dogleg_severity: float | None = None
+    build_rate: float | None = None
+    turn_rate: float | None = None
+    tool_face_deg: float | None = None
+    target: str | None = None
+
+
+class PlanStation(BaseModel):
+    md: float | None = None
+    inclination_deg: float | None = None
+    azimuth_deg: float | None = None
+    tvd: float | None = None
+    subsea: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    vertical_section: float | None = None
+    dogleg_severity: float | None = None
+    build_rate: float | None = None
+    turn_rate: float | None = None
+    labels: list[str] = []
+
+
+class PlanAnnotation(BaseModel):
+    md: float | None = None
+    tvd: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    comment: str | None = None
+
+
+class PlanTarget(BaseModel):
+    name: str
+    tvd: float | None = None
+    north_south: float | None = None
+    east_west: float | None = None
+    northing: float | None = None
+    easting: float | None = None
+    notes: list[str] = []
+
+
+class PlanCasingPoint(BaseModel):
+    name: str
+    md: float | None = None
+    tvd: float | None = None
+    casing_diameter_mm: float | None = None
+    hole_diameter_mm: float | None = None
+
+
+class DirectionalPlan(BaseModel):
+    source_format: str | None = None
+    header: PlanHeader = PlanHeader()
+    plan_sections: list[PlanSection] = []
+    survey: list[PlanStation] = []
+    tops: Tops = Tops()
+    annotations: list[PlanAnnotation] = []
+    targets: list[PlanTarget] = []
+    casing_points: list[PlanCasingPoint] = []
